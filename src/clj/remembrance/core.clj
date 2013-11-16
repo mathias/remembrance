@@ -1,10 +1,13 @@
 (ns remembrance.core
   (:use compojure.core
         remembrance.views
+        remembrance.config
         [hiccup.middleware :only (wrap-base-url)])
   (:require [compojure.route :as route]
             [compojure.handler :as handler]
             [compojure.response :as response]))
+
+(def config (remembrance.config/load!))
 
 ;; defroutes macro defines a function that chains individual route
 ;; functions together. The request map is passed to each function in
