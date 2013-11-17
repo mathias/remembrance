@@ -2,7 +2,9 @@
   (:use compojure.core
         remembrance.views
         remembrance.config
-        [hiccup.middleware :only (wrap-base-url)])
+        [hiccup.middleware :only (wrap-base-url)]
+        ring.middleware.json
+        ring.util.response)
   (:require [compojure.route :as route]
             [compojure.handler :as handler]
             [compojure.response :as response]))
@@ -15,6 +17,10 @@
 (defroutes app-routes
   (GET "/" [] (index-page))
 
+
+  ;; API resources
+  (GET "/documents" [] {:body {:hi "bar" :bar "qux"}})
+
   ; to serve static pages saved in resources/public directory
   (route/resources "/")
 
@@ -24,4 +30,8 @@
 ;; site function creates a handler suitable for a standard website,
 ;; adding a bunch of standard ring middleware to app-route:
 (def handler
-  (handler/site app-routes))
+  (->
+   (handler/site app-routes)
+   (ring.middleware.json/wrap-json-body)
+   (ring.middleware.json/wrap-json-params)
+   (ring.middleware.json/wrap-json-response)))

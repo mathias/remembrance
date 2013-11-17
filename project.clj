@@ -8,7 +8,9 @@
                  [org.clojure/clojurescript "0.0-2014"]
                  [compojure "1.1.6"]
                  [hiccup "1.0.4"]
-                 [prismatic/dommy "0.1.2"]]
+                 [prismatic/dommy "0.1.2"]
+                 [revise "0.0.5"]
+                 [ring/ring-json "0.2.0"]]
 
   ;; clojure source code pathname
   :source-paths ["src/clj"]
