@@ -1,5 +1,6 @@
 (ns remembrance.core
   (:use compojure.core
+        remembrance.api
         remembrance.views
         remembrance.config
         [hiccup.middleware :only (wrap-base-url)]
@@ -19,7 +20,7 @@
 
 
   ;; API resources
-  (GET "/documents" [] {:body {:hi "bar" :bar "qux"}})
+  (GET "/documents" [] {:body (get-all-documents)})
 
   ; to serve static pages saved in resources/public directory
   (route/resources "/")
