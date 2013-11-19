@@ -12,21 +12,22 @@
 
 (def config (remembrance.config/load!))
 
+(defn json-wrap [c] {:body c})
+
 ;; defroutes macro defines a function that chains individual route
 ;; functions together. The request map is passed to each function in
 ;; turn, until a non-nil response is returned.
 (defroutes app-routes
   (GET "/" [] (index-page))
 
-
   ;; API resources
-  (GET "/documents" [] {:body (get-all-documents)})
+  (GET "/documents" [] (json-wrap (all-documents)))
 
   ; to serve static pages saved in resources/public directory
   (route/resources "/")
 
   ; if page is not found
-  (route/not-found "Page not found"))
+  (route/not-found "Page not found."))
 
 ;; site function creates a handler suitable for a standard website,
 ;; adding a bunch of standard ring middleware to app-route:
