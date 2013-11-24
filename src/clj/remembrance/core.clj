@@ -4,11 +4,9 @@
             [compojure.route :as route]
             [ring.middleware.json :as json]
             [remembrance.api :refer :all]
-            [remembrance.config :as config]
+            [remembrance.db :as db]
             [remembrance.views :refer [index-page]]
             [remembrance.config :refer :all]))
-
-(def env (config/load!))
 
 (defmacro wrap [resp] `{:body ~resp})
 
@@ -27,7 +25,9 @@
   ; if page is not found
   (route/not-found "Page not found."))
 
-(defn init [])
+(defn remembrance-init []
+  (db/prepare-db!)
+  (db/prepare-tables!))
 
 (def remembrance-handler
   (->

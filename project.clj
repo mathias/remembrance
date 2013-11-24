@@ -24,7 +24,9 @@
 
   ;; ring tasks configuration
   :ring {:handler remembrance.core/remembrance-handler
-         :init remembrance.core/remembrance-init}
+         :init remembrance.core/remembrance-init
+         :auto-refresh true
+         :nrepl {:start? true}}
 
   ;; cljsbuild tasks configuration
   :cljsbuild {:builds

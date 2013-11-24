@@ -1,1 +1,5 @@
-{}
+{
+  :rethinkdb-host "localhost"
+  :rethinkdb-port 28015
+  :rethinkdb-db "remembrance"
+}

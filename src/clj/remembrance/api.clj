@@ -1,3 +1,5 @@
-(ns remembrance.api)
+(ns remembrance.api
+  (require [remembrance.db :as db]))
 
-(defn all-documents [] {:foo "moo"})
+(defn all-documents []
+  (db/select-all "documents"))
