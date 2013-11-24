@@ -1,27 +1,24 @@
 (ns remembrance.core
-  (:use compojure.core
-        remembrance.api
-        remembrance.views
-        remembrance.config
-        [hiccup.middleware :only (wrap-base-url)]
-        ring.middleware.json
-        ring.util.response)
-  (:require [compojure.route :as route]
+  (:require [compojure.core :refer [GET context defroutes]]
             [compojure.handler :as handler]
-            [compojure.response :as response]))
+            [compojure.route :as route]
+            [ring.middleware.json :as json]
+            [remembrance.api :refer :all]
+            [remembrance.views :refer [index-page]]
+            [remembrance.config :refer :all]))
 
 (def config (remembrance.config/load!))
 
 (defmacro wrap [resp] `{:body ~resp})
 
-;; defroutes macro defines a function that chains individual route
-;; functions together. The request map is passed to each function in
-;; turn, until a non-nil response is returned.
+(defroutes api-routes
+  (GET "/documents" [] (wrap (all-documents))))
+
 (defroutes app-routes
   (GET "/" [] (index-page))
 
   ;; API resources
-  (GET "/documents" [] (wrap (all-documents)))
+  (context "/api" [] api-routes)
 
   ; to serve static pages saved in resources/public directory
   (route/resources "/")
@@ -29,11 +26,9 @@
   ; if page is not found
   (route/not-found "Page not found."))
 
-;; site function creates a handler suitable for a standard website,
-;; adding a bunch of standard ring middleware to app-route:
-(def handler
+(def remembrance-handler
   (->
-   (handler/site app-routes)
-   (ring.middleware.json/wrap-json-body)
-   (ring.middleware.json/wrap-json-params)
-   (ring.middleware.json/wrap-json-response)))
+   (compojure.handler/site app-routes)
+   (json/wrap-json-body)
+   (json/wrap-json-params)
+   (json/wrap-json-response)))

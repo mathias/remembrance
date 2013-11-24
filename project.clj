@@ -23,7 +23,7 @@
             [lein-ring "0.8.7"]]
 
   ;; ring tasks configuration
-  :ring {:handler remembrance.core/handler}
+  :ring {:handler remembrance.core/remembrance-handler}
 
   ;; cljsbuild tasks configuration
   :cljsbuild {:builds
