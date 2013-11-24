@@ -12,7 +12,7 @@
 
 (def config (remembrance.config/load!))
 
-(defn json-wrap [c] {:body c})
+(defmacro wrap [resp] `{:body ~resp})
 
 ;; defroutes macro defines a function that chains individual route
 ;; functions together. The request map is passed to each function in
@@ -21,7 +21,7 @@
   (GET "/" [] (index-page))
 
   ;; API resources
-  (GET "/documents" [] (json-wrap (all-documents)))
+  (GET "/documents" [] (wrap (all-documents)))
 
   ; to serve static pages saved in resources/public directory
   (route/resources "/")
