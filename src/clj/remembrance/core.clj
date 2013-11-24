@@ -4,10 +4,11 @@
             [compojure.route :as route]
             [ring.middleware.json :as json]
             [remembrance.api :refer :all]
+            [remembrance.config :as config]
             [remembrance.views :refer [index-page]]
             [remembrance.config :refer :all]))
 
-(def config (remembrance.config/load!))
+(def env (config/load!))
 
 (defmacro wrap [resp] `{:body ~resp})
 
