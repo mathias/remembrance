@@ -27,6 +27,8 @@
   ; if page is not found
   (route/not-found "Page not found."))
 
+(defn init [])
+
 (def remembrance-handler
   (->
    (compojure.handler/site app-routes)
