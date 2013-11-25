@@ -27,7 +27,8 @@
         db-list ((select (r/db-list)) :response)]
     (if-not (contains? (set db-list) db-name)
       (select
-       (r/db-create (env :rethinkdb-db))))))
+       (r/db-create (env :rethinkdb-db))))
+    db-list))
 
 (defn prepare-tables! []
   (let [db-name (env :rethinkdb-db)
@@ -35,4 +36,5 @@
     (if-not (contains? (set table-list) "documents")
       (select
        (r/db db-name)
-       (r/table-create-db "documents")))))
+       (r/table-create-db "documents")))
+    table-list))

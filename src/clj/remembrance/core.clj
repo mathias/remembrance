@@ -1,12 +1,13 @@
 (ns remembrance.core
-  (:require [compojure.core :refer [GET context defroutes]]
+  (:require [remembrance.api :refer :all]
+            [remembrance.config :refer :all]
+            [remembrance.db :as db]
+            [remembrance.views :refer [index-page]]
+            [compojure.core :refer [GET context defroutes]]
             [compojure.handler :as handler]
             [compojure.route :as route]
             [ring.middleware.json :as json]
-            [remembrance.api :refer :all]
-            [remembrance.db :as db]
-            [remembrance.views :refer [index-page]]
-            [remembrance.config :refer :all]))
+            [taoensso.timbre :as timbre :refer [info]]))
 
 (defmacro wrap [resp] `{:body ~resp})
 
@@ -26,8 +27,8 @@
   (route/not-found "Page not found."))
 
 (defn remembrance-init []
-  (db/prepare-db!)
-  (db/prepare-tables!))
+  (info "DB:" (db/prepare-db!))
+  (info "Tables prep:" (db/prepare-tables!)))
 
 (def remembrance-handler
   (->
