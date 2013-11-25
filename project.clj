@@ -4,10 +4,10 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/clojurescript "0.0-2080"]
-                 [compojure "1.1.6"]
+  :dependencies [[compojure "1.1.6"]
                  [hiccup "1.0.4"]
+                 [org.clojure/clojure "1.5.1"]
+                 [org.clojure/clojurescript "0.0-2080"]
                  [prismatic/dommy "0.1.2"]
                  [revise "0.0.5"]
                  [ring/ring-json "0.2.0"]]
