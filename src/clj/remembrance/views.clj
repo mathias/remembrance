@@ -7,4 +7,5 @@
          [:title "Hello world"]
          (include-css "css/style.css")]
         [:body
-         [:h1 "Hello world"]]))
+         [:h1 "Hello world"]
+         [:p "What am I?"]]))

@@ -1,18 +1,22 @@
 (ns remembrance.core
-  (:require [remembrance.api :refer :all]
-            [remembrance.config :refer :all]
+  (:require [remembrance.models.document :refer :all]
             [remembrance.db :as db]
             [remembrance.views :refer [index-page]]
-            [compojure.core :refer [GET context defroutes]]
+            [compojure.core :refer :all]
             [compojure.handler :as handler]
             [compojure.route :as route]
+            [ring.middleware.params :refer [wrap-params]]
+            [ring.util.response :refer [response content-type]]
             [ring.middleware.json :as json]
-            [taoensso.timbre :as timbre :refer [info]]))
+            [taoensso.timbre :refer [info]]))
 
 (defmacro wrap [resp] `{:body ~resp})
 
 (defroutes api-routes
-  (GET "/documents" [] (wrap (all-documents))))
+  (context "/documents" []
+           (defroutes documents-routes
+             (GET "/" [] (wrap (all-documents)))
+             (POST "/" {:keys [params]} (wrap (create-document params))))))
 
 (defroutes app-routes
   (GET "/" [] (index-page))
@@ -33,6 +37,7 @@
 (def remembrance-handler
   (->
    (compojure.handler/site app-routes)
+   (wrap-params)
    (json/wrap-json-body)
    (json/wrap-json-params)
    (json/wrap-json-response)))

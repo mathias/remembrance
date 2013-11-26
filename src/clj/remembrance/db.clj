@@ -25,16 +25,21 @@
 (defn prepare-db! []
   (let [db-name (env :rethinkdb-db)
         db-list ((select (r/db-list)) :response)]
-    (if-not (contains? (set db-list) db-name)
+    (if-not (some (set db-name) db-list)
       (select
-       (r/db-create (env :rethinkdb-db))))
-    db-list))
+       (r/db-create (env :rethinkdb-db))))))
 
 (defn prepare-tables! []
   (let [db-name (env :rethinkdb-db)
         table-list ((select (r/db db-name) (r/table-list-db)) :response)]
-    (if-not (contains? (set table-list) "documents")
-      (select
-       (r/db db-name)
-       (r/table-create-db "documents")))
-    table-list))
+    (doseq [table-name (env :rethinkdb-tables)]
+      (if-not (some (set table-name) table-list)
+        (select
+         (r/db db-name)
+         (r/table-create-db "documents"))))))
+
+(defn insert [table-name data]
+  (select
+   (r/db (env :rethinkdb-db))
+   (r/table-db table-name)
+   (r/insert data)))
