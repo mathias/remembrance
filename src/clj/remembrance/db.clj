@@ -5,7 +5,7 @@
            [bitemyapp.revise.core :refer [run]]))
 
 (def env (config/load!))
-
+(def db-name (env :rethinkdb-db))
 (defn connect-via-uri! []
   (connect {:host (env :rethinkdb-host)
             :port (env :rethinkdb-port)}))
@@ -19,12 +19,11 @@
 
 (defn select-all [table-name]
   ((select
-    (r/db (env :rethinkdb-db))
+    (r/db db-name)
     (r/table-db table-name)) :response))
 
 (defn prepare-db! []
-  (let [db-name (env :rethinkdb-db)
-        db-list (first ((select (r/db-list)) :response))]
+  (let [db-list (first ((select (r/db-list)) :response))]
     (if-not (some #{db-name} db-list)
       (select
        (r/db-create (env :rethinkdb-db))))
@@ -32,8 +31,7 @@
      (r/db-list))))
 
 (defn prepare-tables! []
-  (let [db-name (env :rethinkdb-db)
-        table-list (first ((select (r/db db-name) (r/table-list-db)) :response))]
+  (let [table-list (first ((select (r/db db-name) (r/table-list-db)) :response))]
     (doseq [table-name (env :rethinkdb-tables)]
       (if-not (some #{table-name} table-list)
         (select
@@ -45,6 +43,12 @@
 
 (defn insert [table-name data]
   (select
-   (r/db (env :rethinkdb-db))
+   (r/db db-name)
    (r/table-db table-name)
    (r/insert data)))
+
+(defn select-one [table-name id]
+  (select
+   (r/db db-name)
+   (r/table-db table-name)
+   (r/get id)))

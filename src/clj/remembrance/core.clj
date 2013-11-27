@@ -16,7 +16,11 @@
   (context "/documents" []
            (defroutes documents-routes
              (GET "/" [] (wrap (all-documents)))
-             (POST "/" {:keys [params]} (wrap (create-document params))))))
+             (POST "/" {:keys [params]} (wrap (create-document params)))
+             (GET "/:id" [id] (wrap (show-document id)))))
+  (context "/notes" []
+           (defroutes notes-routes
+             (GET "/" [] (wrap "foo")))))
 
 (defroutes app-routes
   (GET "/" [] (index-page))

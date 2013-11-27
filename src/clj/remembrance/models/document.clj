@@ -41,4 +41,7 @@
     (info resp)
     (if (every? zero? (pluck resp :errors))
       (str "OK. " (first (pluck resp :generated_keys)))
-      (str "Unprocessable entity."))))
+      (fail "Unprocessable entity."))))
+
+(defn show-document [id]
+  (first ((db/select-one table-name id) :response)))
