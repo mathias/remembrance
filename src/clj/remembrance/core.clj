@@ -32,7 +32,7 @@
 
 (defn remembrance-init []
   (info "DB:" (db/prepare-db!))
-  (info "Tables prep:" (db/prepare-tables!)))
+  (info "Tables:" (db/prepare-tables!)))
 
 (def remembrance-handler
   (->
