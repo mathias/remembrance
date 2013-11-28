@@ -10,17 +10,29 @@
             [ring.middleware.json :as json]
             [taoensso.timbre :refer [info]]))
 
-(defmacro wrap [resp] `{:body ~resp})
+(defn respond-with
+  ([body] {:body body})
+  ([body status] {:status status :body body})
+  ([body status headers] {:status status :headers headers :body body}))
+
+(defn respond-with-error []
+  (respond-with "Unproccessable Entity." 422))
 
 (defroutes api-routes
   (context "/documents" []
            (defroutes documents-routes
-             (GET "/" [] (wrap (all-documents)))
-             (POST "/" {:keys [params]} (wrap (create-document params)))
-             (GET "/:id" [id] (wrap (show-document id)))))
+             (GET "/" [] (respond-with (all-documents)))
+             (POST "/" {:keys [params]} (let [doc (create-document params)]
+                                          (if-not (false? doc)
+                                            (respond-with doc)
+                                            (respond-with-error))))
+             (GET "/:id" [id] (let [doc (show-document id)]
+                                (if-not (false? doc)
+                                  (respond-with doc)
+                                  (respond-with-error))))))
   (context "/notes" []
            (defroutes notes-routes
-             (GET "/" [] (wrap "foo")))))
+             (GET "/" [] (respond-with "foo")))))
 
 (defroutes app-routes
   (GET "/" [] (index-page))

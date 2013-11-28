@@ -28,20 +28,20 @@
 (defn every-valid-attribute? [model-attributes attributes]
   (every? #(some #{%} model-attributes) attributes))
 
-(defn fail [error]
-  (info error)
-  error)
-
 (defn pluck [s key]
   (map (fn [m] (get m key)) s))
 
 (defn create-document [attrs]
-  (let [query-response (db/insert table-name attrs)
+  (let [attrs-with-defaults (merge field-defaults attrs)
+        query-response (db/insert table-name attrs-with-defaults)
         resp (query-response :response)]
     (info resp)
     (if (every? zero? (pluck resp :errors))
       (str "OK. " (first (pluck resp :generated_keys)))
-      (fail "Unprocessable entity."))))
+      false)))
 
 (defn show-document [id]
-  (first ((db/select-one table-name id) :response)))
+  (let [response (first ((db/select-one table-name id) :response))]
+    (if-not (nil? response)
+      response
+      false)))
