@@ -35,9 +35,8 @@
   (let [attrs-with-defaults (merge field-defaults attrs)
         query-response (db/insert table-name attrs-with-defaults)
         resp (query-response :response)]
-    (info resp)
     (if (every? zero? (pluck resp :errors))
-      (first (pluck resp :generated_keys))
+      (first ((first resp) :generated_keys))
       false)))
 
 (defn show-document [id]

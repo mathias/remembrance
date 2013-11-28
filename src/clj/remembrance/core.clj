@@ -28,7 +28,7 @@
            (defroutes documents-routes
              (GET "/" [] (respond-with (all-documents)))
              (POST "/" {:keys [params]} (let [doc (create-document params)]
-                                          (if-not (false? doc)
+                                          (if-not (some false? doc)
                                             (redirect (show-document-url doc))
                                             (respond-with-error))))
              (GET "/:id" [id] (let [doc (show-document id)]
