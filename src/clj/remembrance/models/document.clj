@@ -37,7 +37,7 @@
         resp (query-response :response)]
     (info resp)
     (if (every? zero? (pluck resp :errors))
-      (str "OK. " (first (pluck resp :generated_keys)))
+      (first (pluck resp :generated_keys))
       false)))
 
 (defn show-document [id]

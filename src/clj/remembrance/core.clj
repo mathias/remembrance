@@ -6,9 +6,11 @@
             [compojure.handler :as handler]
             [compojure.route :as route]
             [ring.middleware.params :refer [wrap-params]]
-            [ring.util.response :refer [response content-type]]
+            [ring.util.response :refer [response redirect content-type]]
             [ring.middleware.json :as json]
             [taoensso.timbre :refer [info]]))
+
+(def env (remembrance.config/load!))
 
 (defn respond-with
   ([body] {:body body})
@@ -16,7 +18,10 @@
   ([body status headers] {:status status :headers headers :body body}))
 
 (defn respond-with-error []
-  (respond-with "Unproccessable Entity." 422))
+  (respond-with {:ok false :errors "Unproccessable Entity."} 422))
+
+(defn show-document-url [doc-id]
+  (str (env :hostname) "/api/documents/" doc-id))
 
 (defroutes api-routes
   (context "/documents" []
@@ -24,7 +29,7 @@
              (GET "/" [] (respond-with (all-documents)))
              (POST "/" {:keys [params]} (let [doc (create-document params)]
                                           (if-not (false? doc)
-                                            (respond-with doc)
+                                            (redirect (show-document-url doc))
                                             (respond-with-error))))
              (GET "/:id" [id] (let [doc (show-document id)]
                                 (if-not (false? doc)
