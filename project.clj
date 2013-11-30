@@ -6,22 +6,28 @@
 
   :dependencies [[com.taoensso/timbre "2.7.1"]
                  [compojure "1.1.6"]
+                 [com.datomic/datomic-pro "0.9.4324"]
                  [hiccup "1.0.4"]
                  [org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2080"]
                  [prismatic/dommy "0.1.2"]
-                 [revise "0.0.5"]
                  [ring/ring-json "0.2.0"]]
 
   ;; clojure source code pathname
   :source-paths ["src/clj"]
-
 
   :plugins [;; cljsbuild plugin
             [lein-cljsbuild "0.3.3"]
 
             ;; ring plugin
             [lein-ring "0.8.7"]]
+
+  ;; datomic configuration
+  :datomic {:schemas ["resources/schema" ["remem-schema.edn"
+                                          "initial-data.edn"]]}
+  :profiles {:dev
+             {:datomic {:config "resources/dev-transactor-template.properties"
+                        :db-uri "datomic:dev://localhost:4334/remembrance"}}}
 
   ;; ring tasks configuration
   :ring {:handler remembrance.core/remembrance-handler

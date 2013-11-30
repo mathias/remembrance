@@ -20,27 +20,3 @@
 
 (def field-defaults {:read false
                      :ingest_state "new"})
-
-
-(defn all-documents []
-  (db/select-all "documents"))
-
-(defn every-valid-attribute? [model-attributes attributes]
-  (every? #(some #{%} model-attributes) attributes))
-
-(defn pluck [s key]
-  (map (fn [m] (get m key)) s))
-
-(defn create-document [attrs]
-  (let [attrs-with-defaults (merge field-defaults attrs)
-        query-response (db/insert table-name attrs-with-defaults)
-        resp (query-response :response)]
-    (if (every? zero? (pluck resp :errors))
-      (first ((first resp) :generated_keys))
-      false)))
-
-(defn show-document [id]
-  (let [response (first ((db/select-one table-name id) :response))]
-    (if-not (nil? response)
-      response
-      false)))

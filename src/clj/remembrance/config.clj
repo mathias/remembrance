@@ -1,7 +1,7 @@
 (ns remembrance.config
   (:require clojure.edn))
 
-(def config-file-path "config.edn")
+(def config-file-path "resources/config.edn")
 
 (defn load! []
   (clojure.edn/read-string

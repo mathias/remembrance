@@ -8,3 +8,6 @@ pom.xml.asc
 /.lein-*
 /.nrepl-port
 config.edn
+
+# datomic
+resources/dev-transactor-template.properties
