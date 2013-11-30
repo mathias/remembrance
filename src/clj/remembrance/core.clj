@@ -52,7 +52,8 @@
   (route/not-found "Page not found."))
 
 (defn remembrance-init []
-  (info "DB:" (db/info)))
+  (info "DB:" (db/prepare!)))
+
 
 (def remembrance-handler
   (->

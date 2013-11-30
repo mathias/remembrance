@@ -12,4 +12,6 @@
   nil)
 
 (defn all-articles []
-  (d/q '[:find ?a :where [?a :article/title]] (d/db db/connection)))
+  (let [db (d/db db/connection)
+        result-ids (d/q '[:find ?a :where [?a :article/original_url]] db)]
+    (map #(d/entity db (first %)) result-ids)))

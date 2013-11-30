@@ -18,8 +18,9 @@
 
  {:db/id #db/id[:db.part/db]
   :db/ident :article/original_url
-  :db/valueType :db.type/uri
+  :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one
+  :db/unique :db.unique/identity
   :db/index true
   :db.install/_attribute :db.part/db}
 

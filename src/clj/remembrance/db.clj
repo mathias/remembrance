@@ -12,7 +12,8 @@
   connection)
 
 (defn prepare! []
-
-  (def schema-tx (read-string (slurp "resources/schema/remem-schema.edn")))
-
-  @(d/transact connection schema-tx))
+  (let [schema-tx (read-string (slurp "resources/schema/remem-schema.edn"))
+        data-tx (read-string (slurp "resources/schema/initial-data.edn"))]
+    ;; Since we're in dev, load the schema and seed data every time:
+    @(d/transact connection schema-tx)
+    @(d/transact connection data-tx)))
