@@ -1,5 +1,5 @@
 (ns remembrance.core
-  (:require [remembrance.models.document :refer :all]
+  (:require [remembrance.models.article :refer :all]
             [remembrance.db :as db]
             [remembrance.views :refer [index-page]]
             [compojure.core :refer :all]
@@ -20,20 +20,20 @@
 (defn respond-with-error []
   (respond-with {:ok false :errors "Unproccessable Entity."} 422))
 
-(defn show-document-url [doc-id]
-  (str (env :hostname) "/api/documents/" doc-id))
+(defn show-article-url [doc-id]
+  (str (env :hostname) "/api/articles/" doc-id))
 
 (defroutes api-routes
-  (context "/documents" []
-           (defroutes documents-routes
-             (GET "/" [] (respond-with (all-documents)))
-             (POST "/" {:keys [params]} (let [doc (create-document params)]
+  (context "/articles" []
+           (defroutes articles-routes
+             (GET "/" [] (respond-with (all-articles)))
+             (POST "/" {:keys [params]} (let [doc (create-article params)]
                                           (if-not (some false? doc)
-                                            (redirect (show-document-url doc))
+                                            (redirect (show-article-url doc))
                                             (respond-with-error))))
-             (GET "/:id" [id] (let [doc (show-document id)]
-                                (if-not (false? doc)
-                                  (respond-with doc)
+             (GET "/:id" [id] (let [article (show-article id)]
+                                (if-not (false? article)
+                                  (respond-with article)
                                   (respond-with-error))))))
   (context "/notes" []
            (defroutes notes-routes
@@ -52,8 +52,7 @@
   (route/not-found "Page not found."))
 
 (defn remembrance-init []
-  (info "DB:" (db/prepare-db!))
-  (info "Tables:" (db/prepare-tables!)))
+  (info "DB:" (db/info)))
 
 (def remembrance-handler
   (->
