@@ -30,11 +30,10 @@
              (GET "/" [] (respond-with (all-articles)))
              (POST "/" {:keys [params]} (let [article (create-article params)
                                               guid (:article/guid article)]
-                                          (info "GUID returned from create" guid)
                                           (enqueue-article-ingest guid)
                                           (redirect (show-article-url guid))))
-             (GET "/:id" [id] (let [article (show-article id)]
-                                (if-not (false? article)
+             (GET "/:guid" [guid] (let [article (show-article guid)]
+                                (if-not (nil? article)
                                   (respond-with article)
                                   (respond-with-error))))))
   (context "/notes" []
@@ -56,7 +55,6 @@
 (defn remembrance-init []
   (info "DB:" (db/prepare!))
   (info "Redis PING:" (ping-redis)))
-
 
 (def remembrance-handler
   (->
