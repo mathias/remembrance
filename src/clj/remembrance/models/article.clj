@@ -4,6 +4,14 @@
            [datomic.api :as d]
            [taoensso.timbre :refer [info]]))
 
+(defn entity [eid]
+  (d/entity (db/db) eid))
+
+(defn article-guid [article]
+  (info article)
+  (info (get article :article/guid))
+  (get article :article/guid))
+
 (defn find-article-by-guid [guid]
   (d/q '[:find ?eid
          :in $ ?guid
@@ -17,27 +25,30 @@
     (d/entity (db/db) eid)))
 
 (defn find-article-by-original-url [original-url]
-  (d/q '[:find ?e :
-         in $ ?original_url
+  (d/q '[:find ?e
+         :in $ ?original_url
          :where [?e :article/original_url ?original_url]]
        (db/db)
        original-url))
 
+(defn create-article-tx [guid original-url]
+  (db/t [{:db/id (d/tempid "db.part/user")
+          :article/guid guid
+          :article/original_url original-url
+          :article/ingest_state "new"}]))
+
 (defn create-article [attrs]
-  ;; try to find an existing one first
+  ;; try to find an existing article first
   (let [original-url (attrs :original_url)
         existing (find-article-by-original-url original-url)]
     (if (empty? existing)
       (let [guid (str (d/squuid))]
         ;; create the new article:
-        @(db/t [{:db/id (d/tempid "db.part/user")
-                 :article/guid guid
-                 :article/original_url original-url
-                 :article/ingest_state "new"}])
+        (create-article-tx guid original-url)
         (enqueue-article-ingest guid)
-        ;; redirect to article
+        ;; return guid so that it can redirect to article
         guid)
-      ((first existing) :guid))))
+      (article-guid (first existing)))))
 
 (defn find-all-article-ids []
   (d/q '[:find ?a
@@ -46,5 +57,4 @@
 
 (defn all-articles []
   (let [result-ids (find-all-article-ids)]
-    (map (->> % first (d/entity (db/db)))
-         result-ids)))
+    (map (fn [result-id] (entity (first result-id))) result-ids)))
