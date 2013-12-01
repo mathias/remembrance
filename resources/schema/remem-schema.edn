@@ -2,7 +2,7 @@
  ;; article attributes
  {:db/id #db/id[:db.part/db]
   :db/ident :article/guid
-  :db/valueType :db.type/uuid
+  :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one
   :db/unique :db.unique/identity
   :db/index true
