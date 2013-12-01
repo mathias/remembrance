@@ -55,7 +55,12 @@
                  {:handler (fn [{:keys [message attempt lock-ms eoq-backoff-ms nthreads throttle-ms]}]
                              (info "Article Ingest Worker got work:" message)
                              ;; get the article entity
-                             (article-ingest message))}))
+                             (article-ingest message))
+                  ;; enable to log dry runs on each tick:
+                  ;; :monitor (fn [{:keys [mid-circle-size ndry-runs poll-reply]}] (info "dry runs:" ndry-runs))
+                  :throttle-ms 500
+                  :eoq-backoff-ms 100 ;;#(car-mq/exp-backoff (/ % 10))
+                  }))
 
 (defn enqueue-article-ingest [article-guid]
   (wcar* (car-mq/enqueue "article-ingest-queue" article-guid)))
