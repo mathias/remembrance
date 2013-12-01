@@ -1,8 +1,8 @@
 (ns remembrance.core
-  (:require [remembrance.models.article :refer :all]
+  (:require [remembrance.models.article :refer [all-articles create-article show-article]]
             [remembrance.db :as db]
             [remembrance.views :refer [index-page]]
-            [remembrance.workers :as workers]
+            [remembrance.workers :refer [ping-redis enqueue-article-ingest]]
             [compojure.core :refer :all]
             [compojure.handler :as handler]
             [compojure.route :as route]
@@ -21,17 +21,18 @@
 (defn respond-with-error []
   (respond-with {:ok false :errors "Unproccessable Entity."} 422))
 
-(defn show-article-url [doc-id]
-  (str (env :hostname) "/api/articles/" doc-id))
+(defn show-article-url [guid]
+  (str (env :hostname) "/api/articles/" guid))
 
 (defroutes api-routes
   (context "/articles" []
            (defroutes articles-routes
              (GET "/" [] (respond-with (all-articles)))
-             (POST "/" {:keys [params]} (let [doc (create-article params)]
-                                          (if-not (some false? doc)
-                                            (redirect (show-article-url doc))
-                                            (respond-with-error))))
+             (POST "/" {:keys [params]} (let [article (create-article params)
+                                              guid (:article/guid article)]
+                                          (info "GUID returned from create" guid)
+                                          (enqueue-article-ingest guid)
+                                          (redirect (show-article-url guid))))
              (GET "/:id" [id] (let [article (show-article id)]
                                 (if-not (false? article)
                                   (respond-with article)
@@ -54,7 +55,7 @@
 
 (defn remembrance-init []
   (info "DB:" (db/prepare!))
-  (info "Redis PING:" (workers/ping-redis)))
+  (info "Redis PING:" (ping-redis)))
 
 
 (def remembrance-handler

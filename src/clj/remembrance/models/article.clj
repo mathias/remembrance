@@ -1,6 +1,5 @@
 (ns remembrance.models.article
   (require [remembrance.db :as db]
-           [remembrance.workers :refer [enqueue-article-ingest]]
            [datomic.api :as d]
            [taoensso.timbre :refer [info]]))
 
@@ -8,8 +7,6 @@
   (d/entity (db/db) eid))
 
 (defn article-guid [article]
-  (info article)
-  (info (get article :article/guid))
   (get article :article/guid))
 
 (defn find-article-by-guid [guid]
@@ -18,6 +15,12 @@
          :where [?eid :article/guid ?guid]]
        (db/db)
        guid))
+
+(defn find-one-article-by-guid [guid]
+  (->> guid
+       (find-article-by-guid)
+       (ffirst)
+       (entity)))
 
 (defn show-article [guid]
   (let [results (find-article-by-guid guid)
@@ -45,10 +48,9 @@
       (let [guid (str (d/squuid))]
         ;; create the new article:
         (create-article-tx guid original-url)
-        (enqueue-article-ingest guid)
         ;; return guid so that it can redirect to article
-        guid)
-      (article-guid (first existing)))))
+        (find-one-article-by-guid guid))
+      (entity (ffirst existing)))))
 
 (defn find-all-article-ids []
   (d/q '[:find ?a
