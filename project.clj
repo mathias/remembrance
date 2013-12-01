@@ -4,13 +4,15 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :dependencies [[com.taoensso/carmine "2.4.0"]
+  :dependencies [[com.cemerick/url "0.1.0"]
+                 [com.datomic/datomic-pro "0.9.4324"]
+                 [com.taoensso/carmine "2.4.0"]
                  [com.taoensso/timbre "2.7.1"]
                  [compojure "1.1.6"]
-                 [com.datomic/datomic-pro "0.9.4324"]
                  [hiccup "1.0.4"]
                  [org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2080"]
+                 [org.clojure/data.json "0.2.3"]
                  [prismatic/dommy "0.1.2"]
                  [ring/ring-json "0.2.0"]]
 
