@@ -1,8 +1,8 @@
 (ns remembrance.models.article
   (require [remembrance.db :as db]
+           [remembrance.workers :refer [enqueue-article-ingest]]
            [datomic.api :as d]
            [taoensso.timbre :refer [info]]))
-
 
 (defn show-article [guid]
   (let [results (d/q '[:find ?eid :in $ ?guid :where [?eid :article/guid ?guid]] (db/db) guid)
@@ -11,7 +11,7 @@
 
 (defn create-article [attrs]
   ;; try to find an existing one first
-  (let [original-url {attrs :original_url}
+  (let [original-url (attrs :original_url)
         existing (d/q '[:find ?e :in $ ?original_url :where [?e :article/original_url ?original_url]] (db/db) original-url)]
     (if (empty? existing)
       (let [guid (str (d/squuid))]
@@ -19,7 +19,9 @@
         ;; create the new article:
         @(db/t [{:db/id (d/tempid "db.part/user")
                  :article/guid guid
-                 :article/original_url original-url}])
+                 :article/original_url original-url
+                 :article/ingest_state "new"}])
+        (enqueue-article-ingest guid)
         ;; redirect to article
         guid)
       ((first existing) :guid))))
