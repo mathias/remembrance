@@ -5,7 +5,9 @@
 
 
 (defn show-article [guid]
-  (d/entity (db/db) (ffirst (d/q '[:find ?eid :in $ ?guid :where [?eid :article/guid ?guid]] (db/db) guid))))
+  (let [results (d/q '[:find ?eid :in $ ?guid :where [?eid :article/guid ?guid]] (db/db) guid)
+        eid (ffirst results)]
+    (d/entity (db/db) eid)))
 
 (defn create-article [attrs]
   ;; try to find an existing one first
