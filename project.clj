@@ -4,7 +4,8 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :dependencies [[com.taoensso/timbre "2.7.1"]
+  :dependencies [[com.taoensso/carmine "2.4.0"]
+                 [com.taoensso/timbre "2.7.1"]
                  [compojure "1.1.6"]
                  [com.datomic/datomic-pro "0.9.4324"]
                  [hiccup "1.0.4"]
