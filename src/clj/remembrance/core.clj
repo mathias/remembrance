@@ -1,5 +1,5 @@
 (ns remembrance.core
-  (:require [remembrance.models.article :refer [all-article-list-items create-article show-article]]
+  (:require [remembrance.models.article :refer [find-all-ingested-articles create-article show-article]]
             [remembrance.db :as db]
             [remembrance.views :refer [index-page]]
             [remembrance.workers :refer [ping-redis enqueue-article-ingest]]
@@ -27,7 +27,7 @@
 (defroutes api-routes
   (context "/articles" []
            (defroutes articles-routes
-             (GET "/" [] (respond-with (all-article-list-items)))
+             (GET "/" [] (respond-with (find-all-ingested-articles)))
              (POST "/" {:keys [params]} (let [article (create-article params)
                                               guid (:article/guid article)]
                                           (enqueue-article-ingest guid)

@@ -71,18 +71,18 @@
   (let [result-ids (find-all-article-ids)]
     (map article-entity result-ids)))
 
-(defn articles-without-errors [articles]
-  (remove (fn [article]
-            (= "errored" (:article/ingest_state article)))
-          articles))
+(defn zip-article-list-item-keys [article-row]
+  (zipmap [:guid :title :original_url] article-row))
 
-(defn all-article-list-items []
-  (let [articles (map article-entity (find-all-article-ids))]
-  (map (fn [article]
-           {:title (:article/title article)
-            :guid (:article/guid article)
-            :original_url (:article/original_url article)})
-       (articles-without-errors articles))))
+(defn find-all-ingested-articles []
+  (map zip-article-list-item-keys
+       (d/q '[:find ?guid ?title ?original_url
+              :where [?a :article/guid ?guid]
+                     [?a :article/title ?title]
+                     [?a :article/original_url ?original_url]
+                     [?a :article/ingest_state ?ingest_state]
+                     [(not= "errored" ?ingest_state)]]
+            (db/db))))
 
 (defn fetch-original-html [article]
   (let [original-url (:article/original_url article)
