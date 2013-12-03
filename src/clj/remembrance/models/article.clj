@@ -71,36 +71,46 @@
   (let [result-ids (find-all-article-ids)]
     (map article-entity result-ids)))
 
+(defn articles-without-errors [articles]
+  (remove (fn [article]
+            (= "errored" (:article/ingest_state article)))
+          articles))
+
 (defn all-article-list-items []
-  (map (fn [ent]
-         (let [article (article-entity ent))]
+  (let [articles (map article-entity (find-all-article-ids))]
+  (map (fn [article]
            {:title (:article/title article)
             :guid (:article/guid article)
-            :original_url (:article/original_url article)}))
-         (find-all-article-ids)))
+            :original_url (:article/original_url article)})
+       (articles-without-errors articles))))
 
 (defn fetch-original-html [article]
-  (let [original-url (:article/original_url article)]
-    (@(http/get original-url) :body)))
+  (let [original-url (:article/original_url article)
+        original-html (get @(http/get original-url) :body)]
+    (str original-html)))
 
 (defn wolfcastle-url [url-to-ingest]
   (str (assoc (url wolfcastle-uri) :query {:url (url-encode url-to-ingest)})))
 
 (defn get-readable-article [article]
   (json/read-str
-   (@(http/get (wolfcastle-url (:article/original_url article))) :body)
+   (get @(http/get (wolfcastle-url (:article/original_url article))) :body)
    :key-fn keyword))
 
 (defn update-original-html [article]
-  (db/t [{:db/id (:db/id article)
-          :article/original_html (fetch-original-html article)
-          :article/ingest_state "fetched"}]))
+  (let [article-html (or (fetch-original-html article)
+                         "Original page not found.")]
+  @(db/t [{:db/id (:db/id article)
+          :article/original_html article-html
+          :article/ingest_state "fetched"}])))
 
 (defn update-readable-html [article]
-  (let [readable-article (get-readable-article article)]
-    (db/t [{:db/id (:db/id article)
-            :article/title (readable-article :title)
-            :article/readable_body (readable-article :body)
+  (let [readable-article (get-readable-article article)
+        title (or (get readable-article :title) "")
+        body (or (get readable-article :html) "")]
+    @(db/t [{:db/id (:db/id article)
+            :article/title title
+            :article/readable_body body
             :article/ingest_state "ingested"}])))
 
 (defn article-ingest [guid]
