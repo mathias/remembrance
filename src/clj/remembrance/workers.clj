@@ -49,10 +49,9 @@
 
 (defn article-ingest [guid]
   (let [article (find-one-article-by-guid guid)]
-    (if (and (update-original-html article)
-             (update-readable-html article))
-      {:status :success}
-      {:status :error})))
+    (update-original-html article)
+    (update-readable-html article)
+    {:status :success}))
 
 (def article-ingest-worker
   (car-mq/worker {:pool {} :spec {:uri redis-uri}}
