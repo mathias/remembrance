@@ -1,7 +1,14 @@
 (ns remembrance.models.article
-  (require [remembrance.db :as db]
+  (require [remembrance.config :as config]
+           [remembrance.db :as db]
            [datomic.api :as d]
+           [cemerick.url :refer [url url-encode]]
+           [clojure.data.json :as json]
+           [org.httpkit.client :as http]
            [taoensso.timbre :refer [info]]))
+
+(def env (config/load!))
+(def wolfcastle-uri (env :wolfcastle-uri))
 
 (defn entity [eid]
   (d/entity (db/db) eid))
@@ -60,3 +67,33 @@
 (defn all-articles []
   (let [result-ids (find-all-article-ids)]
     (map (fn [result-id] (entity (first result-id))) result-ids)))
+
+(defn fetch-original-html [article]
+  (let [original-url (:article/original_url article)]
+    (@(http/get original-url) :body)))
+
+(defn wolfcastle-url [url-to-ingest]
+  (str (assoc (url wolfcastle-uri) :query {:url (url-encode url-to-ingest)})))
+
+(defn get-readable-article [article]
+  (json/read-str
+   (@(http/get (wolfcastle-url (:article/original_url article))) :body)
+   :key-fn keyword))
+
+(defn update-original-html [article]
+  (db/t [{:db/id (:db/id article)
+          :article/original_html (fetch-original-html article)
+          :article/ingest_state "fetched"}]))
+
+(defn update-readable-html [article]
+  (let [readable-article (get-readable-article article)]
+    (db/t [{:db/id (:db/id article)
+            :article/title (readable-article :title)
+            :article/readable_body (readable-article :body)
+            :article/ingest_state "ingested"}])))
+
+(defn article-ingest [guid]
+  (let [article (find-one-article-by-guid guid)]
+    (update-original-html article)
+    (update-readable-html article)
+    article))
