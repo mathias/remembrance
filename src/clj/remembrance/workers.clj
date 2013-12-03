@@ -7,6 +7,7 @@
             [cemerick.url :refer [url url-encode]]
             [datomic.api :as d]
             [clojure.data.json :as json]
+            [org.httpkit.client :as http]
             [taoensso.timbre :refer [info]]))
 
 (def env (config/load!))
@@ -22,33 +23,34 @@
 (defn ping-redis []
   (wcar* (car/ping)))
 
+(defn fetch-original-html [article]
+  (let [original-url (:article/original_url article)]
+    (@(http/get original-url) :body)))
+
 (defn wolfcastle-url [url-to-ingest]
   (str (assoc (url wolfcastle-uri) :query {:url (url-encode url-to-ingest)})))
 
-(defn update-original-html [article original-url]
-  (let [original-html (slurp original-url)]
-    (db/t [{:db/id (:db/id article)
-            :article/original_html original-html
-            :article/ingest_state "fetched"}])))
+(defn get-readable-article [article]
+  (json/read-str
+   (@(http/get (wolfcastle-url (:article/original_url article))) :body)
+   :key-fn keyword))
 
-(defn update-readable-html [article readable-title readable-body]
+(defn update-original-html [article]
   (db/t [{:db/id (:db/id article)
-          :article/readable_body readable-body
-          :article/title readable-title
-          :article/ingest_state "ingested"}]))
+          :article/original_html (fetch-original-html article)
+          :article/ingest_state "fetched"}]))
+
+(defn update-readable-html [article]
+  (let [readable-article (get-readable-article article)]
+    (db/t [{:db/id (:db/id article)
+            :article/title (readable-article :title)
+            :article/readable_body (readable-article :body)
+            :article/ingest_state "ingested"}])))
 
 (defn article-ingest [guid]
-  (let [article (find-one-article-by-guid guid)
-        original-url (:article/original_url article)
-        original-html-tx @(update-original-html article original-url)
-        wolfcastle-response (slurp (wolfcastle-url original-url))
-        parsed-wolfcastle-response (json/read-str wolfcastle-response :key-fn keyword)
-        readable-title (parsed-wolfcastle-response :title)
-        readable-body (parsed-wolfcastle-response :html)
-        readable-body-tx @(update-readable-html article readable-title readable-body)]
-    (info "Fetched readable:" readable-title)
-    (if (and original-html-tx
-             readable-body-tx)
+  (let [article (find-one-article-by-guid guid)]
+    (if (and (update-original-html article)
+             (update-readable-html article))
       {:status :success}
       {:status :error})))
 
