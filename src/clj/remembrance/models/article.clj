@@ -16,6 +16,9 @@
 (defn article-guid [article]
   (get article :article/guid))
 
+(defn article-entity [entity-vec]
+  (entity (first entity-vec)))
+
 (defn find-article-by-guid [guid]
   (d/q '[:find ?eid
          :in $ ?guid
@@ -66,7 +69,15 @@
 
 (defn all-articles []
   (let [result-ids (find-all-article-ids)]
-    (map (fn [result-id] (entity (first result-id))) result-ids)))
+    (map article-entity result-ids)))
+
+(defn all-article-list-items []
+  (map (fn [ent]
+         (let [article (article-entity ent))]
+           {:title (:article/title article)
+            :guid (:article/guid article)
+            :original_url (:article/original_url article)}))
+         (find-all-article-ids)))
 
 (defn fetch-original-html [article]
   (let [original-url (:article/original_url article)]
