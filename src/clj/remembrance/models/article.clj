@@ -118,3 +118,18 @@
     (update-original-html article)
     (update-readable-html article)
     article))
+
+(defn search-article-attributes [query-string]
+  (d/q '[:find ?e
+         :in $ % ?query
+         :where (article-search-rules ?query ?e)]
+       (db/db)
+       '[[(article-search-rules ?query ?e)
+         [(fulltext $ :article/readable_body ?query) [[?e]]]]
+        [(article-search-rules ?query ?e)
+         [(fulltext $ :article/title ?query) [[?e]]]]]
+       query-string))
+
+(defn search-articles [query-string]
+  (let [results (search-article-attributes query-string)]
+    (map article-entity results)))

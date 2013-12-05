@@ -1,5 +1,5 @@
 (ns remembrance.core
-  (:require [remembrance.models.article :refer [find-all-ingested-articles create-article show-article]]
+  (:require [remembrance.models.article :refer [find-all-ingested-articles create-article show-article search-articles]]
             [remembrance.db :as db]
             [remembrance.views :refer [index-page]]
             [remembrance.workers :refer [ping-redis enqueue-article-ingest]]
@@ -29,7 +29,7 @@
 
 (defn make-json-article [article]
   {
-   :href (show-article-url (:guid article))
+   :href (article-show-url (:guid article))
    :guid (:guid article)
    :title (:title article)
    :original_url (:original_url article)
@@ -50,6 +50,7 @@
                                               guid (:article/guid article)]
                                           (enqueue-article-ingest guid)
                                           (redirect (article-show-url guid))))
+             (GET "/search" {:keys [params]} (respond-with (search-articles (:q params))))
              (GET "/:guid" [guid] (let [article (show-article guid)]
                                 (if-not (nil? article)
                                   (respond-with article)
