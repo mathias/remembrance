@@ -21,17 +21,35 @@
 (defn respond-with-error []
   (respond-with {:ok false :errors "Unproccessable Entity."} 422))
 
-(defn show-article-url [guid]
+(defn article-index-url []
+  (str (env :hostname) "/api/articles"))
+
+(defn article-show-url [guid]
   (str (env :hostname) "/api/articles/" guid))
+
+(defn make-json-article [article]
+  {
+   :href (show-article-url (:guid article))
+   :guid (:guid article)
+   :title (:title article)
+   :original_url (:original_url article)
+  })
+
+(defn article-collection-json [collection]
+  { :collection {
+    :version (env :api-version)
+    :href (article-index-url)
+    :items (map make-json-article collection)
+  }})
 
 (defroutes api-routes
   (context "/articles" []
            (defroutes articles-routes
-             (GET "/" [] (respond-with (find-all-ingested-articles)))
+             (GET "/" [] (respond-with (article-collection-json (find-all-ingested-articles))))
              (POST "/" {:keys [params]} (let [article (create-article params)
                                               guid (:article/guid article)]
                                           (enqueue-article-ingest guid)
-                                          (redirect (show-article-url guid))))
+                                          (redirect (article-show-url guid))))
              (GET "/:guid" [guid] (let [article (show-article guid)]
                                 (if-not (nil? article)
                                   (respond-with article)
