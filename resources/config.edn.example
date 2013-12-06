@@ -1,4 +1,6 @@
 {
+  :api-version "1.0"
+  :hostname "localhost:3000"
   :db-uri "datomic:pro://localhost:4334/remembrance"
   :redis-uri "redis://127.0.0.1:6379"
   :wolfcastle-uri "http://memoriae.us:4000/scrape"
