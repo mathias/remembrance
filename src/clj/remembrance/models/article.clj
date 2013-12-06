@@ -33,9 +33,8 @@
        (entity)))
 
 (defn show-article [guid]
-  (let [results (find-article-by-guid guid)
-        eid (ffirst results)]
-    (d/entity (db/db) eid)))
+  (let [results (find-article-by-guid guid)]
+    (d/touch (entity (ffirst results)))))
 
 (defn find-article-by-original-url [original-url]
   (d/q '[:find ?e

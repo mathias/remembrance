@@ -1,5 +1,5 @@
 (ns remembrance.core
-  (:require [remembrance.models.article :refer [find-all-ingested-articles create-article show-article search-articles]]
+  (:require [remembrance.models.article :as article]
             [remembrance.db :as db]
             [remembrance.views :refer [index-page]]
             [remembrance.workers :refer [ping-redis enqueue-article-ingest]]
@@ -27,33 +27,43 @@
 (defn article-show-url [guid]
   (str (env :hostname) "/api/articles/" guid))
 
-(defn make-json-article [article]
+(defn article-wrap-json [article]
   {
    :href (article-show-url (:guid article))
    :guid (:guid article)
    :title (:title article)
    :original_url (:original_url article)
-  })
+   })
+
+(defn full-article-wrap-json [full-article]
+  {
+   :href (article-show-url (:article/guid full-article))
+   :guid (:article/guid full-article)
+   :title (:article/title full-article)
+   :original_url (:article/original_url full-article)
+   :readable_body (:article/readable_body full-article)
+   })
 
 (defn article-collection-json [collection]
   { :collection {
     :version (env :api-version)
     :href (article-index-url)
-    :items (map make-json-article collection)
+    :items (map article-wrap-json collection)
   }})
 
 (defroutes api-routes
   (context "/articles" []
            (defroutes articles-routes
-             (GET "/" [] (respond-with (article-collection-json (find-all-ingested-articles))))
-             (POST "/" {:keys [params]} (let [article (create-article params)
+             (GET "/" [] (respond-with (article-collection-json (article/find-all-ingested-articles))))
+             (POST "/" {:keys [params]} (let [article (article/create-article params)
                                               guid (:article/guid article)]
                                           (enqueue-article-ingest guid)
                                           (redirect (article-show-url guid))))
-             (GET "/search" {:keys [params]} (respond-with (search-articles (:q params))))
-             (GET "/:guid" [guid] (let [article (show-article guid)]
+             (GET "/search" {:keys [params]} (respond-with (article-collection-json (article/search-articles (:q params)))))
+             ;; (PUT "/:guid/mark_as_read" [guid] (respond-with (mark-article-as-read guid)))
+             (GET "/:guid" [guid] (let [article (article/show-article guid)]
                                 (if-not (nil? article)
-                                  (respond-with article)
+                                  (respond-with (full-article-wrap-json article))
                                   (respond-with-error))))))
   (context "/notes" []
            (defroutes notes-routes
