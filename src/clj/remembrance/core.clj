@@ -8,7 +8,7 @@
             [compojure.route :as route]
             [ring.middleware.params :refer [wrap-params]]
             [ring.util.response :refer [response redirect content-type]]
-            [ring.middleware.json :as json]
+            [cheshire.core :as json]
             [taoensso.timbre :refer [info]]))
 
 (def env (remembrance.config/load!))
@@ -20,6 +20,9 @@
 
 (defn respond-with-error []
   (respond-with {:ok false :errors "Unproccessable Entity."} 422))
+
+(defn respond-with-json [body]
+  (respond-with (json/generate-string body {:pretty true}) 200 {"Content-Type" "application/json"}))
 
 (defn article-index-url []
   (str (env :hostname) "/api/articles"))
@@ -54,20 +57,20 @@
 (defroutes api-routes
   (context "/articles" []
            (defroutes articles-routes
-             (GET "/" [] (respond-with (article-collection-json (article/find-all-ingested-articles))))
+             (GET "/" [] (respond-with-json (article-collection-json (article/find-all-ingested-articles))))
              (POST "/" {:keys [params]} (let [article (article/create-article params)
                                               guid (:article/guid article)]
                                           (enqueue-article-ingest guid)
                                           (redirect (article-show-url guid))))
-             (GET "/search" {:keys [params]} (respond-with (article-collection-json (article/search-articles (:q params)))))
+             (GET "/search" {:keys [params]} (respond-with-json (article-collection-json (article/search-articles (:q params)))))
              ;; (PUT "/:guid/mark_as_read" [guid] (respond-with (mark-article-as-read guid)))
              (GET "/:guid" [guid] (let [article (article/show-article guid)]
                                 (if-not (nil? article)
-                                  (respond-with (full-article-wrap-json article))
+                                  (respond-with-json (full-article-wrap-json article))
                                   (respond-with-error))))))
   (context "/notes" []
            (defroutes notes-routes
-             (GET "/" [] (respond-with "foo")))))
+             (GET "/" [] (respond-with-json "foo")))))
 
 (defroutes app-routes
   (GET "/" [] (index-page))
@@ -88,7 +91,4 @@
 (def remembrance-handler
   (->
    (compojure.handler/site app-routes)
-   (wrap-params)
-   (json/wrap-json-body)
-   (json/wrap-json-params)
-   (json/wrap-json-response)))
+   (wrap-params)))
