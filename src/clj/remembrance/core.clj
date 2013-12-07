@@ -54,14 +54,17 @@
     :items (map article-wrap-json collection)
   }})
 
+(defn create-and-enqueue-article [params]
+  (let [article (article/create-article params)
+        guid (:article/guid article)]
+    (enqueue-article-ingest guid)
+    (redirect (article-show-url guid))))
+
 (defroutes api-routes
   (context "/articles" []
            (defroutes articles-routes
              (GET "/" [] (respond-with-json (article-collection-json (article/find-all-ingested-articles))))
-             (POST "/" {:keys [params]} (let [article (article/create-article params)
-                                              guid (:article/guid article)]
-                                          (enqueue-article-ingest guid)
-                                          (redirect (article-show-url guid))))
+             (POST "/" {:keys [params]} (create-and-enqueue-article params))
              (GET "/search" {:keys [params]} (respond-with-json (article-collection-json (article/search-articles (:q params)))))
              ;; (PUT "/:guid/mark_as_read" [guid] (respond-with (mark-article-as-read guid)))
              (GET "/:guid" [guid] (let [article (article/show-article guid)]
