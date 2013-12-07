@@ -31,11 +31,12 @@
   (str (env :hostname) "/api/articles/" guid))
 
 (defn article-wrap-json [article]
+  (info article)
   {
-   :href (article-show-url (:guid article))
-   :guid (:guid article)
-   :title (:title article)
-   :original_url (:original_url article)
+   :href (article-show-url (:article/guid article))
+   :guid (:article/guid article)
+   :title (:article/title article)
+   :original_url (:article/original_url article)
    })
 
 (defn full-article-wrap-json [full-article]

@@ -74,14 +74,10 @@
   (zipmap [:guid :title :original_url] article-row))
 
 (defn find-all-ingested-articles []
-  (map zip-article-list-item-keys
-       (d/q '[:find ?guid ?title ?original_url
-              :where [?a :article/guid ?guid]
-                     [?a :article/title ?title]
-                     [?a :article/original_url ?original_url]
-                     [?a :article/ingest_state ?ingest_state]
-                     [(not= "errored" ?ingest_state)]]
-            (db/db))))
+  (map article-entity (d/q '[:find ?a
+                             :where [?a :article/ingest_state ?ingest_state]
+                                    [(not= "errored" ?ingest_state)]]
+                           (db/db))))
 
 (defn fetch-original-html [article]
   (let [original-url (:article/original_url article)
