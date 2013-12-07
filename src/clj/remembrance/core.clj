@@ -49,10 +49,7 @@
    })
 
 (defn article-collection-json [collection]
-  { :articles {
-    :href (article-index-url)
-    :items (map article-wrap-json collection)
-  }})
+  {:articles (map article-wrap-json collection)})
 
 (defn create-and-enqueue-article [params]
   (let [article (article/create-article params)
