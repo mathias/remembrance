@@ -49,8 +49,7 @@
    })
 
 (defn article-collection-json [collection]
-  { :collection {
-    :version (env :api-version)
+  { :articles {
     :href (article-index-url)
     :items (map article-wrap-json collection)
   }})
