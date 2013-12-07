@@ -31,7 +31,6 @@
   (str (env :hostname) "/api/articles/" guid))
 
 (defn article-wrap-json [article]
-  (info article)
   {
    :href (article-show-url (:article/guid article))
    :guid (:article/guid article)
