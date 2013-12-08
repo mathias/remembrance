@@ -1,5 +1,4 @@
-(ns remembrance.config
-  (:require clojure.edn))
+(ns remembrance.config)
 
 (def config-file-path "resources/config.edn")
 

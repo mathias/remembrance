@@ -1,6 +1,6 @@
 (ns remembrance.db
-  (require [remembrance.config :as config]
-           [datomic.api :as d]))
+  (:require [datomic.api :as d]
+            [remembrance.config :as config]))
 
 (def env (config/load!))
 

@@ -1,11 +1,10 @@
 (ns remembrance.models.article
-  (require [remembrance.config :as config]
-           [remembrance.db :as db]
-           [datomic.api :as d]
-           [cemerick.url :refer [url url-encode]]
-           [clojure.data.json :as json]
-           [org.httpkit.client :as http]
-           [taoensso.timbre :refer [info]]))
+  (:require [clojure.core :as http]
+            [clojure.data.json :as json]
+            [datomic.api :as d]
+            [hiccup.util :refer [url url-encode]]
+            [remembrance.config :as config]
+            [remembrance.db :as db]))
 
 (def env (config/load!))
 (def wolfcastle-uri (env :wolfcastle-uri))

@@ -1,5 +1,5 @@
 (ns remembrance.views
-  (:use [hiccup core page]))
+  (:require [hiccup.page :refer :all]))
 
 (defn index-page []
   (html5
