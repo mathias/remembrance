@@ -1,14 +1,14 @@
 (ns remembrance.core
-  (:require [remembrance.models.article :as article]
-            [remembrance.db :as db]
-            [remembrance.views :refer [index-page]]
-            [remembrance.workers :refer [ping-redis enqueue-article-ingest]]
+  (:require [cheshire.core :as json]
             [compojure.core :refer :all]
             [compojure.handler :as handler]
             [compojure.route :as route]
+            [remembrance.db :as db]
+            [remembrance.models.article :as article]
+            [remembrance.views :refer [index-page]]
+            [remembrance.workers :refer [enqueue-article-ingest ping-redis]]
             [ring.middleware.params :refer [wrap-params]]
-            [ring.util.response :refer [response redirect content-type]]
-            [cheshire.core :as json]
+            [ring.util.response :refer [redirect]]
             [taoensso.timbre :refer [info]]))
 
 (def env (remembrance.config/load!))
@@ -88,5 +88,5 @@
 
 (def remembrance-handler
   (->
-   (compojure.handler/site app-routes)
+   (handler/site app-routes)
    (wrap-params)))
