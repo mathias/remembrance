@@ -127,3 +127,16 @@
 (defn search-articles [query-string]
   (let [results (search-article-attributes query-string)]
     (map article-entity results)))
+
+(defn count-articles
+  ([]
+     (ffirst (d/q '[:find (count ?e)
+                    :where [?e :article/guid _]]
+                  (db/db))))
+  ([state]
+     (ffirst (d/q '[:find (count ?e)
+                    :in $ ?state
+                    :where [?e :article/guid _]
+                           [?e :article/ingest_state ?state]]
+                  (db/db)
+                  state))))
