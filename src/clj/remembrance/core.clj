@@ -1,6 +1,7 @@
 (ns remembrance.core
   (:require [cheshire.core :as json]
             [compojure.core :refer :all]
+            [compojure.handler :as handler]
             [compojure.route :as route]
             [remembrance.db :as db]
             [remembrance.models.article :as article]
@@ -87,5 +88,5 @@
 
 (def remembrance-handler
   (->
-   (compojure.handler/site app-routes)
+   (handler/site app-routes)
    (wrap-params)))
