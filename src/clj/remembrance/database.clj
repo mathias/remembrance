@@ -1,4 +1,4 @@
-(ns remembrance.db
+(ns remembrance.database
   (:require [datomic.api :as d]
             [remembrance.config :as config]))
 

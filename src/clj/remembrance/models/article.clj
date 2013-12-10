@@ -4,13 +4,16 @@
             [datomic.api :as d]
             [hiccup.util :refer [url url-encode]]
             [remembrance.config :as config]
-            [remembrance.db :as db]))
+            [remembrance.database :as database]))
 
 (def env (config/load!))
 (def wolfcastle-uri (env :wolfcastle-uri))
 
+(defn db []
+  (database/db))
+
 (defn entity [eid]
-  (d/entity (db/db) eid))
+  (d/entity (db) eid))
 
 (defn article-guid [article]
   (get article :article/guid))
@@ -22,7 +25,7 @@
   (d/q '[:find ?eid
          :in $ ?guid
          :where [?eid :article/guid ?guid]]
-       (db/db)
+       (db)
        guid))
 
 (defn find-one-article-by-guid [guid]
@@ -39,14 +42,14 @@
   (d/q '[:find ?e
          :in $ ?original_url
          :where [?e :article/original_url ?original_url]]
-       (db/db)
+       (db)
        original-url))
 
 (defn create-article-tx [guid original-url]
-  (db/t [{:db/id (d/tempid "db.part/user")
-          :article/guid guid
-          :article/original_url original-url
-          :article/ingest_state "new"}]))
+  (database/t [{:db/id (d/tempid "db.part/user")
+                :article/guid guid
+                :article/original_url original-url
+                :article/ingest_state "new"}]))
 
 (defn create-article [attrs]
   ;; try to find an existing article first
@@ -63,7 +66,7 @@
 (defn find-all-article-ids []
   (d/q '[:find ?a
          :where [?a :article/guid]]
-       (db/db)))
+       (db)))
 
 (defn all-articles []
   (let [result-ids (find-all-article-ids)]
@@ -76,7 +79,7 @@
   (map article-entity (d/q '[:find ?a
                              :where [?a :article/ingest_state ?ingest_state]
                                     [(not= "errored" ?ingest_state)]]
-                           (db/db))))
+                           (db))))
 
 (defn fetch-original-html [article]
   (let [original-url (:article/original_url article)
@@ -94,18 +97,18 @@
 (defn update-original-html [article]
   (let [article-html (or (fetch-original-html article)
                          "Original page not found.")]
-  @(db/t [{:db/id (:db/id article)
-          :article/original_html article-html
-          :article/ingest_state "fetched"}])))
+  @(database/t [{:db/id (:db/id article)
+                 :article/original_html article-html
+                 :article/ingest_state "fetched"}])))
 
 (defn update-readable-html [article]
   (let [readable-article (get-readable-article article)
         title (or (get readable-article :title) "")
         body (or (get readable-article :html) "")]
-    @(db/t [{:db/id (:db/id article)
-            :article/title title
-            :article/readable_body body
-            :article/ingest_state "ingested"}])))
+    @(database/t [{:db/id (:db/id article)
+                   :article/title title
+                   :article/readable_body body
+                   :article/ingest_state "ingested"}])))
 
 (defn article-ingest [guid]
   (let [article (find-one-article-by-guid guid)]
@@ -117,7 +120,7 @@
   (d/q '[:find ?e
          :in $ % ?query
          :where (article-search-rules ?query ?e)]
-       (db/db)
+       (db)
        '[[(article-search-rules ?query ?e)
          [(fulltext $ :article/readable_body ?query) [[?e]]]]
         [(article-search-rules ?query ?e)
@@ -132,11 +135,11 @@
   ([]
      (ffirst (d/q '[:find (count ?e)
                     :where [?e :article/guid _]]
-                  (db/db))))
+                  (db))))
   ([state]
      (ffirst (d/q '[:find (count ?e)
                     :in $ ?state
                     :where [?e :article/guid _]
                            [?e :article/ingest_state ?state]]
-                  (db/db)
+                  (db)
                   state))))

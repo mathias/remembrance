@@ -3,7 +3,7 @@
             [compojure.core :refer :all]
             [compojure.handler :as handler]
             [compojure.route :as route]
-            [remembrance.db :as db]
+            [remembrance.database :as db]
             [remembrance.models.article :as article]
             [remembrance.views :refer [index-page]]
             [remembrance.workers :refer [enqueue-article-ingest ping-redis]]
