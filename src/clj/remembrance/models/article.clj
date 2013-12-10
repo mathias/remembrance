@@ -16,7 +16,7 @@
   (d/entity (db) eid))
 
 (defn article-guid [article]
-  (get article :article/guid))
+  (:article/guid article))
 
 (defn article-entity [entity-vec]
   (entity (first entity-vec)))
@@ -91,20 +91,23 @@
 
 (defn get-readable-article [article]
   (json/read-str
-   (get @(http/get (wolfcastle-url (:article/original_url article))) :body)
+   (or
+    (get @(http/get (wolfcastle-url (:article/original_url article))) :body)
+    "{}")
    :key-fn keyword))
 
 (defn update-original-html [article]
-  (let [article-html (or (fetch-original-html article)
-                         "Original page not found.")]
+  (let [article-html (fetch-original-html article)
+        state (if (nil? article-html) "errored" "fetched")]
   @(database/t [{:db/id (:db/id article)
-                 :article/original_html article-html
-                 :article/ingest_state "fetched"}])))
+                 :article/original_html (or article-html
+                                            "Original page cannot be found.")
+                 :article/ingest_state state}])))
 
 (defn update-readable-html [article]
   (let [readable-article (get-readable-article article)
-        title (or (get readable-article :title) "")
-        body (or (get readable-article :html) "")]
+        title (or (:title readable-article) "")
+        body (or (:html readable-article) "")]
     @(database/t [{:db/id (:db/id article)
                    :article/title title
                    :article/readable_body body
