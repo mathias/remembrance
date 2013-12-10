@@ -1,8 +1,8 @@
 (ns remembrance.models.article
-  (:require [clojure.core :as http]
-            [clojure.data.json :as json]
+  (:require [clojure.data.json :as json]
+            [cemerick.url :refer [url url-encode]]
             [datomic.api :as d]
-            [hiccup.util :refer [url url-encode]]
+            [org.httpkit.client :as http]
             [remembrance.config :as config]
             [remembrance.database :as database]))
 
