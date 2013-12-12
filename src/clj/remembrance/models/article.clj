@@ -153,9 +153,10 @@
                     :where [?e :article/guid _]]
                   (db))))
   ([state]
-     (ffirst (d/q '[:find (count ?e)
-                    :in $ ?state
-                    :where [?e :article/guid _]
-                           [?e :article/ingest_state ?state]]
-                  (db)
-                  state))))
+     (or (ffirst (d/q '[:find (count ?e)
+                         :in $ ?state
+                         :where [?e :article/guid _]
+                         [?e :article/ingest_state ?state]]
+                       (db)
+                       state))
+         0)))

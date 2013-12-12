@@ -10,5 +10,11 @@
         [:body
          [:h1 "Hello world"]
          [:p "What am I?"]
+         [:h2 "Stats"]
          [:p (str "There are " (count-articles) " articles in the system.")]
-         [:p (str (count-articles "ingested") " ingested and " (count-articles "error") " errored.")]]))
+         [:p (str (count-articles "ingested")
+                  " ingested, "
+                  (count-articles "fetched")
+                  " fetched, and "
+                  (count-articles "error")
+                  " errored.")]]))
