@@ -1,6 +1,6 @@
 (ns remembrance.workers
   (:require [remembrance.config :as config]
-            [remembrance.models.article :refer [article-ingest]]
+            [remembrance.models.article :refer [article-ingest article-get-original-html]]
             [taoensso.carmine :as car :refer (wcar)]
             [taoensso.carmine.message-queue :as car-mq]
             [taoensso.timbre :refer [info]]))
@@ -17,8 +17,7 @@
   (wcar* (car/ping)))
 
 (def article-ingest-worker
-  (car-mq/worker {:pool {} :spec {:uri redis-uri}}
-                 "article-ingest-queue"
+  (car-mq/worker {:spec {:uri redis-uri}} "article-ingest-queue"
                  {:handler (fn [{:keys [message]}]
                              (info "Article Ingest Worker got work:" message)
                              (article-ingest message)
@@ -30,3 +29,15 @@
 
 (defn enqueue-article-ingest [article-guid]
   (wcar* (car-mq/enqueue "article-ingest-queue" article-guid)))
+
+(def article-original-html-worker
+  (car-mq/worker {:spec {:uri redis-uri}} "article-original-html-queue"
+                 {:handler (fn [{:keys [message]}]
+                             (info "Article Original HTML Worker got work:" message)
+                             (article-get-original-html message)
+                             {:status :success})
+                  :throttle-ms 500
+                  :eoq-backoff-ms 100}))
+
+(defn enqueue-article-original-html [article-guid]
+  (wcar* (car-mq/enqueue "article-original-html-queue" article-guid)))

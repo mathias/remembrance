@@ -115,8 +115,12 @@
 
 (defn article-ingest [guid]
   (let [article (find-one-article-by-guid guid)]
-    (update-original-html article)
     (update-readable-html article)
+    article))
+
+(defn article-get-original-html [guid]
+  (let [article (find-one-article-by-guid guid)]
+    (update-original-html article)
     article))
 
 (defn search-article-attributes [query-string]
