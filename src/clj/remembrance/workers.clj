@@ -20,10 +20,7 @@
   (car-mq/worker {:spec {:uri redis-uri}} "article-ingest-queue"
                  {:handler (fn [{:keys [message]}]
                              (info "Article Ingest Worker got work:" message)
-                             (article-ingest message)
-                             {:status :success})
-                  ;; enable to log dry runs on each tick:
-                  ;; :monitor (fn [{:keys [mid-circle-size ndry-runs poll-reply]}] (info "dry runs:" ndry-runs))
+                             {:status (article-ingest message)})
                   :throttle-ms 500
                   :eoq-backoff-ms 100}))
 
@@ -34,8 +31,7 @@
   (car-mq/worker {:spec {:uri redis-uri}} "article-original-html-queue"
                  {:handler (fn [{:keys [message]}]
                              (info "Article Original HTML Worker got work:" message)
-                             (article-get-original-html message)
-                             {:status :success})
+                             {:status (article-get-original-html message)})
                   :throttle-ms 500
                   :eoq-backoff-ms 100}))
 

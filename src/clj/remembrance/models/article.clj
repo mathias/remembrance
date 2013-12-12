@@ -96,32 +96,43 @@
     "{}")
    :key-fn keyword))
 
-(defn update-original-html [article]
-  (let [article-html (fetch-original-html article)
-        state (if (nil? article-html) "errored" "fetched")]
-  @(database/t [{:db/id (:db/id article)
-                 :article/original_html (or article-html
-                                            "Original page cannot be found.")
-                 :article/ingest_state state}])))
+(def not-nil? (complement nil?))
 
-(defn update-readable-html [article]
-  (let [readable-article (get-readable-article article)
-        title (or (:title readable-article) "")
+(defn update-original-html-txn [article article-html]
+  @(database/t [{:db/id (:db/id article)
+                 :article/original_html article-html
+                 :article/ingest_state "fetched"}])
+  :success)
+
+(defn update-original-html [article]
+  (if-let [article-html (fetch-original-html article)]
+    (update-original-html-txn article article-html)
+    :error))
+
+(defn update-readable-html-txn [article readable-article]
+  (let [title (or (:title readable-article) "")
         body (or (:html readable-article) "")]
     @(database/t [{:db/id (:db/id article)
                    :article/title title
                    :article/readable_body body
-                   :article/ingest_state "ingested"}])))
+                   :article/ingest_state "ingested"}]))
+  :success)
+
+
+(defn update-readable-html [article]
+  (if-let [readable-article (get-readable-article article)]
+    (update-readable-html-txn article readable-article)
+    :error))
 
 (defn article-ingest [guid]
-  (let [article (find-one-article-by-guid guid)]
+  (if-let [article (find-one-article-by-guid guid)]
     (update-readable-html article)
-    article))
+    :error))
 
 (defn article-get-original-html [guid]
-  (let [article (find-one-article-by-guid guid)]
+  (if-let [article (find-one-article-by-guid guid)]
     (update-original-html article)
-    article))
+    :error))
 
 (defn search-article-attributes [query-string]
   (d/q '[:find ?e
