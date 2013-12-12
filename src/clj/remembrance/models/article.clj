@@ -96,8 +96,6 @@
     "{}")
    :key-fn keyword))
 
-(def not-nil? (complement nil?))
-
 (defn update-original-html-txn [article article-html]
   @(database/t [{:db/id (:db/id article)
                  :article/original_html article-html
