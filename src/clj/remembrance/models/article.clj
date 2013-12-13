@@ -96,6 +96,11 @@
     "{}")
    :key-fn keyword))
 
+(defn set-article-as-errored [article]
+  @(database/t [{:db/id (:db/id article)
+                 :article/ingest_state "errored"}])
+  :error)
+
 (defn update-original-html-txn [article article-html]
   @(database/t [{:db/id (:db/id article)
                  :article/original_html article-html
@@ -105,7 +110,7 @@
 (defn update-original-html [article]
   (if-let [article-html (fetch-original-html article)]
     (update-original-html-txn article article-html)
-    :error))
+    (set-article-as-errored article)))
 
 (defn update-readable-html-txn [article readable-article]
   (let [title (or (:title readable-article) "")
@@ -120,7 +125,7 @@
 (defn update-readable-html [article]
   (if-let [readable-article (get-readable-article article)]
     (update-readable-html-txn article readable-article)
-    :error))
+    (set-article-as-errored article)))
 
 (defn article-ingest [guid]
   (if-let [article (find-one-article-by-guid guid)]
