@@ -102,8 +102,8 @@
   :error)
 
 (defn update-readable-html-txn [article readable-article]
-  (let [title ""
-        body (or readable-article "")]
+  (let [title (or (:title readable-article) "")
+        body (or (:html readable-article) "")]
     @(database/t [{:db/id (:db/id article)
                    :article/title title
                    :article/readable_body body
