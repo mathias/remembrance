@@ -101,6 +101,25 @@
                  :article/ingest_state "errored"}])
   :error)
 
+(defn update-readable-html-txn [article readable-article]
+  (let [title ""
+        body (or readable-article "")]
+    @(database/t [{:db/id (:db/id article)
+                   :article/title title
+                   :article/readable_body body
+                   :article/ingest_state "ingested"}]))
+  :success)
+
+(defn update-readable-html [article]
+  (if-let [readable-article (get-readable-article article)]
+    (update-readable-html-txn article readable-article)
+    (set-article-as-errored article)))
+
+(defn article-extract-text [guid]
+  (if-let [article (find-one-article-by-guid guid)]
+    (update-readable-html article)
+    :error))
+
 (defn update-original-html-txn [article article-html]
   @(database/t [{:db/id (:db/id article)
                  :article/original_html article-html
@@ -111,26 +130,6 @@
   (if-let [article-html (fetch-original-html article)]
     (update-original-html-txn article article-html)
     (set-article-as-errored article)))
-
-(defn update-readable-html-txn [article readable-article]
-  (let [title (or (:title readable-article) "")
-        body (or (:html readable-article) "")]
-    @(database/t [{:db/id (:db/id article)
-                   :article/title title
-                   :article/readable_body body
-                   :article/ingest_state "ingested"}]))
-  :success)
-
-
-(defn update-readable-html [article]
-  (if-let [readable-article (get-readable-article article)]
-    (update-readable-html-txn article readable-article)
-    (set-article-as-errored article)))
-
-(defn article-ingest [guid]
-  (if-let [article (find-one-article-by-guid guid)]
-    (update-readable-html article)
-    :error))
 
 (defn article-get-original-html [guid]
   (if-let [article (find-one-article-by-guid guid)]

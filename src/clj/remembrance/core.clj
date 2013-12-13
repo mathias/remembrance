@@ -6,7 +6,7 @@
             [remembrance.database :as db]
             [remembrance.models.article :as article]
             [remembrance.views :refer [index-page]]
-            [remembrance.workers :refer [enqueue-article-ingest enqueue-article-original-html ping-redis]]
+            [remembrance.workers :refer [enqueue-article-original-html ping-redis]]
             [ring.middleware.params :refer [wrap-params]]
             [ring.util.response :refer [redirect]]
             [taoensso.timbre :refer [info]]))
@@ -54,7 +54,6 @@
   (let [article (article/create-article params)
         guid (:article/guid article)]
     (enqueue-article-original-html guid)
-    (enqueue-article-ingest guid)
     (redirect (article-show-url guid))))
 
 (defroutes api-routes

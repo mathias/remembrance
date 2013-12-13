@@ -1,6 +1,6 @@
 (ns remembrance.workers
   (:require [remembrance.config :as config]
-            [remembrance.models.article :refer [article-ingest article-get-original-html]]
+            [remembrance.models.article :refer [article-get-original-html article-extract-text]]
             [taoensso.carmine :as car :refer (wcar)]
             [taoensso.carmine.message-queue :as car-mq]
             [taoensso.timbre :refer [info]]))
@@ -16,22 +16,28 @@
 (defn ping-redis []
   (wcar* (car/ping)))
 
-(def article-ingest-worker
-  (car-mq/worker {:spec {:uri redis-uri}} "article-ingest-queue"
+(def article-text-extraction
+  (car-mq/worker {:spec {:uri redis-uri}} "article-text-extraction-queue"
                  {:handler (fn [{:keys [message]}]
-                             (info "Article Ingest Worker got work:" message)
-                             {:status (article-ingest message)})
+                             (info "Article Text Extraction Worker got work:" message)
+                             {:status (article-extract-text message)})
                   :throttle-ms 500
                   :eoq-backoff-ms 100}))
 
-(defn enqueue-article-ingest [article-guid]
-  (wcar* (car-mq/enqueue "article-ingest-queue" article-guid)))
+(defn enqueue-text-extraction [article-guid]
+  (wcar* (car-mq/enqueue "article-text-extraction-queue" article-guid)))
+
+(defn enqueue-next-step-and-return-success [guid]
+  (enqueue-text-extraction guid)
+  {:status :success})
 
 (def article-original-html-worker
   (car-mq/worker {:spec {:uri redis-uri}} "article-original-html-queue"
                  {:handler (fn [{:keys [message]}]
                              (info "Article Original HTML Worker got work:" message)
-                             {:status (article-get-original-html message)})
+                             (if (= :success (article-get-original-html message))
+                               (enqueue-next-step-and-return-success message)
+                               {:status :error}))
                   :throttle-ms 500
                   :eoq-backoff-ms 100}))
 
