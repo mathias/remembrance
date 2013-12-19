@@ -49,7 +49,8 @@
   (database/t [{:db/id (d/tempid "db.part/user")
                 :article/guid guid
                 :article/original_url original-url
-                :article/ingest_state "new"}]))
+                :article/ingest_state "new"
+                :article/read false}]))
 
 (defn create-article [attrs]
   ;; try to find an existing article first
@@ -62,6 +63,10 @@
         ;; return guid so that it can redirect to article
         (find-one-article-by-guid guid))
       (entity (ffirst existing)))))
+
+(defn set-article-read-status [article read?]
+  (database/t [{:db/id (:db/id article)
+                :article/read read?}]))
 
 (defn find-all-article-ids []
   (d/q '[:find ?a

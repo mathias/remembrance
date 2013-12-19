@@ -36,6 +36,7 @@
    :guid (:article/guid article)
    :title (:article/title article)
    :original_url (:article/original_url article)
+   :read (:article/read article)
    })
 
 (defn full-article-wrap-json [full-article]
@@ -45,6 +46,7 @@
    :title (:article/title full-article)
    :original_url (:article/original_url full-article)
    :readable_body (:article/readable_body full-article)
+   :read (:article/read full-article)
    })
 
 (defn article-collection-json [collection]
