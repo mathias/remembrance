@@ -5,6 +5,7 @@
             [remembrance.database :as db]
             [remembrance.routes.api :as api-routes]
             [remembrance.views :refer [index-page]]
+            [remembrance.workers :refer [ping-redis]]
             [ring.middleware.params :refer [wrap-params]]
             [taoensso.timbre :refer [info]]))
 
