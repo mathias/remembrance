@@ -10,4 +10,4 @@ pom.xml.asc
 config.edn
 
 # datomic
-resources/dev-transactor-template.properties
+resources/*-transactor-template.properties

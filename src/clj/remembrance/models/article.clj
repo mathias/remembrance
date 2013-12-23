@@ -49,7 +49,7 @@
   (database/t [{:db/id (d/tempid "db.part/user")
                 :article/guid guid
                 :article/original_url original-url
-                :article/ingest_state "new"
+                :article/ingest_state :article.ingest_state/new
                 :article/read false}]))
 
 (defn create-article [attrs]
@@ -83,7 +83,7 @@
 (defn find-all-ingested-articles []
   (map article-entity (d/q '[:find ?a
                              :where [?a :article/ingest_state ?ingest_state]
-                                    [(not= "errored" ?ingest_state)]]
+                                    [(not= :article.ingest_state/errored ?ingest_state)]]
                            (db))))
 
 (defn fetch-original-html [article]
@@ -103,7 +103,7 @@
 
 (defn set-article-as-errored [article]
   @(database/t [{:db/id (:db/id article)
-                 :article/ingest_state "errored"}])
+                 :article/ingest_state :article.ingest_state/errored}])
   :error)
 
 (defn update-readable-html-txn [article readable-article]
@@ -112,7 +112,7 @@
     @(database/t [{:db/id (:db/id article)
                    :article/title title
                    :article/readable_body body
-                   :article/ingest_state "ingested"}]))
+                   :article/ingest_state :article.ingest_state/ingested}]))
   :success)
 
 (defn update-readable-html [article]
@@ -128,7 +128,7 @@
 (defn update-original-html-txn [article article-html]
   @(database/t [{:db/id (:db/id article)
                  :article/original_html article-html
-                 :article/ingest_state "fetched"}])
+                 :article/ingest_state :article.ingest_state/fetched}])
   :success)
 
 (defn update-original-html [article]

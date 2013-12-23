@@ -40,22 +40,22 @@
   :db/index false
   :db.install/_attribute :db.part/db}
 
- {:db/id #db/id[:db.part/db -1]
+ {:db/id #db/id[:db.part/db]
   :db/ident :article/ingest_state
   :db/valueType :db.type/ref
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
 
- {:db/id #db/id [:db.part/article -2]
+ {:db/id #db/id[:db.part/user]
   :db/ident :article.ingest_state/new}
 
- {:db/id #db/id [:db.part/article -3]
+ {:db/id #db/id[:db.part/user]
   :db/ident :article.ingest_state/errored}
 
- {:db/id #db/id [:db.part/article -4]
+ {:db/id #db/id[:db.part/user]
   :db/ident :article.ingest_state/fetched}
 
- {:db/id #db/id [:db.part/article -5]
+ {:db/id #db/id[:db.part/user]
   :db/ident :article.ingest_state/ingested}
 
  {:db/id #db/id[:db.part/db]

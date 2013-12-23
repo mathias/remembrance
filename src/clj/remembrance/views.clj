@@ -12,9 +12,9 @@
          [:p "What am I?"]
          [:h2 "Stats"]
          [:p (str "There are " (count-articles) " articles in the system.")]
-         [:p (str (count-articles "ingested")
+         [:p (str (count-articles :article.ingest_state/ingested)
                   " ingested, "
-                  (count-articles "fetched")
+                  (count-articles :article.ingest_state/fetched)
                   " fetched, and "
-                  (count-articles "error")
+                  (count-articles :article.ingest_state/errored)
                   " errored.")]]))

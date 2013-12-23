@@ -32,8 +32,8 @@
   :datomic {:schemas ["resources/schema" ["remem-schema.edn"
                                           "initial-data.edn"]]}
   :profiles {:dev
-             {:datomic {:config "resources/dev-transactor-template.properties"
-                        :db-uri "datomic:dev://localhost:4334/remembrance"}}}
+             {:datomic {:config "resources/sql-transactor-template.properties"
+                        :db-uri "datomic:sql://remembrance?jdbc:postgresql://localhost:5432/datomic?user=datomic&password=datomic"}}}
 
   ;; ring tasks configuration
   :ring {:handler remembrance.core/remembrance-handler
