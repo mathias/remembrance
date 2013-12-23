@@ -40,12 +40,23 @@
   :db/index false
   :db.install/_attribute :db.part/db}
 
- {:db/id #db/id[:db.part/db]
+ {:db/id #db/id[:db.part/db -1]
   :db/ident :article/ingest_state
-  :db/valueType :db.type/string
+  :db/valueType :db.type/ref
   :db/cardinality :db.cardinality/one
-  :db/index true
   :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/article -2]
+  :db/ident :article.ingest_state/new}
+
+ {:db/id #db/id [:db.part/article -3]
+  :db/ident :article.ingest_state/errored}
+
+ {:db/id #db/id [:db.part/article -4]
+  :db/ident :article.ingest_state/fetched}
+
+ {:db/id #db/id [:db.part/article -5]
+  :db/ident :article.ingest_state/ingested}
 
  {:db/id #db/id[:db.part/db]
   :db/ident :article/read
@@ -58,6 +69,12 @@
  ;; article timestamps we care about
  {:db/id #db/id[:db.part/db]
   :db/ident :article/date_published
+  :db/valueType :db.type/instant
+  :db/cardinality :db.cardinality/one
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :article/date_fetched
   :db/valueType :db.type/instant
   :db/cardinality :db.cardinality/one
   :db.install/_attribute :db.part/db}
