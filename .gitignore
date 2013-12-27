@@ -8,6 +8,14 @@ pom.xml.asc
 /.lein-*
 /.nrepl-port
 config.edn
+.lein-deps-sum
+.lein-repl-history
+.lein-plugins/
 
 # datomic
 resources/*-transactor-template.properties
+
+# emacs
+*~
+\#*\#
+.#*
