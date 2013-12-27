@@ -7,7 +7,7 @@
   :dependencies [[cheshire "5.2.0"]
                  [clojure-csv "2.0.1"]
                  [com.cemerick/url "0.1.0"]
-                 [com.datomic/datomic-pro "0.9.4324"]
+                 [com.datomic/datomic-pro "0.9.4384"]
                  [com.taoensso/carmine "2.4.0"]
                  [com.taoensso/timbre "2.7.1"]
                  [compojure "1.1.6"]
