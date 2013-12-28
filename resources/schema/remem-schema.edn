@@ -65,7 +65,6 @@
   :db/index true
   :db.install/_attribute :db.part/db}
 
-
  ;; article timestamps we care about
  {:db/id #db/id[:db.part/db]
   :db/ident :article/date_published

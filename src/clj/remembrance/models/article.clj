@@ -3,10 +3,10 @@
             [cemerick.url :refer [url url-encode]]
             [datomic.api :as d]
             [org.httpkit.client :as http]
-            [remembrance.config :as config]
+            [remembrance.config :refer [load!]]
             [remembrance.database :as database]))
 
-(def env (config/load!))
+(def env (load!))
 (def wolfcastle-uri (env :wolfcastle-uri))
 
 (defn db []
@@ -158,9 +158,10 @@
 
 (defn count-articles
   ([]
-     (ffirst (d/q '[:find (count ?e)
-                    :where [?e :article/guid _]]
-                  (db))))
+     (or (ffirst (d/q '[:find (count ?e)
+                        :where [?e :article/guid _]]
+                      (db)))
+         0))
   ([state]
      (or (ffirst (d/q '[:find (count ?e)
                          :in $ ?state
@@ -171,9 +172,10 @@
          0)))
 
 (defn count-read-articles []
-  (ffirst (d/q '[:find (count ?e)
-                 :where [?e :article/read true]]
-               (db))))
+  (or (ffirst (d/q '[:find (count ?e)
+                     :where [?e :article/read true]]
+                   (db)))
+      0))
 
 (defn articles-stats []
   {:stats

@@ -3,6 +3,7 @@
             [compojure.core :refer [GET POST context defroutes]]
             [remembrance.config :refer [load!]]
             [remembrance.models.article :as article]
+            [remembrance.models.note :as note]
             [remembrance.workers :refer [enqueue-article-original-html]]
             [ring.util.response :refer [redirect]]))
 
@@ -28,8 +29,7 @@
   (str (env :hostname) "/api/articles/" guid))
 
 (defn article-wrap-json [article]
-  {
-   :href (article-show-url (:article/guid article))
+  {:href (article-show-url (:article/guid article))
    :guid (:article/guid article)
    :title (:article/title article)
    :original_url (:article/original_url article)
@@ -37,8 +37,7 @@
    })
 
 (defn full-article-wrap-json [full-article]
-  {
-   :href (article-show-url (:article/guid full-article))
+  {:href (article-show-url (:article/guid full-article))
    :guid (:article/guid full-article)
    :title (:article/title full-article)
    :original_url (:article/original_url full-article)
@@ -55,7 +54,21 @@
     (enqueue-article-original-html guid)
     (redirect (article-show-url guid))))
 
-(defroutes api-routes
+(defn note-show-url [guid]
+  ;; TODO: Use cemerick.url to compose URLs
+  (str (env :hostname) "/api/notes/" guid))
+
+(defn note-wrap-json [note]
+  {:href (note-show-url (:note/guid note))
+   :guid (:note/guid note)
+   :title (:note/title note)
+   :articles (article-collection-json (:note/articles note))})
+
+(defn note-collection-json [coll]
+  {:notes (map note-wrap-json coll)})
+
+
+(defroutes article-routes
   (context "/articles" []
            (defroutes articles-routes
              (GET "/" [] (respond-with-json (article-collection-json (article/find-all-ingested-articles))))
@@ -65,7 +78,9 @@
              (GET "/:guid" [guid] (let [article (article/show-article guid)]
                                 (if-not (nil? article)
                                   (respond-with-json (full-article-wrap-json article))
-                                  (respond-with-error))))))
+                                  (respond-with-error)))))))
+
+(defroutes note-routes
   (context "/notes" []
            (defroutes notes-routes
-             (GET "/" [] (respond-with-json "foo")))))
+             (GET "/" [] (respond-with-json (note-collection-json (note/all-notes)))))))
