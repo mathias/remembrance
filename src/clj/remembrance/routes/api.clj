@@ -61,6 +61,7 @@
              (GET "/" [] (respond-with-json (article-collection-json (article/find-all-ingested-articles))))
              (POST "/" {:keys [params]} (create-and-enqueue-article params))
              (GET "/search" {:keys [params]} (respond-with-json (article-collection-json (article/search-articles (:q params)))))
+             (GET "/stats" [] (respond-with-json (article/articles-stats)))
              (GET "/:guid" [guid] (let [article (article/show-article guid)]
                                 (if-not (nil? article)
                                   (respond-with-json (full-article-wrap-json article))
