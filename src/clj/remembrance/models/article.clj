@@ -169,3 +169,8 @@
                        (db)
                        state))
          0)))
+
+(defn count-read-articles []
+  (ffirst (d/q '[:find (count ?e)
+                 :where [?e :article/read true]]
+               (db))))
