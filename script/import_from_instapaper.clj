@@ -38,7 +38,8 @@
 
 (do
   (def csv-file (second *command-line-args*))
-  (ingest-instapaper-csv csv-file))
+  (time
+   (ingest-instapaper-csv csv-file)))
 
 (println "Import complete!")
 (System/exit 0)
