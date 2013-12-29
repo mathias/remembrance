@@ -13,10 +13,12 @@
                  [compojure "1.1.6"]
                  [hiccup "1.0.4"]
                  [http-kit "2.1.13"]
+                 [io.rkn/conformity "0.2.1" :exclusions [com.datomic/datomic-free]]
                  [org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2080"]
                  [org.clojure/data.json "0.2.3"]
                  [prismatic/dommy "0.1.2"]
+                 [ring/ring-jetty-adapter "1.2.1"]
                  [ring/ring-json "0.2.0"]]
 
   ;; clojure source code pathname
@@ -26,7 +28,7 @@
             [lein-cljsbuild "0.3.3"]
 
             ;; ring plugin
-            [lein-ring "0.8.7"]]
+            [lein-ring "0.8.8"]]
 
   ;; datomic configuration
   :profiles {:dev
