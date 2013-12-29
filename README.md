@@ -12,19 +12,15 @@ Install deps:
 lein deps
 ```
 
-Configure your storage, drop your key into the `.properties` file, etc. Then run:
-
-```bash
-lein exec -p script/init_datomic.clj
-```
-
-to load the schema in.
+Configure your storage, drop your key into the `.properties` file, etc.
 
 You should now be able to run the webapp with:
 
 ```bash
 lein ring server
 ```
+
+Migrations will run automatically on the Datomic db.
 
 To ingest from an Instapaper CSV export:
 
@@ -33,6 +29,10 @@ lein exec -p script/import_from_instapaper.clj /path/to/instapaper-export.csv
 ```
 
 (Note that the `-p` flag is very important to run the lein-exec in the scope of the project and get its CLASSPATH.)
+
+### Notes:
+
+**Never** run `lein datomic initialize` -- it will destroy data, and we no longer use `lein datomic`'s concept of a schema file!
 
 ## License
 
