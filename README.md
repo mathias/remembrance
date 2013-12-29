@@ -1,6 +1,8 @@
 # remembrance
 
-Some smarty-pants quote goes here.
+> “Remembrance of things past is not necessarily the remembrance of things as they were.”
+
+&mdash; Marcel Proust
 
 ## Usage
 
