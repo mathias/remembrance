@@ -13,5 +13,5 @@
 
 (def t #(d/transact connection %))
 
-(defn prepare! []
+(defn prepare-database! []
   (db))

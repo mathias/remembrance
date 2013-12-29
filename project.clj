@@ -29,8 +29,6 @@
             [lein-ring "0.8.7"]]
 
   ;; datomic configuration
-  :datomic {:schemas ["resources/schema" ["remem-schema.edn"
-                                          "initial-data.edn"]]}
   :profiles {:dev
              {:datomic {:config "resources/sql-transactor-template.properties"
                         :db-uri "datomic:sql://remembrance?jdbc:postgresql://localhost:5432/datomic?user=datomic&password=datomic"}}}

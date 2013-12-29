@@ -2,7 +2,7 @@
   (:require [compojure.core :refer :all]
             [compojure.handler :as handler]
             [compojure.route :as route]
-            [remembrance.database :as db]
+            [remembrance.database :refer [prepare-database!]]
             [remembrance.routes.api :as api-routes]
             [remembrance.views :refer [index-page]]
             [remembrance.workers :refer [ping-redis]]
@@ -22,7 +22,7 @@
   (route/not-found "Page not found."))
 
 (defn remembrance-init []
-  (info "DB:" (db/prepare!))
+  (info "DB:" (prepare-database!))
   (info "Redis PING:" (ping-redis)))
 
 (def remembrance-handler
