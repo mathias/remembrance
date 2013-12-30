@@ -6,7 +6,7 @@
   (let [total-articles-count (count-articles)]
     (html5
      [:head
-      [:title "Hello world"]
+      [:title "Remembrance"]
       (include-css "css/style.css")]
      [:body
       [:h1 "Hello world"]
