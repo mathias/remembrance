@@ -67,6 +67,9 @@
 (defn note-collection-json [coll]
   (map note-wrap-json coll))
 
+(defn create-note-and-redirect [params]
+  (let [note (note/create-note params)]
+    (respond-with-json (note-wrap-json note))))
 
 (defroutes article-routes
   (GET "/" [] (respond-with-json {:articles (article-collection-json (article/find-all-ingested-articles))}))
@@ -79,7 +82,8 @@
                            (respond-with-error)))))
 
 (defroutes note-routes
-  (GET "/" [] (respond-with-json {:notes (note-collection-json (note/all-notes))})))
+  (GET "/" [] (respond-with-json {:notes (note-collection-json (note/all-notes))}))
+  (POST "/" {:keys [params]} (create-note-and-redirect params)))
 
 (defroutes api-routes
   (context "/articles" [] article-routes)

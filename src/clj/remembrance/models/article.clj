@@ -4,7 +4,8 @@
             [datomic.api :as d]
             [org.httpkit.client :as http]
             [remembrance.config :refer [load!]]
-            [remembrance.database :as database]))
+            [remembrance.database :as database]
+            [taoensso.timbre :refer [info]]))
 
 (def env (load!))
 (def wolfcastle-uri (env :wolfcastle-uri))
@@ -53,6 +54,7 @@
                 :article/read false}]))
 
 (defn create-article [attrs]
+  (info attrs)
   ;; try to find an existing article first
   (let [original-url (attrs :original_url)
         existing (find-article-by-original-url original-url)]

@@ -1,7 +1,8 @@
 (ns remembrance.models.note
   (:require [remembrance.config :refer [load!]]
             [datomic.api :as d]
-            [remembrance.database :as database]))
+            [remembrance.database :as database]
+            [taoensso.timbre :refer [info]]))
 
 (def env (load!))
 
@@ -24,9 +25,11 @@
 (defn create-note [{:keys [title body articles]
                     :or {title "Untitled"
                          body ""
-                         articles []}}]
-  (database/t [{:db/id (d/tempid "db.part/user")
-                :note/guid (str (d/squuid))
+                         articles []}
+                    :as all-params}]
+  (info all-params)
+  @(database/t [{:db/id (d/tempid "db.part/user")
+                :note/guid (database/new-guid)
                 :note/title title
                 :note/body body
-                :note/artcles articles}]))
+                :note/articles articles}]))
