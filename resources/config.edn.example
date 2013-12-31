@@ -1,5 +1,5 @@
 {
-  :api-version "1.0"
+  :api-version "1.1.0"
   :hostname "http://localhost:3000"
   :db-uri "datomic:pro://localhost:4334/remembrance"
   :redis-uri "redis://127.0.0.1:6379"
