@@ -1,24 +1,15 @@
 (ns remembrance.routes.api
-  (:require [cheshire.core :as json]
-            [compojure.core :refer [GET POST context defroutes]]
+  (:require
+            [playnice.core :refer [dassoc] :as playnice]
             [remembrance.config :refer [load!]]
             [remembrance.models.article :as article]
             [remembrance.models.note :as note]
+            [remembrance.routes.core :refer [respond-with respond-with-error respond-with-json]]
             [remembrance.workers :refer [enqueue-article-original-html]]
-            [ring.util.response :refer [redirect]]))
+            [ring.util.response :refer [redirect]]
+            [taoensso.timbre :refer [info]]))
 
 (def env (load!))
-
-(defn respond-with
-  ([body] {:body body})
-  ([body status] {:status status :body body})
-  ([body status headers] {:status status :headers headers :body body}))
-
-(defn respond-with-error []
-  (respond-with {:ok false :errors "Unproccessable Entity."} 422))
-
-(defn respond-with-json [body]
-  (respond-with (json/generate-string body {:pretty true}) 200 {"Content-Type" "application/json"}))
 
 (defn article-index-url []
   ;; TODO: Use cemerick.url to compose URLs
@@ -71,20 +62,31 @@
   (let [note (note/create-note params)]
     (respond-with-json (note-wrap-json note))))
 
-(defroutes article-routes
-  (GET "/" [] (respond-with-json {:articles (article-collection-json (article/find-all-ingested-articles))}))
-  (POST "/" {:keys [params]} (create-and-enqueue-article params))
-  (GET "/search" {:keys [params]} (respond-with-json (article-collection-json (article/search-articles (:q params)))))
-  (GET "/stats" [] (respond-with-json (article/articles-stats)))
-  (GET "/:guid" [guid] (let [article (article/show-article guid)]
-                         (if-not (nil? article)
-                           (respond-with-json (full-article-wrap-json article))
-                           (respond-with-error)))))
+(defn print-info [req]
+  (info (or req "We got somewhere but there was no signal"))
+  (respond-with req))
 
-(defroutes note-routes
-  (GET "/" [] (respond-with-json {:notes (note-collection-json (note/all-notes))}))
-  (POST "/" {:keys [params]} (create-note-and-redirect params)))
+(def article-routes
+  ;;  (GET "/" [] (respond-with-json {:articles (article-collection-json (article/find-all-ingested-articles))}))
+  (-> nil
+      (dassoc "/" print-info)
+      (dassoc "/:guid" print-info)))
+;; (create-and-enqueue-article params)
+  ;; (GET "/search" {:keys [params]} (respond-with-json (article-collection-json (article/search-articles (:q params)))))
+  ;; (GET "/stats" [] (respond-with-json (article/articles-stats)))
+  ;; (GET "/:guid" [guid] (let [article (article/show-article guid)]
+  ;;                        (if-not (nil? article)
+  ;;                          (respond-with-json (full-article-wrap-json article))
+  ;;                          (respond-with-error)))))
 
-(defroutes api-routes
-  (context "/articles" [] article-routes)
-  (context "/notes" [] note-routes))
+
+(def note-routes
+  (-> nil
+      (dassoc "/" print-info)))
+  ;; (GET "/" [] (respond-with-json {:notes (note-collection-json (note/all-notes))}))
+  ;; (POST "/" {:keys [params]} (create-note-and-redirect params))))
+
+(def api-routes
+  (-> nil
+      (dassoc "/articles" article-routes)
+      (dassoc "/notes" note-routes)))

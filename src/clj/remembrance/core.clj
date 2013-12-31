@@ -1,32 +1,38 @@
 (ns remembrance.core
-  (:require [compojure.core :refer :all]
-            [compojure.handler :as handler]
-            [compojure.route :as route]
-            [remembrance.database :refer [prepare-database! db]]
-            [remembrance.routes.api :as api-routes]
+  (:require [remembrance.database :refer [prepare-database! db]]
+            [remembrance.routes.core :as routes]
+            [remembrance.routes.api :as api]
             [remembrance.views :refer [index-page]]
             [remembrance.workers :refer [ping-redis]]
+            [playnice.core :refer [dassoc] :as playnice]
             [ring.middleware.params :refer [wrap-params]]
             [taoensso.timbre :refer [info]]))
 
-(defroutes app-routes
-  (GET "/" [] (index-page))
+(def routes (atom {}))
 
+(defn route [path destination]
+  (swap! routes
+         dassoc
+         path
+         destination))
+
+(defn wire-app-routes []
+  (route "/" (fn [req] {:body (index-page)}))
   ;; API resources
-  (context "/api" [] api-routes/api-routes)
-
-  ; to serve static pages saved in resources/public directory
-  (route/resources "/")
-
-  ; if page is not found
-  (route/not-found "Page not found."))
+  (route "/api/articles" api/article-routes)
+  (route "/api/notes" api/note-routes))
 
 (defn remembrance-init []
   (info "Migrations:" (prepare-database!))
   (info "DB:" (db))
-  (info "Redis PING:" (ping-redis)))
+  (info "Redis PING:" (ping-redis))
+  (wire-app-routes)
+  (info "Routes:" @routes))
+
+(defn routes-handler [req]
+  (playnice/dispatch @routes req))
 
 (def remembrance-handler
   (->
-   (handler/site app-routes)
+   routes-handler
    (wrap-params)))

@@ -10,7 +10,7 @@
                  [com.datomic/datomic-pro "0.9.4384"]
                  [com.taoensso/carmine "2.4.0"]
                  [com.taoensso/timbre "2.7.1"]
-                 [compojure "1.1.6"]
+                 [playnice "1.0.1"]
                  [hiccup "1.0.4"]
                  [http-kit "2.1.13"]
                  [io.rkn/conformity "0.2.1" :exclusions [com.datomic/datomic-free]]
