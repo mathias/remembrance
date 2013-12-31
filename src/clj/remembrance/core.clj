@@ -13,7 +13,7 @@
   (GET "/" [] (index-page))
 
   ;; API resources
-  (context "/api" [] api-routes/article-routes)
+  (context "/api" [] api-routes/api-routes)
 
   ; to serve static pages saved in resources/public directory
   (route/resources "/")

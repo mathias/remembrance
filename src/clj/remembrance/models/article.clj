@@ -57,7 +57,7 @@
   (let [original-url (attrs :original_url)
         existing (find-article-by-original-url original-url)]
     (if (empty? existing)
-      (let [guid (str (d/squuid))]
+      (let [guid (database/new-guid)]
         ;; create the new article:
         (create-article-tx guid original-url)
         ;; return guid so that it can redirect to article
@@ -74,8 +74,7 @@
        (db)))
 
 (defn all-articles []
-  (let [result-ids (find-all-article-ids)]
-    (map article-entity result-ids)))
+  (map article-entity (find-all-article-ids)))
 
 (defn zip-article-list-item-keys [article-row]
   (zipmap [:guid :title :original_url] article-row))

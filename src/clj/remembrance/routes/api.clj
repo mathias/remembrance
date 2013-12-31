@@ -46,7 +46,7 @@
    })
 
 (defn article-collection-json [collection]
-  {:articles (map article-wrap-json collection)})
+  (map article-wrap-json collection))
 
 (defn create-and-enqueue-article [params]
   (let [article (article/create-article params)
@@ -65,22 +65,22 @@
    :articles (article-collection-json (:note/articles note))})
 
 (defn note-collection-json [coll]
-  {:notes (map note-wrap-json coll)})
+  (map note-wrap-json coll))
 
 
 (defroutes article-routes
-  (context "/articles" []
-           (defroutes articles-routes
-             (GET "/" [] (respond-with-json (article-collection-json (article/find-all-ingested-articles))))
-             (POST "/" {:keys [params]} (create-and-enqueue-article params))
-             (GET "/search" {:keys [params]} (respond-with-json (article-collection-json (article/search-articles (:q params)))))
-             (GET "/stats" [] (respond-with-json (article/articles-stats)))
-             (GET "/:guid" [guid] (let [article (article/show-article guid)]
-                                (if-not (nil? article)
-                                  (respond-with-json (full-article-wrap-json article))
-                                  (respond-with-error)))))))
+  (GET "/" [] (respond-with-json {:articles (article-collection-json (article/find-all-ingested-articles))}))
+  (POST "/" {:keys [params]} (create-and-enqueue-article params))
+  (GET "/search" {:keys [params]} (respond-with-json (article-collection-json (article/search-articles (:q params)))))
+  (GET "/stats" [] (respond-with-json (article/articles-stats)))
+  (GET "/:guid" [guid] (let [article (article/show-article guid)]
+                         (if-not (nil? article)
+                           (respond-with-json (full-article-wrap-json article))
+                           (respond-with-error)))))
 
 (defroutes note-routes
-  (context "/notes" []
-           (defroutes notes-routes
-             (GET "/" [] (respond-with-json (note-collection-json (note/all-notes)))))))
+  (GET "/" [] (respond-with-json {:notes (note-collection-json (note/all-notes))})))
+
+(defroutes api-routes
+  (context "/articles" [] article-routes)
+  (context "/notes" [] note-routes))

@@ -15,12 +15,17 @@
   (d/db connection))
 
 (def t #(d/transact connection %))
+(def simple-q #(d/q % (db)))
+
+(defn new-guid []
+  (str (d/squuid)))
 
 ;; migrations
 (defn load-migration [filename]
   (read-string (slurp (str "resources/schema/" filename))))
 
-(def migrations ["1387819157_add_articles.edn"])
+(def migrations ["1387819157_add_articles.edn"
+                 "1388418412_add_notes.edn"])
 
 (defn migrate! [migrations]
   (map (fn [migration-file]
