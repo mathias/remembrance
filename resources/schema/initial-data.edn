@@ -1,9 +1,0 @@
-[
- {
-  :db/id #db/id[:db.part/user -1000001]
-  :article/title "Image Retention on Retina iPad Mini"
-  :article/original_url "http://www.marco.org/2013/11/14/image-retention-retina-ipad-mini"
-  :article/guid "529a76ea-24ab-421e-84c6-b98835e7e3d7"
-  :article/ingest_state "new"
-  }
-]
