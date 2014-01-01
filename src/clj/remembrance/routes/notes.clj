@@ -3,7 +3,8 @@
             [remembrance.config :as config]
             [remembrance.routes.core :refer :all]
             [remembrance.models.note :as note]
-            [liberator.core :refer [defresource]]))
+            [liberator.core :refer [defresource]]
+            [taoensso.timbre :refer [info]]))
 
 (def env (config/load!))
 
@@ -20,8 +21,6 @@
 (defn note-collection-json [coll]
   (map note-wrap-json coll))
 
-(defn string-keys-to-symbols [map]
-    (reduce #(assoc %1 (-> (key %2) keyword) (val %2)) {} map))
 
 (defresource index-path
   :available-media-types ["application/json"]
@@ -30,14 +29,9 @@
                {:notes (note-collection-json (note/all-notes))})
   :post! (fn [ctx]
            (dosync
-            (let [params (string-keys-to-symbols (get-in ctx [:request :form-params]))
+            (let [params (keyword-form-params ctx)
                   note (note/create-note params)
                   guid (:note/guid note)]
               {::guid guid})))
   :post-redirect? (fn [ctx]
                     {:location (note-show-url (::guid ctx))}))
-
-;;(defn note-routes []
-  ;; (GET "/" [] (respond-with-json {:notes (note-collection-json (note/all-notes))}))
-  ;; (POST "/" {:keys [params]} (create-note-and-redirect params))))
-  ;;)

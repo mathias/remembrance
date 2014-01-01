@@ -4,7 +4,7 @@
             [remembrance.config :as config]
             [remembrance.models.article :as article]
             [remembrance.models.note :as note]
-            [remembrance.routes.core :refer [respond-with respond-with-error respond-with-json]]
+            [remembrance.routes.core :refer :all]
             [remembrance.workers :refer [enqueue-article-original-html]]
             [ring.util.response :refer [redirect]]
             [taoensso.timbre :refer [info]]))
@@ -39,13 +39,11 @@
   (let [article (article/create-article params)
         guid (:article/guid article)]
     (enqueue-article-original-html guid)
-    (redirect (article-show-url guid))))
+    guid))
 
-
-(defn article-routes []
+;;(defn article-routes []
   ;;  (GET "/" [] (respond-with-json {:articles (article-collection-json (article/find-all-ingested-articles))}))
 
-)
 ;; (create-and-enqueue-article params)
   ;; (GET "/search" {:keys [params]} (respond-with-json (article-collection-json (article/search-articles (:q params)))))
   ;; (GET "/stats" [] (respond-with-json (article/articles-stats)))
@@ -59,7 +57,13 @@
   :allowed-methods [:get :post]
   :handle-ok (fn [_]
                {:articles (article-collection-json
-                           (article/find-all-ingested-articles))}))
+                           (article/find-all-ingested-articles))})
+  :post! (fn [ctx]
+           (dosync
+            (let [guid (create-and-enqueue-article (keyword-form-params ctx))]
+              {::guid guid})))
+  :post-redirect? (fn [ctx]
+                    {:location (article-show-url (::guid ctx))}))
 
 (defresource show-article)
 (defresource search)
