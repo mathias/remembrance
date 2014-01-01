@@ -1,5 +1,6 @@
 (ns remembrance.routes.articles
   (:require [playnice.core :refer [dassoc] :as playnice]
+            [cemerick.url :refer [url url-encode]]
             [remembrance.config :as config]
             [remembrance.models.article :as article]
             [remembrance.models.note :as note]
@@ -11,12 +12,11 @@
 (def env (config/load!))
 
 (defn article-index-url []
-  ;; TODO: Use cemerick.url to compose URLs
-  (str (env :hostname) "/api/articles"))
+  (str (assoc (url (env :hostname)) :path "/api/articles")))
 
 (defn article-show-url [guid]
-  ;; TODO: Use cemerick.url to compose URLs
-  (str (env :hostname) "/api/articles/" guid))
+  (str (assoc (url (env :hostname)) :path (str "/api/articles/" guid))))
+
 
 (defn article-wrap-json [article]
   {:href (article-show-url (:article/guid article))

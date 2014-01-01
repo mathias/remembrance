@@ -70,9 +70,8 @@
                 :article/read read?}]))
 
 (defn find-all-article-ids []
-  (d/q '[:find ?a
-         :where [?a :article/guid]]
-       (db)))
+  (database/simple-q '[:find ?a
+                       :where [?a :article/guid]]))
 
 (defn all-articles []
   (map article-entity (find-all-article-ids)))
