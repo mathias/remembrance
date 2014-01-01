@@ -22,7 +22,7 @@ You should now be able to run the webapp with:
 lein ring server
 ```
 
-Migrations will run automatically on the Datomic db.
+Migrations will run automatically on the Datomic db. (See [database.clj](https://github.com/mathias/remembrance/blob/fa798b24783688b5568b2cb78c80854e3ae8cdbf/src/clj/remembrance/database.clj) for migration system built on top of https://github.com/rkneufeld/conformity
 
 To ingest from an Instapaper CSV export:
 
@@ -35,6 +35,31 @@ lein exec -p script/import_from_instapaper.clj /path/to/instapaper-export.csv
 ### Notes:
 
 **Never** run `lein datomic initialize` -- it will destroy data, and we no longer use `lein datomic`'s concept of a schema file!
+
+## Features, TODOs, wishful thinking.
+
+- [ ] Need to remove the Redis-backed worker queue. Eventually, I see that work being done by https://github.com/mathias/herman and enqueued by https://github.com/mathias/renfield
+- [ ] Finish rewriting to use Liberator.
+- [ ] Add https://github.com/cemerick/friend/ for auth.
+- [ ] Lots more that I'm probably not thinking of right now.
+
+Future features:
+
+* Automatically pull in each webpage read with a Chrome extension, to be indexed and searchable (with a lower "importance" score than manually added articles.)
+* Move all of my RSS feed reading activities to this app, using a cron-like feed updater.
+* Index emails sent/received for later searching and cross-referencing, with lower "importance"
+* Features utilizing topic modeling + TDF/IF scores to find related content and suggest related content. (See: http://infolab.stanford.edu/~ullman/mmds.html )
+
+Someday:
+
+* A ClojureScript-based mobile-first UI that provides as good or better experience as reading content in Instapaper native iOS app. One can dream.
+* Full instrumentation about time taken to read, etc.
+* Suggest related content, possibly web search / web crawling built in to crawl for other related content not yet in the data store.
+* Features that otherwise help this app be a research assistant.
+
+Related but maybe not living in this app:
+
+* Quantified self style datastore for personal analytics: Fitbit steps, Strava bike rides, Lift habit goals, RescueTime-like application usage tracking, and any other data I generate day-to-day. Since this won't be lots of text to be indexed/search, it probably doesn't make sense to store it in this app.
 
 ## License
 
