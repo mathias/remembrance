@@ -17,15 +17,20 @@
          path
          destination))
 
-;; Pages
-(route "/" (fn [req] (respond-with (index-page))))
+(defn define-routes! []
+  ;; Pages
+  (route "/" (fn [req] (respond-with (index-page))))
 
-;; API
-(route "/api/articles" articles/index-path)
-(route "/api/articles/:guid" articles/show-article)
-(route "/api/articles/search" articles/search)
-(route "/api/articles/stats" articles/stats)
-(route "/api/notes" notes/index-path)
+  ;; API
+  (route "/api/articles" articles/index-path)
+  (route "/api/articles/:guid" articles/show-article)
+  (route "/api/articles/search" articles/search)
+  (route "/api/articles/stats" articles/stats)
+  (route "/api/notes" notes/index-path)
+
+  (route "/testpost" articles/testpost))
+
+(define-routes!)
 
 (defn remembrance-init []
   (info "Migrations:" (prepare-database!))

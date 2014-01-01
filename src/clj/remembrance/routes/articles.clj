@@ -71,3 +71,8 @@
   :available-media-types ["application/json"]
   :allowed-methods [:get]
   :handle-ok (fn [_] {:stats {:articles (article/articles-stats)}}))
+
+(defresource testpost
+  :allowed-methods [:post]
+  :post! (fn [ctx] {:request ctx})
+  :post-redirect? (fn [ctx] {:location (article-index-url)}))
