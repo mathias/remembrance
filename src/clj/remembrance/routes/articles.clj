@@ -65,5 +65,5 @@
 (defresource search)
 (defresource stats
   :available-media-types ["application/json"]
-  :allowed-methods [:get :post]
+  :allowed-methods [:get]
   :handle-ok (fn [_] {:stats {:articles (article/articles-stats)}}))
