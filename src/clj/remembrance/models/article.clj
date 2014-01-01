@@ -177,9 +177,8 @@
       0))
 
 (defn articles-stats []
-  {:stats
-   {:articles {:total (count-articles)
-               :ingested (count-articles :article.ingest_state/ingested)
-               :fetched (count-articles :article.ingest_state/fetched)
-               :errored (count-articles :article.ingest_state/errored)
-               :read (count-read-articles)}}})
+  {:total (count-articles)
+   :ingested (count-articles :article.ingest_state/ingested)
+   :fetched (count-articles :article.ingest_state/fetched)
+   :errored (count-articles :article.ingest_state/errored)
+   :read (count-read-articles)})

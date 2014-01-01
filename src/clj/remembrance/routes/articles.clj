@@ -1,5 +1,5 @@
 (ns remembrance.routes.articles
-  (:require [playnice.core :refer [dassoc] :as playnice]
+  (:require [liberator.core :refer [defresource]]
             [cemerick.url :refer [url url-encode]]
             [remembrance.config :as config]
             [remembrance.models.article :as article]
@@ -17,14 +17,12 @@
 (defn article-show-url [guid]
   (str (assoc (url (env :hostname)) :path (str "/api/articles/" guid))))
 
-
 (defn article-wrap-json [article]
   {:href (article-show-url (:article/guid article))
    :guid (:article/guid article)
    :title (:article/title article)
    :original_url (:article/original_url article)
-   :read (:article/read article)
-   })
+   :read (:article/read article)})
 
 (defn full-article-wrap-json [full-article]
   {:href (article-show-url (:article/guid full-article))
@@ -32,8 +30,7 @@
    :title (:article/title full-article)
    :original_url (:article/original_url full-article)
    :readable_body (:article/readable_body full-article)
-   :read (:article/read full-article)
-   })
+   :read (:article/read full-article)})
 
 (defn article-collection-json [collection]
   (map article-wrap-json collection))
@@ -57,9 +54,16 @@
   ;;                          (respond-with-json (full-article-wrap-json article))
   ;;                          (respond-with-error)))))
 
-(defn index-path [req]
-  (respond-with "hi haters"))
+(defresource index-path
+  :available-media-types ["application/json"]
+  :allowed-methods [:get :post]
+  :handle-ok (fn [_]
+               {:articles (article-collection-json
+                           (article/find-all-ingested-articles))}))
 
-(defn show-article [req] {})
-(defn search [req] {})
-(defn stats [req] {})
+(defresource show-article)
+(defresource search)
+(defresource stats
+  :available-media-types ["application/json"]
+  :allowed-methods [:get :post]
+  :handle-ok (fn [_] {:stats {:articles (article/articles-stats)}}))
