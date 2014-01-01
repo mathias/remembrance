@@ -15,9 +15,8 @@
   (entity (first entity-vec)))
 
 (defn find-all-note-ids []
-  (d/q '[:find ?n
-         :where [?n :note/guid _]]
-       (db)))
+  (database/simple-q '[:find ?n
+                       :where [?n :note/guid _]]))
 
 (defn all-notes []
   (map note-entity (find-all-note-ids)))
@@ -27,9 +26,19 @@
                          body ""
                          articles []}
                     :as all-params}]
-  (info all-params)
-  @(database/t [{:db/id (d/tempid "db.part/user")
-                :note/guid (database/new-guid)
-                :note/title title
-                :note/body body
-                :note/articles articles}]))
+  (let [guid (database/new-guid)]
+    @(database/t [{:db/id (d/tempid "db.part/user")
+                   :note/guid guid
+                   :note/title title
+                   :note/body body
+                   :note/articles articles}])
+    (entity (ffirst (d/q '[:find ?n
+                           :in $ ?guid
+                           :where [?n :note/guid ?guid]]
+                          (db)
+                          guid)))))
+(defn count-notes []
+  (or (ffirst (d/q '[:find (count ?e)
+                     :where [?e :note/guid _]]
+                   (db)))
+      0))

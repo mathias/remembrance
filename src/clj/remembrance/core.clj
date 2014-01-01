@@ -17,25 +17,23 @@
          path
          destination))
 
-(defn build-routes! []
-  ;; Pages
-  (route "/" (fn [req] (respond-with (index-page))))
+;; Pages
+(route "/" (fn [req] (respond-with (index-page))))
 
-  ;; API
-  (route "/api/articles" articles/index-path)
-  (route "/api/articles/:guid" articles/show-article)
-  (route "/api/articles/search" articles/search)
-  (route "/api/articles/stats" articles/stats)
-
-  (route "/api/notes" notes/index-path))
+;; API
+(route "/api/articles" articles/index-path)
+(route "/api/articles/:guid" articles/show-article)
+(route "/api/articles/search" articles/search)
+(route "/api/articles/stats" articles/stats)
+(route "/api/notes" notes/index-path)
 
 (defn remembrance-init []
   (info "Migrations:" (prepare-database!))
   (info "DB:" (db))
   (info "Redis PING:" (ping-redis))
-  (build-routes!)
-  (info "Routes:")
-  (clojure.pprint/pprint @routes))
+  ;;(info "Routes:")
+  ;;(clojure.pprint/pprint @routes)
+  )
 
 (defn routes-handler [req]
   (playnice/dispatch @routes req))

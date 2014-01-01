@@ -54,7 +54,6 @@
                 :article/read false}]))
 
 (defn create-article [attrs]
-  (info attrs)
   ;; try to find an existing article first
   (let [original-url (attrs :original_url)
         existing (find-article-by-original-url original-url)]

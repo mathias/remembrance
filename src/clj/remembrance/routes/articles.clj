@@ -44,27 +44,6 @@
     (enqueue-article-original-html guid)
     (redirect (article-show-url guid))))
 
-(defn note-show-url [guid]
-  ;; TODO: Use cemerick.url to compose URLs
-  (str (env :hostname) "/api/notes/" guid))
-
-(defn note-wrap-json [note]
-  {:href (note-show-url (:note/guid note))
-   :guid (:note/guid note)
-   :title (:note/title note)
-   :articles (article-collection-json (:note/articles note))})
-
-(defn note-collection-json [coll]
-  (map note-wrap-json coll))
-
-(defn create-note-and-redirect [params]
-  (let [note (note/create-note params)]
-    (respond-with-json (note-wrap-json note))))
-
-(defn print-info [req]
-  (info (or req "We got somewhere but there was no signal"))
-  (respond-with req))
-
 
 (defn article-routes []
   ;;  (GET "/" [] (respond-with-json {:articles (article-collection-json (article/find-all-ingested-articles))}))
