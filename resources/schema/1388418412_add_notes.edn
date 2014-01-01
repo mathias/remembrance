@@ -20,7 +20,6 @@
            :db/ident :note/body
            :db/valueType :db.type/string
            :db/cardinality :db.cardinality/one
-           :db/unique :db.unique/identity
            :db/fulltext true
            :db/index true
            :db.install/_attribute :db.part/db}
