@@ -1,10 +1,10 @@
 (ns remembrance.models.note
-  (:require [remembrance.config :refer [load!]]
+  (:require [remembrance.config :as config]
             [datomic.api :as d]
             [remembrance.database :as database]
             [taoensso.timbre :refer [info]]))
 
-(def env (load!))
+(def env (config/load!))
 
 (defn db [] (database/db))
 

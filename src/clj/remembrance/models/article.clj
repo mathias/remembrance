@@ -3,11 +3,11 @@
             [cemerick.url :refer [url url-encode]]
             [datomic.api :as d]
             [org.httpkit.client :as http]
-            [remembrance.config :refer [load!]]
+            [remembrance.config :as config]
             [remembrance.database :as database]
             [taoensso.timbre :refer [info]]))
 
-(def env (load!))
+(def env (config/load!))
 (def wolfcastle-uri (env :wolfcastle-uri))
 
 (defn db []

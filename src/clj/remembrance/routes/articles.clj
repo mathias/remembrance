@@ -1,7 +1,6 @@
-(ns remembrance.routes.api
-  (:require
-            [playnice.core :refer [dassoc] :as playnice]
-            [remembrance.config :refer [load!]]
+(ns remembrance.routes.articles
+  (:require [playnice.core :refer [dassoc] :as playnice]
+            [remembrance.config :as config]
             [remembrance.models.article :as article]
             [remembrance.models.note :as note]
             [remembrance.routes.core :refer [respond-with respond-with-error respond-with-json]]
@@ -9,7 +8,7 @@
             [ring.util.response :refer [redirect]]
             [taoensso.timbre :refer [info]]))
 
-(def env (load!))
+(def env (config/load!))
 
 (defn article-index-url []
   ;; TODO: Use cemerick.url to compose URLs
@@ -66,11 +65,11 @@
   (info (or req "We got somewhere but there was no signal"))
   (respond-with req))
 
-(def article-routes
+
+(defn article-routes []
   ;;  (GET "/" [] (respond-with-json {:articles (article-collection-json (article/find-all-ingested-articles))}))
-  (-> nil
-      (dassoc "/" print-info)
-      (dassoc "/:guid" print-info)))
+
+)
 ;; (create-and-enqueue-article params)
   ;; (GET "/search" {:keys [params]} (respond-with-json (article-collection-json (article/search-articles (:q params)))))
   ;; (GET "/stats" [] (respond-with-json (article/articles-stats)))
@@ -79,14 +78,9 @@
   ;;                          (respond-with-json (full-article-wrap-json article))
   ;;                          (respond-with-error)))))
 
+(defn index-path [req]
+  (respond-with "hi haters"))
 
-(def note-routes
-  (-> nil
-      (dassoc "/" print-info)))
-  ;; (GET "/" [] (respond-with-json {:notes (note-collection-json (note/all-notes))}))
-  ;; (POST "/" {:keys [params]} (create-note-and-redirect params))))
-
-(def api-routes
-  (-> nil
-      (dassoc "/articles" article-routes)
-      (dassoc "/notes" note-routes)))
+(defn show-article [req] {})
+(defn search [req] {})
+(defn stats [req] {})
