@@ -53,7 +53,7 @@
   ;;                          (respond-with-error)))))
 
 (defresource index-path
-  :available-media-types ["application/json"]
+  :available-media-types ["application/json" "application/x-www-form-urlencoded"]
   :allowed-methods [:get :post]
   :handle-ok (fn [_]
                {:articles (article-collection-json
@@ -65,7 +65,14 @@
   :post-redirect? (fn [ctx]
                     {:location (article-show-url (::guid ctx))}))
 
-(defresource show-article)
+(defresource show-article
+  :available-media-types ["application/json"]
+  :allowed-methods [:get :put]
+  :exists? (fn [ctx]
+             (if-let [article (article/show-article (get-in ctx [:request :guid]))]
+               {::article article}))
+  :handle-ok (fn [ctx]
+               {:articles [(full-article-wrap-json (get ctx ::article))]}))
 (defresource search)
 (defresource stats
   :available-media-types ["application/json"]
@@ -73,6 +80,8 @@
   :handle-ok (fn [_] {:stats {:articles (article/articles-stats)}}))
 
 (defresource testpost
+  :available-media-types ["application/x-www-form-urlencoded"]
   :allowed-methods [:post]
-  :post! (fn [ctx] {:request ctx})
-  :post-redirect? (fn [ctx] {:location (article-index-url)}))
+  :post! (fn [ctx]
+             (clojure.pprint/pprint ctx)
+             {:request ctx}))

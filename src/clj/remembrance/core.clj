@@ -28,7 +28,7 @@
   (route "/api/articles/stats" articles/stats)
   (route "/api/notes" notes/index-path)
 
-  (route "/testpost" articles/testpost))
+  (route "/api/testpost" articles/testpost))
 
 (define-routes!)
 
