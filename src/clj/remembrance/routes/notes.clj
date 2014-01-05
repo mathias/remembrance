@@ -29,7 +29,7 @@
                {:notes (note-collection-json (note/all-notes))})
   :post! (fn [ctx]
            (dosync
-            (let [params (keyword-form-params ctx)
+            (let [params (keywordize-form-params ctx)
                   note (note/create-note params)
                   guid (:note/guid note)]
               {::guid guid})))

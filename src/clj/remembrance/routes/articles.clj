@@ -60,28 +60,29 @@
                            (article/find-all-ingested-articles))})
   :post! (fn [ctx]
            (dosync
-            (let [guid (create-and-enqueue-article (keyword-form-params ctx))]
+            (let [guid (create-and-enqueue-article (keywordize-form-params ctx))]
               {::guid guid})))
   :post-redirect? (fn [ctx]
                     {:location (article-show-url (::guid ctx))}))
 
 (defresource show-article
   :available-media-types ["application/json"]
-  :allowed-methods [:get :put]
+  :allowed-methods [:get]
   :exists? (fn [ctx]
              (if-let [article (article/show-article (get-in ctx [:request :guid]))]
                {::article article}))
   :handle-ok (fn [ctx]
                {:articles [(full-article-wrap-json (get ctx ::article))]}))
-(defresource search)
+
+(defresource search
+  :available-media-types ["application/json"]
+  :allowed-methods [:get]
+  :handle-ok (fn [ctx]
+               (let [query (:q (keywordize-query-params ctx))
+                     articles (article-collection-json (article/search-articles query))]
+                 {:articles articles})))
+
 (defresource stats
   :available-media-types ["application/json"]
   :allowed-methods [:get]
   :handle-ok (fn [_] {:stats {:articles (article/articles-stats)}}))
-
-(defresource testpost
-  :available-media-types ["application/x-www-form-urlencoded"]
-  :allowed-methods [:post]
-  :post! (fn [ctx]
-             (clojure.pprint/pprint ctx)
-             {:request ctx}))

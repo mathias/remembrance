@@ -15,5 +15,8 @@
 (defn string-keys-to-symbols [map]
     (reduce #(assoc %1 (-> (key %2) keyword) (val %2)) {} map))
 
-(defn keyword-form-params [ctx]
+(defn keywordize-form-params [ctx]
   (string-keys-to-symbols (get-in ctx [:request :form-params])))
+
+(defn keywordize-query-params [ctx]
+  (string-keys-to-symbols (get-in ctx [:request :query-params])))
