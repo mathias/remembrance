@@ -26,7 +26,9 @@
   (route "/api/articles/:guid" articles/show-article)
   (route "/api/articles/search" articles/search)
   (route "/api/articles/stats" articles/stats)
-  (route "/api/notes" notes/index-path))
+  (route "/api/notes" notes/index-path)
+  (route "/api/notes/:guid" notes/show-note))
+
 
 ;; we must do this in the namespace and not init fn below,
 ;; because ring in dev will reload this file but not re-run init,

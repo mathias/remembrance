@@ -42,3 +42,14 @@
                      :where [?e :note/guid _]]
                    (db)))
       0))
+
+(defn find-note-by-guid [guid]
+  (d/q '[:find ?eid
+         :in $ ?guid
+         :where [?eid :note/guid ?guid]]
+       (db)
+       guid))
+
+(defn show-note [guid]
+  (let [results (find-note-by-guid guid)]
+    (entity (ffirst results))))

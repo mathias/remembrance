@@ -35,3 +35,12 @@
               {::guid guid})))
   :post-redirect? (fn [ctx]
                     {:location (note-show-url (::guid ctx))}))
+
+(defresource show-note
+  :available-media-types ["application/json"]
+  :allowed-methods [:get]
+  :exists? (fn [ctx]
+             (if-let [note (note/show-note (get-in ctx [:request :guid]))]
+               {::note note}))
+  :handle-ok (fn [ctx]
+               {:notes [(note-wrap-json (get ctx ::note))]}))
