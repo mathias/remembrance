@@ -111,7 +111,9 @@
     @(database/t [{:db/id (:db/id article)
                    :article/title title
                    :article/readable_body body
-                   :article/ingest_state :article.ingest_state/ingested}]))
+                   :article/ingest_state :article.ingest_state/ingested
+                   :article/date_ingested (java.util.Date.)
+                   }]))
   :success)
 
 (defn update-readable-html [article]
@@ -127,7 +129,8 @@
 (defn update-original-html-txn [article article-html]
   @(database/t [{:db/id (:db/id article)
                  :article/original_html article-html
-                 :article/ingest_state :article.ingest_state/fetched}])
+                 :article/ingest_state :article.ingest_state/fetched
+                 :article/date_fetched (java.util.Date.)}])
   :success)
 
 (defn update-original-html [article]
