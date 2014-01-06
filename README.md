@@ -27,10 +27,8 @@ Migrations will run automatically on the Datomic db. (See [database.clj](https:/
 To ingest from an Instapaper CSV export:
 
 ```bash
-lein exec -p script/import_from_instapaper.clj /path/to/instapaper-export.csv
+lein run -m remembrance.scripts.import_from_instapaper /path/to/instapaper-export.csv
 ```
-
-(Note that the `-p` flag is very important to run the lein-exec in the scope of the project and get its CLASSPATH.)
 
 ### Notes:
 
@@ -39,7 +37,7 @@ lein exec -p script/import_from_instapaper.clj /path/to/instapaper-export.csv
 ## Features, TODOs, wishful thinking.
 
 - [ ] Need to remove the Redis-backed worker queue. Eventually, I see that work being done by https://github.com/mathias/herman and enqueued by https://github.com/mathias/renfield
-- [ ] Finish rewriting to use Liberator.
+- [X] Finish rewriting to use Liberator.
 - [ ] Add https://github.com/cemerick/friend/ for auth.
 - [ ] Lots more that I'm probably not thinking of right now.
 

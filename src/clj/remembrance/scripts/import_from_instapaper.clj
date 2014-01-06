@@ -1,6 +1,7 @@
-(require '[remembrance.models.article :refer :all]
-         '[clojure.java.io :as io]
-         '[clojure-csv.core :as csv])
+(ns remembrance.scripts.import_from_instapaper
+  (:require [remembrance.models.article :refer :all]
+            [clojure.java.io :as io]
+            [clojure-csv.core :as csv]))
 
 (defn parse-row [row]
   (let [v (first (csv/parse-csv row))]
@@ -36,10 +37,7 @@
            (println "Error. Not a valid record:" (or (:title attrs)
                                                      (:original_url attrs))))))))
 
-(do
-  (def csv-file (second *command-line-args*))
-  (time
-   (ingest-instapaper-csv csv-file)))
-
-(println "Import complete!")
-(System/exit 0)
+(defn -main [csv-file]
+  (time (ingest-instapaper-csv csv-file))
+  (println "Import complete!")
+  (System/exit 0))
