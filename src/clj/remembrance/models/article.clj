@@ -182,3 +182,9 @@
    :fetched (count-articles :article.ingest_state/fetched)
    :errored (count-articles :article.ingest_state/errored)
    :read (count-read-articles)})
+
+(defn update-article [article attributes]
+  ;; TODO: Use a real validation library here. We should be checking the keys and the values' types.
+  (let [read-status (or (boolean (:read attributes)) (:read article))]
+    @(database/t [{:db/id (:db/id article)
+                   :article/read read-status}])))

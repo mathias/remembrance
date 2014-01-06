@@ -41,17 +41,6 @@
     (enqueue-article-original-html guid)
     guid))
 
-;;(defn article-routes []
-  ;;  (GET "/" [] (respond-with-json {:articles (article-collection-json (article/find-all-ingested-articles))}))
-
-;; (create-and-enqueue-article params)
-  ;; (GET "/search" {:keys [params]} (respond-with-json (article-collection-json (article/search-articles (:q params)))))
-  ;; (GET "/stats" [] (respond-with-json (article/articles-stats)))
-  ;; (GET "/:guid" [guid] (let [article (article/show-article guid)]
-  ;;                        (if-not (nil? article)
-  ;;                          (respond-with-json (full-article-wrap-json article))
-  ;;                          (respond-with-error)))))
-
 (defresource index-path
   :available-media-types ["application/json" "application/x-www-form-urlencoded"]
   :allowed-methods [:get :post]
@@ -66,13 +55,16 @@
                     {:location (article-show-url (::guid ctx))}))
 
 (defresource show-article
-  :available-media-types ["application/json"]
-  :allowed-methods [:get]
+  :available-media-types ["application/json" "application/x-www-form-urlencoded"]
+  :allowed-methods [:get :put]
   :exists? (fn [ctx]
              (if-let [article (article/show-article (get-in ctx [:request :guid]))]
                {::article article}))
   :handle-ok (fn [ctx]
-               {:articles [(full-article-wrap-json (get ctx ::article))]}))
+               {:articles [(full-article-wrap-json (get ctx ::article))]})
+  :put! (fn [ctx] (when-let [article (get ctx ::article)]
+                   (article/update-article article (keywordize-form-params ctx))))
+)
 
 (defresource search
   :available-media-types ["application/json"]
