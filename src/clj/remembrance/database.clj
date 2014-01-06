@@ -25,7 +25,8 @@
   (read-string (slurp (str "resources/schema/" filename))))
 
 (def migrations ["1387819157_add_articles.edn"
-                 "1388418412_add_notes.edn"])
+                 "1388418412_add_notes.edn"
+                 "1388969538_add_ratings_to_articles.edn"])
 
 (defn migrate! [migrations]
   (map (fn [migration-file]
