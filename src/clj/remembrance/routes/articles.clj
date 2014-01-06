@@ -58,13 +58,16 @@
   :available-media-types ["application/json" "application/x-www-form-urlencoded"]
   :allowed-methods [:get :put]
   :exists? (fn [ctx]
-             (if-let [article (article/show-article (get-in ctx [:request :guid]))]
+             (if-let [article (article/find-one-article-by-guid (get-in ctx [:request :guid]))]
                {::article article}))
   :handle-ok (fn [ctx]
                {:articles [(full-article-wrap-json (get ctx ::article))]})
-  :put! (fn [ctx] (when-let [article (get ctx ::article)]
-                   (article/update-article article (keywordize-form-params ctx))))
-)
+  :can-put-to-missing? false
+  :put! (fn [ctx]
+          (dosync
+           (let [article (get ctx ::article)
+                 attributes (keywordize-form-params ctx)]
+             (article/update-article article attributes)))))
 
 (defresource search
   :available-media-types ["application/json"]

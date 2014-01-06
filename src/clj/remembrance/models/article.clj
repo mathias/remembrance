@@ -187,7 +187,13 @@
    :read (count-read-articles)})
 
 (defn update-article [article attributes]
-  ;; TODO: Use a real validation library here. We should be checking the keys and the values' types.
-  (let [read-status (or (boolean (:read attributes)) (:read article))]
-    @(database/t [{:db/id (:db/id article)
-                   :article/read read-status}])))
+  ;; TODO: Use a real validation library here.
+  ;; We should be checking the values' types & doing other validations on input.
+  (let [mapped-attributes (map (fn [[k v]] (condp = k
+                                            :read {:article/read (read-string v)}
+                                            :user_rating {:article/user_rating (read-string v)}
+                                            nil))
+                               attributes)
+        attributes-to-update (apply merge mapped-attributes)]
+    (clojure.pprint/pprint attributes-to-update)
+    (database/t [(merge {:db/id (:db/id article)} attributes-to-update)])))
