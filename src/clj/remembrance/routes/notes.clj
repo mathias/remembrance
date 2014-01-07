@@ -23,7 +23,7 @@
 
 
 (defresource index-path
-  :available-media-types ["application/json"]
+  :available-media-types ["application/json" "application/x-www-form-urlencoded"]
   :allowed-methods [:get :post]
   :handle-ok (fn [_]
                {:notes (note-collection-json (note/all-notes))})
@@ -37,10 +37,16 @@
                     {:location (note-show-url (::guid ctx))}))
 
 (defresource show-note
-  :available-media-types ["application/json"]
-  :allowed-methods [:get]
+  :available-media-types ["application/json" "application/x-www-form-urlencoded"]
+  :allowed-methods [:get :put]
   :exists? (fn [ctx]
              (if-let [note (note/show-note (get-in ctx [:request :guid]))]
                {::note note}))
   :handle-ok (fn [ctx]
-               {:notes [(note-wrap-json (get ctx ::note))]}))
+               {:notes [(note-wrap-json (get ctx ::note))]})
+  :can-put-to-missing? false
+  :put! (fn [ctx]
+          (dosync
+           (let [note (get ctx ::note)
+                 attributes (keywordize-form-params ctx)]
+             (note/update-note note attributes)))))

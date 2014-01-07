@@ -1,5 +1,6 @@
 (ns remembrance.models.note
   (:require [remembrance.config :as config]
+            [remembrance.models.article :refer [find-article-by-guid]]
             [datomic.api :as d]
             [remembrance.database :as database]
             [taoensso.timbre :refer [info]]))
@@ -21,6 +22,16 @@
 (defn all-notes []
   (map note-entity (find-all-note-ids)))
 
+(defn find-note-by-guid [guid]
+  (d/q '[:find ?eid
+         :in $ ?guid
+         :where [?eid :note/guid ?guid]]
+       (db)
+       guid))
+
+(defn find-articles-for-params [articles-param]
+  (map ffirst (map find-article-by-guid (read-string articles-param))))
+
 (defn create-note [{:keys [title body articles]
                     :or {title "Untitled"
                          body ""
@@ -31,25 +42,28 @@
                    :note/guid guid
                    :note/title title
                    :note/body body
-                   :note/articles articles}])
-    (entity (ffirst (d/q '[:find ?n
-                           :in $ ?guid
-                           :where [?n :note/guid ?guid]]
-                          (db)
-                          guid)))))
+                   :note/articles (find-articles-for-params articles)}])
+    (find-note-by-guid guid)))
+
 (defn count-notes []
   (or (ffirst (d/q '[:find (count ?e)
                      :where [?e :note/guid _]]
                    (db)))
       0))
 
-(defn find-note-by-guid [guid]
-  (d/q '[:find ?eid
-         :in $ ?guid
-         :where [?eid :note/guid ?guid]]
-       (db)
-       guid))
-
 (defn show-note [guid]
   (let [results (find-note-by-guid guid)]
     (entity (ffirst results))))
+
+
+(defn update-note [note attributes]
+  (let [mapped-attributes (map (fn [[k v]] (condp = k
+                                            :title {:note/title v}
+                                            :body {:nody/body v}
+                                            :articles {:note/articles (find-articles-for-params v)}))
+                               attributes)
+        attributes-to-update (apply merge mapped-attributes)]
+    (clojure.pprint/pprint attributes-to-update)
+    @(database/t [(merge {:db/id (:db/id note)}
+                        attributes-to-update)])
+    (find-note-by-guid (:note/guid note))))
