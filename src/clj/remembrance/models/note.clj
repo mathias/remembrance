@@ -67,3 +67,6 @@
     @(database/t [(merge {:db/id (:db/id note)}
                         attributes-to-update)])
     (find-note-by-guid (:note/guid note))))
+
+(defn notes-stats []
+  {:total (count-notes)})

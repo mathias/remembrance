@@ -1,6 +1,6 @@
 (ns remembrance.core
   (:require [remembrance.database :refer [prepare-database! db]]
-            [remembrance.routes.core :refer [respond-with]]
+            [remembrance.routes.core :refer [respond-with api-stats]]
             [remembrance.routes.articles :as articles]
             [remembrance.routes.notes :as notes]
             [remembrance.views :refer [index-page]]
@@ -27,7 +27,9 @@
   (route "/api/articles/search" articles/search)
   (route "/api/articles/stats" articles/stats)
   (route "/api/notes" notes/index-path)
-  (route "/api/notes/:guid" notes/show-note))
+  (route "/api/notes/:guid" notes/show-note)
+  (route "/api/notes/stats" notes/stats)
+  (route "/api/stats" api-stats))
 
 
 ;; we must do this in the namespace and not init fn below,

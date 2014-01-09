@@ -1,5 +1,8 @@
 (ns remembrance.routes.core
-  (:require [cheshire.core :as json]))
+  (:require [cheshire.core :as json]
+            [liberator.core :refer [defresource]]
+            [remembrance.models.article :refer [articles-stats]]
+            [remembrance.models.note :refer [notes-stats]]))
 
 (defn respond-with
   ([body] {:body body})
@@ -20,3 +23,10 @@
 
 (defn keywordize-query-params [ctx]
   (string-keys-to-symbols (get-in ctx [:request :query-params])))
+
+(defresource api-stats
+  :available-media-types ["application/json"]
+  :allowed-methods [:get]
+  :handle-ok (fn [_] {:stats
+                     {:articles (articles-stats)
+                      :notes (notes-stats)}}))

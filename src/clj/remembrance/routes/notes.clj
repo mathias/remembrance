@@ -50,3 +50,8 @@
            (let [note (get ctx ::note)
                  attributes (keywordize-form-params ctx)]
              (note/update-note note attributes)))))
+
+(defresource stats
+  :available-media-types ["application/json"]
+  :allowed-methods [:get]
+  :handle-ok (fn [_] {:stats {:notes (note/notes-stats)}}))
