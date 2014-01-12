@@ -20,7 +20,7 @@
        [:li (str (count-articles :article.ingest_state/ingested)
                 " ingested, "
                 (count-articles :article.ingest_state/fetched)
-                " fetched, and "
+                " waiting to be ingested, and "
                 (count-articles :article.ingest_state/errored)
                 " errored.")]
        [:li (str "You have read " (count-read-articles) " out of " total-articles-count ".")]]
