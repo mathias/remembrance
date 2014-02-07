@@ -19,3 +19,6 @@ resources/*-transactor-template.properties
 *~
 \#*\#
 .#*
+
+# redis dumps
+dump.rdb
