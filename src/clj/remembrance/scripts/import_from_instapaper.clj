@@ -6,8 +6,8 @@
             [clojure.string :as str]))
 
 (defn parse-file [csv-data]
-  (let [[header & rows] (csv/parse-csv csv-data)
-        lowercased-headers (map str/lower-case header)]
+  (let [[headers & rows] (csv/parse-csv csv-data)
+        lowercased-headers (map str/lower-case headers)]
     (map #(->> % (zipmap lowercased-headers) walk/keywordize-keys) rows)))
 
 (defn ingest-article [guid]
