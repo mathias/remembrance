@@ -8,7 +8,6 @@
                  [clojure-csv "2.0.1"]
                  [com.cemerick/url "0.1.0"]
                  [com.datomic/datomic-pro "0.9.4384"]
-                 [com.taoensso/carmine "2.4.0"]
                  [com.taoensso/timbre "2.7.1"]
                  [playnice "1.0.1"]
                  [hiccup "1.0.4"]
@@ -20,7 +19,9 @@
                  [org.clojure/data.json "0.2.3"]
                  [prismatic/dommy "0.1.2"]
                  [ring/ring-jetty-adapter "1.2.1"]
-                 [ring/ring-json "0.2.0"]]
+                 [ring/ring-json "0.2.0"]
+                 [hearst "0.1.1-SNAPSHOT"]
+                 [org.clojure/core.async "0.1.267.0-0d7780-alpha"]]
 
   ;; clojure source code pathname
   :source-paths ["src/clj"]

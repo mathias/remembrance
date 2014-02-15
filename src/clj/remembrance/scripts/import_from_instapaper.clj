@@ -3,7 +3,12 @@
             [clojure.java.io :as io]
             [clojure-csv.core :as csv]
             [clojure.walk :as walk]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [hearst.url-cleanup :refer [normalize-url]]
+            [clojure.core.async :refer [chan go <! >!]]))
+
+(def create-article-chan (chan))
+(def ingest-chan (chan))
 
 (defn parse-file [csv-data]
   (let [[headers & rows] (csv/parse-csv csv-data)
@@ -13,7 +18,7 @@
 (defn ingest-article [guid]
   (article-get-original-html guid)
   (article-extract-text guid)
-  (println "Ingested: " (:article/title (find-one-article-by-guid guid))))
+  (println "Ingested:" (:article/title (find-one-article-by-guid guid))))
 
 (defn ingest-and-set-state [article attrs]
   ;; Always try to update the read status
@@ -25,18 +30,25 @@
 
 (defn create-and-ingest-article [attrs]
   (if-let [article (create-article attrs)]
-    (ingest-and-set-state article attrs)
+    (go (>! ingest-chan [article attrs]))
     (println "Error creating article:"(:url attrs))))
 
 (defn valid-row? [attrs]
   (not (nil? (:url attrs))))
 
+(go (while true
+      (let [row (<! create-article-chan)]
+        (create-and-ingest-article row))))
+
+(go (while true
+      (let [[article attrs] (<! ingest-chan)]
+        (ingest-and-set-state article attrs))))
+
 (defn ingest-instapaper-csv [filename]
-  (doseq [row (parse-file (slurp filename))]
-    (when (valid-row? row)
-      (create-and-ingest-article row))))
+  (go
+   (doseq [row (parse-file (slurp filename))]
+     (when (valid-row? row)
+       (>! create-article-chan row)))))
 
 (defn -main [csv-file]
-  (time (ingest-instapaper-csv csv-file))
-  (println "Import complete!")
-  (System/exit 0))
+  (ingest-instapaper-csv csv-file))

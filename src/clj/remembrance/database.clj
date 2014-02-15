@@ -9,7 +9,7 @@
 
 (def db-uri (env :db-uri))
 
-(def connection (d/connect db-uri))
+(defonce connection (d/connect db-uri))
 
 (defn db []
   (d/db connection))

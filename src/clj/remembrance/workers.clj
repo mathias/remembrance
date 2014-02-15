@@ -1,45 +1,32 @@
 (ns remembrance.workers
-  (:require [remembrance.config :as config]
-            [remembrance.models.article :refer [article-get-original-html article-extract-text]]
-            [taoensso.carmine :as car :refer (wcar)]
-            [taoensso.carmine.message-queue :as car-mq]
+  (:require [remembrance.models.article :refer [article-get-original-html article-extract-text]]
+            [clojure.core.async :refer [chan go <! >!]]
             [taoensso.timbre :refer [info]]))
 
-(def env (config/load!))
+(defonce article-original-html-channel (chan))
+(defonce article-extract-text-channel (chan))
 
-(def redis-uri (env :redis-uri))
-
-(def server-conn {:pool {} :spec {:uri redis-uri}})
-
-(defmacro wcar* [& body] `(car/wcar server-conn ~@body))
-
-(defn ping-redis []
-  (wcar* (car/ping)))
-
-(def article-text-extraction
-  (car-mq/worker {:spec {:uri redis-uri}} "article-text-extraction-queue"
-                 {:handler (fn [{:keys [message]}]
-                             (info "Article Text Extraction Worker got work:" message)
-                             {:status (article-extract-text message)})
-                  :throttle-ms 500
-                  :eoq-backoff-ms 100}))
+(defn process-text-extraction [article-guid]
+  (do
+    (info "Article text extraction worker got:" article-guid)
+    (article-extract-text article-guid)))
 
 (defn enqueue-text-extraction [article-guid]
-  (wcar* (car-mq/enqueue "article-text-extraction-queue" article-guid)))
+  (go (>! article-extract-text-channel article-guid)))
 
-(defn enqueue-next-step-and-return-success [guid]
-  (enqueue-text-extraction guid)
-  {:status :success})
+(defn process-original-html [article-guid]
+  (do
+    (info "Original HTML worker got:" article-guid)
+    (if (= :success (article-get-original-html article-guid))
+      (enqueue-text-extraction article-guid))))
+(go
+ (while true
+   (process-text-extraction (<! article-extract-text-channel))))
 
-(def article-original-html-worker
-  (car-mq/worker {:spec {:uri redis-uri}} "article-original-html-queue"
-                 {:handler (fn [{:keys [message]}]
-                             (info "Article Original HTML Worker got work:" message)
-                             (if (= :success (article-get-original-html message))
-                               (enqueue-next-step-and-return-success message)
-                               {:status :error}))
-                  :throttle-ms 500
-                  :eoq-backoff-ms 100}))
+(go
+ (while true
+   (process-original-html (<! article-original-html-channel))))
+
 
 (defn enqueue-article-original-html [article-guid]
-  (wcar* (car-mq/enqueue "article-original-html-queue" article-guid)))
+  (go (>! article-original-html-channel article-guid)))

@@ -4,7 +4,6 @@
             [remembrance.routes.articles :as articles]
             [remembrance.routes.notes :as notes]
             [remembrance.views :refer [index-page]]
-            [remembrance.workers :refer [ping-redis]]
             [playnice.core :refer [dassoc] :as playnice]
             [ring.middleware.params :refer [wrap-params]]
             [taoensso.timbre :refer [info]]))
@@ -40,10 +39,9 @@
 (defn remembrance-init []
   (info "Migrations:" (prepare-database!))
   (info "DB:" (db))
-  (info "Redis PING:" (ping-redis))
-  ;; (info "Routes:")
-  ;; (clojure.pprint/pprint @routes))
-)
+  (comment
+    (info "Routes:")
+    (clojure.pprint/pprint @routes)))
 
 (defn routes-handler [req]
   (playnice/dispatch @routes req))
