@@ -21,7 +21,8 @@
                  [ring/ring-jetty-adapter "1.2.1"]
                  [ring/ring-json "0.2.0"]
                  [hearst "0.1.1-SNAPSHOT"]
-                 [org.clojure/core.async "0.1.267.0-0d7780-alpha"]]
+                 [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
+                 [midje "1.6.0"]]
 
   ;; clojure source code pathname
   :source-paths ["src/clj"]
