@@ -35,7 +35,7 @@
 (defn create-note [{:keys [title body articles]
                     :or {title "Untitled"
                          body ""
-                         articles []}
+                         articles "[]"}
                     :as all-params}]
   (let [guid (database/new-guid)]
     @(database/t [{:db/id (d/tempid "db.part/user")
@@ -59,11 +59,10 @@
 (defn update-note [note attributes]
   (let [mapped-attributes (map (fn [[k v]] (condp = k
                                             :title {:note/title v}
-                                            :body {:nody/body v}
+                                            :body {:note/body v}
                                             :articles {:note/articles (find-articles-for-params v)}))
                                attributes)
         attributes-to-update (apply merge mapped-attributes)]
-    (clojure.pprint/pprint attributes-to-update)
     @(database/t [(merge {:db/id (:db/id note)}
                         attributes-to-update)])
     (find-note-by-guid (:note/guid note))))

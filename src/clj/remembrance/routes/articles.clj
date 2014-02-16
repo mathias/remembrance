@@ -63,6 +63,8 @@
   :handle-ok (fn [ctx]
                {:articles [(full-article-wrap-json (get ctx ::article))]})
   :can-put-to-missing? false
+  :new? false
+  :respond-with-entity? true
   :put! (fn [ctx]
           (dosync
            (let [article (get ctx ::article)

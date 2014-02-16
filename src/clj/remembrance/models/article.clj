@@ -197,5 +197,4 @@
                                             nil))
                                attributes)
         attributes-to-update (apply merge mapped-attributes)]
-    (clojure.pprint/pprint attributes-to-update)
     (database/t [(merge {:db/id (:db/id article)} attributes-to-update)])))

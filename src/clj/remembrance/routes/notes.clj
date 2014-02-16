@@ -45,6 +45,8 @@
   :handle-ok (fn [ctx]
                {:notes [(note-wrap-json (get ctx ::note))]})
   :can-put-to-missing? false
+  :new? false
+  :respond-with-entity? true
   :put! (fn [ctx]
           (dosync
            (let [note (get ctx ::note)
