@@ -1,5 +1,5 @@
 (ns remembrance.core
-  (:require [remembrance.database :refer [prepare-database! db]]
+  (:require [remembrance.database :refer [prepare-database! db shutdown-database!]]
             [remembrance.routes.core :refer [respond-with api-stats api-health]]
             [remembrance.routes.articles :as articles]
             [remembrance.routes.notes :as notes]
@@ -53,3 +53,7 @@
   (->
    routes-handler
    (wrap-params)))
+
+(defn remembrance-clean-shutdown []
+  (info "Shutting down the database connection.")
+  (shutdown-database!))

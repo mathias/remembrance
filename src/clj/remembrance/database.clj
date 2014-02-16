@@ -38,3 +38,7 @@
 
 (defn prepare-database! []
   (migrate! migrations))
+
+(defn shutdown-database! []
+  ;; we send false to tell Datomic not to release all Clojure agents
+  (d/shutdown false))
