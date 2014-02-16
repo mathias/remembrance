@@ -1,9 +1,9 @@
 (ns remembrance.config
   (:require [clojure.edn :as edn]))
 
-(def config (atom {}))
+(defonce config (atom {}))
 
-(def config-file-path "resources/config.edn")
+(defonce config-file-path "resources/config.edn")
 
 (defn load! []
   (if-not (empty? @config)

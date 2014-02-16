@@ -2,7 +2,8 @@
   (:require [cheshire.core :as json]
             [liberator.core :refer [defresource]]
             [remembrance.models.article :refer [articles-stats]]
-            [remembrance.models.note :refer [notes-stats]]))
+            [remembrance.models.note :refer [notes-stats]]
+            [remembrance.utils.health :refer [health-stats]]))
 
 (defn respond-with
   ([body] {:body body})
@@ -30,3 +31,8 @@
   :handle-ok (fn [_] {:stats
                      {:articles (articles-stats)
                       :notes (notes-stats)}}))
+
+(defresource api-health
+  :available-media-types ["application/json"]
+  :allowed-methods [:get]
+  :handle-ok (fn [_] {:health (health-stats)}))
