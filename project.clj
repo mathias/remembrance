@@ -36,7 +36,8 @@
   ;; datomic configuration
   :profiles {:dev
              {:datomic {:config "resources/sql-transactor-template.properties"
-                        :db-uri "datomic:sql://remembrance?jdbc:postgresql://localhost:5432/datomic?user=datomic&password=datomic"}}}
+                        :db-uri "datomic:sql://remembrance?jdbc:postgresql://localhost:5432/datomic?user=datomic&password=datomic"}
+              :plugins [[lein-midje "3.1.1"]]}}
 
   ;; ring tasks configuration
   :ring {:handler remembrance.core/remembrance-handler
