@@ -8,7 +8,8 @@
   (-> (java.lang.management.ManagementFactory/getRuntimeMXBean)
       (.getName)
       (string/split #"@")
-      (first)))
+      (first)
+      (read-string)))
 
 (defn process-uptime []
   (-> (java.lang.management.ManagementFactory/getRuntimeMXBean)

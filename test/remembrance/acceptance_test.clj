@@ -2,6 +2,7 @@
   (:require [midje.sweet :refer :all]
             [ring.mock.request :refer :all]
             [clojure.data.json :as json]
+            [schema.core :as s]
             [remembrance.core :refer :all]))
 
 (defn parse-redirect-location [response]
@@ -122,3 +123,157 @@
 
        (fact "GET /api/health"
              (get! "/api/health") => ok?))
+
+(def Uri
+  "A URI represented by a string"
+  s/Str)
+
+(def Guid
+  "A GUID for a resource"
+  s/Str)
+
+(def FullArticle
+  "JSON schema for a full article's content"
+  {:articles
+   [{:href Uri
+     :guid Guid
+     :title s/Str
+     :original_url Uri
+     :readable_body s/Str
+     :read s/Bool}]})
+
+(def ArticleInfo
+  "JSON schema for individual article"
+  {:href Uri
+   :guid Guid
+   :title s/Str
+   :original_url Uri
+   :read s/Bool})
+
+(def ArticleList
+  "JSON schema for article list"
+  {:articles [ArticleInfo]})
+
+(def ArticleStats
+  "Stats about articles"
+  {:total s/Int
+   :ingested s/Int
+   :fetched s/Int
+   :errored s/Int
+   :read s/Int})
+
+(def NoteInfo
+  "JSON schema for an individual note"
+  {:guid Guid
+   :title s/Str
+   :body s/Str
+   :href Uri
+   :articles [Guid]})
+
+(def NoteList
+  "JSON schema for notes list"
+  {:notes [NoteInfo]})
+
+(def NoteStats
+  "Stats about articles"
+   {:total s/Int})
+
+(def ApiStats
+  "Stats for the entire system"
+  {:stats
+   {:articles ArticleStats
+    :notes NoteStats}})
+
+(def Timestamp
+  "A timestamp -- String for now until it can be further validated"
+  s/Str)
+
+(def ApiHealth
+  "Health checks for system in dev"
+  {:health
+   {:timestamp Timestamp
+    :database-value s/Str
+    :pid s/Int
+    :process-uptime s/Int
+    :memory {:free s/Int
+             :total s/Int}
+    :os {:hostname s/Str}}})
+
+(defn schema-valid? [schema-type]
+        (fn [actual]
+         (s/validate schema-type actual)))
+
+(defn parsed-json-body [resp]
+  (-> resp
+      (get-body)
+      (json/read-str)
+      (clojure.walk/keywordize-keys)))
+
+(defn get-parsed-json-body [route]
+  (-> (get! route)
+      (parsed-json-body)))
+
+(facts "JSON schema structure"
+       (fact "GET /api/articles"
+             (get-parsed-json-body "/api/articles") => (schema-valid? ArticleList))
+
+       (fact "Check schema of one item in /api/articles"
+             (first (:articles (get-parsed-json-body "/api/articles")))
+             =>
+             (schema-valid? ArticleInfo))
+
+       (fact "GET /api/articles/:guid"
+             (get-parsed-json-body (str "/api/articles/" existing-article-guid))
+             =>
+             (schema-valid? FullArticle))
+
+       (fact "PUT /api/articles/:guid"
+             (parsed-json-body (put! (str "/api/articles/" existing-article-guid)
+                                      {"read" true}))
+             =>
+             (schema-valid? FullArticle))
+
+       (fact "GET /api/articles/search"
+             (get-parsed-json-body "/api/articles/search?q=Example")
+             =>
+             (schema-valid? ArticleList))
+
+       (fact "GET /api/articles/stats"
+             (get-in (get-parsed-json-body "/api/articles/stats") [:stats :articles])
+             =>
+             (schema-valid? ArticleStats))
+
+       (fact "GET /api/notes"
+             (get-parsed-json-body "/api/notes") => (schema-valid? NoteList))
+
+       (fact "Check schema of one item in /api/notes"
+             (first (:notes (get-parsed-json-body "/api/notes")))
+             =>
+             (schema-valid? NoteInfo))
+
+       (fact "GET /api/notes/:guid"
+             (first (:notes (get-parsed-json-body (str "/api/notes/" existing-note-guid))))
+             =>
+             (schema-valid? NoteInfo))
+
+       (fact "PUT /api/notes/:guid"
+             (first (:notes
+                     (parsed-json-body
+                      (put! (str "/api/notes/" existing-note-guid)
+                            {"body" "Body text"}))))
+             => (schema-valid? NoteInfo))
+
+       (fact "GET /api/notes/stats"
+             (get-in (get-parsed-json-body "/api/notes/stats") [:stats :notes])
+             =>
+             (schema-valid? NoteStats))
+
+       (fact "GET /api/stats"
+             (get-parsed-json-body "/api/stats")
+             =>
+             (schema-valid? ApiStats))
+
+       (fact "GET /api/health"
+             (get-parsed-json-body "/api/health")
+             =>
+             (schema-valid? ApiHealth)))

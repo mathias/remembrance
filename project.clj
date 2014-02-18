@@ -22,6 +22,7 @@
                  [org.clojure/data.json "0.2.3"]
                  [playnice "1.0.1"]
                  [prismatic/dommy "0.1.2"]
+                 [prismatic/schema "0.2.1"]
                  [ring/ring-jetty-adapter "1.2.1"]
                  [ring/ring-json "0.2.0"]
                  [ring-mock "0.1.5"]]
