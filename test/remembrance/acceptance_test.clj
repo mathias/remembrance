@@ -53,7 +53,7 @@
 (defn create-initial-article [uri]
   (post! "/api/articles" {"original_url" uri}))
 
-(def existing-article-guid
+(defonce existing-article-guid
   (-> (create-initial-article existing-article-uri)
       (parse-redirect-location)
       (get-guid-from-uri)))
@@ -64,7 +64,7 @@
 (defn get-href [json-body]
   (get json-body "href"))
 
-(def existing-note-guid
+(defonce existing-note-guid
   (-> (get! "/api/notes")
       (get-body)
       (json/read-str)
