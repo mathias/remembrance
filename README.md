@@ -36,8 +36,8 @@ lein run -m remembrance.scripts.import_from_instapaper /path/to/instapaper-expor
 
 ## Features, TODOs, wishful thinking.
 
-- [ ] Need to remove the Redis-backed worker queue. Eventually, I see that work being done by https://github.com/mathias/herman and enqueued by https://github.com/mathias/renfield
-- [X] Finish rewriting to use Liberator.
+- [x] Need to remove the Redis-backed worker queue. Eventually, I see that work being done by https://github.com/mathias/herman and enqueued by https://github.com/mathias/renfield
+- [x] Finish rewriting to use Liberator.
 - [ ] Add https://github.com/cemerick/friend/ for auth.
 - [ ] Lots more that I'm probably not thinking of right now.
 
