@@ -85,7 +85,11 @@
              (post! "/api/articles"
                     {"original_url" existing-article-uri})
              =>
-             redirects?)
+             redirects?
+             (provided
+              (remembrance.workers/enqueue-article-original-html & anything)
+              =>
+              true))
 
        (fact "GET /api/articles/:guid"
              (get! (str "/api/articles/" existing-article-guid)) => ok?)
