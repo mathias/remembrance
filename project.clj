@@ -9,7 +9,6 @@
                  [com.cemerick/url "0.1.0"]
                  [com.datomic/datomic-pro "0.9.4384"]
                  [com.taoensso/timbre "2.7.1"]
-
                  [hearst "0.1.1-SNAPSHOT"]
                  [hiccup "1.0.4"]
                  [http-kit "2.1.13"]
