@@ -39,9 +39,16 @@
 ;; losing all route definitions!
 (define-routes!)
 
+
 (defn remembrance-init []
+  ;; Turn off tests when running the server in production:
+  (if (= (System/getenv "RING_ENV") "production")
+    (alter-var-root #'clojure.test/*load-tests* (constantly false)))
+
+
   (info "Migrations:" (prepare-database!))
   (info "DB:" (db))
+
   (comment
     (info "Routes:")
     (clojure.pprint/pprint @routes)))
