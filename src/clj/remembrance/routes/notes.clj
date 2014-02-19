@@ -21,7 +21,6 @@
 (defn note-collection-json [coll]
   (map note-wrap-json coll))
 
-
 (defresource index-path
   :available-media-types ["application/json" "application/x-www-form-urlencoded"]
   :allowed-methods [:get :post]

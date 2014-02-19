@@ -2,7 +2,7 @@
   (:require [clojure.string :as string]))
 
 (defn current-date []
-  (.toString (java.util.Date.)))
+  (str (java.util.Date.)))
 
 (defn current-pid []
   (-> (java.lang.management.ManagementFactory/getRuntimeMXBean)
