@@ -1,8 +1,6 @@
 {:1388969538_add_ratings_to_articles
- {:txes [[
-          {:db/id #db/id[:db.part/db]
+ {:txes [[{:db/id #db/id[:db.part/db]
            :db/ident :article/user_rating
            :db/valueType :db.type/long
            :db/cardinality :db.cardinality/one
-           :db.install/_attribute :db.part/db}
-          ]]}}
+           :db.install/_attribute :db.part/db}]]}}

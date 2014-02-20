@@ -26,7 +26,8 @@
 
 (def migrations ["1387819157_add_articles.edn"
                  "1388418412_add_notes.edn"
-                 "1388969538_add_ratings_to_articles.edn"])
+                 "1388969538_add_ratings_to_articles.edn"
+                 "1392916852_add_newspaper_fields_to_articles.edn"])
 
 (defn migrate! [migrations]
   (map (fn [migration-file]

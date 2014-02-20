@@ -1,0 +1,79 @@
+{:1392916852_add_newspaper_fields_to_articles
+ {:txes [[{:db/id #db/id[:db.part/db]
+           :db/ident :article/plain_text_body
+           :db/valueType :db.type/string
+           :db/cardinality :db.cardinality/one
+           :db.install/_attribute :db.part/db}
+
+          ;; authors relation
+          {:db/id #db/id[:db.part/db]
+           :db/ident :article/authors
+           :db/valueType :db.type/ref
+           :db/cardinality :db.cardinality/many
+           :db/doc "List of authors found for this article"
+           :db.install/_attribute :db.part/db}
+
+          {:db/id #db/id[:db.part/db]
+           :db/ident :article/keywords
+           :db/valueType :db.type/string
+           :db/cardinality :db.cardinality/many
+           :db/doc "Keywords found for article"
+           :db.install/_attribute :db.part/db}
+
+          {:db/id #db/id[:db.part/db]
+           :db/ident :article/meta_description
+           :db/valueType :db.type/string
+           :db/cardinality :db.cardinality/one
+           :db/doc "Meta description scraped from original page"
+           :db.install/_attribute :db.part/db}
+
+          {:db/id #db/id[:db.part/db]
+           :db/ident :article/meta_language
+           :db/valueType :db.type/string
+           :db/cardinality :db.cardinality/one
+           :db/doc "IETF Language detected from original page"
+           :db.install/_attribute :db.part/db}
+
+          {:db/id #db/id[:db.part/db]
+           :db/ident :article/summary
+           :db/valueType :db.type/string
+           :db/cardinality :db.cardinality/one
+           :db/doc "Machine-generated summary of the article"
+           :db.install/_attribute :db.part/db}
+
+          {:db/id #db/id[:db.part/db]
+           :db/ident :article/tags
+           :db/valueType :db.type/string
+           :db/cardinality :db.cardinality/many
+           :db/doc "Tags found for article, if any"
+           :db.install/_attribute :db.part/db}
+
+          ;; authors entity attributes
+          {:db/id #db/id[:db.part/db]
+           :db/ident :author/guid
+           :db/valueType :db.type/string
+           :db/cardinality :db.cardinality/one
+           :db/unique :db.unique/identity
+           :db/index true
+           :db.install/_attribute :db.part/db}
+
+          {:db/id #db/id[:db.part/db]
+           :db/ident :author/full_name
+           :db/valueType :db.type/string
+           :db/cardinality :db.cardinality/one
+           :db/doc "Name of the author"
+           :db.install/_attribute :db.part/db}
+
+          {:db/id #db/id[:db.part/db]
+           :db/ident :author/canonical_url
+           :db/valueType :db.type/string
+           :db/cardinality :db.cardinality/one
+           :db/doc "Canonical URL for their writing"
+           :db.install/_attribute :db.part/db}
+
+          {:db/id #db/id[:db.part/db]
+           :db/ident :author/social_media_uris
+           :db/valueType :db.type/string
+           :db/cardinality :db.cardinality/many
+           :db/doc "Social media accounts we have detected"
+           :db.install/_attribute :db.part/db}]]}}
