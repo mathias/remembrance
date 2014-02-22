@@ -10,9 +10,6 @@
      (d/create-database uri)
      (d/connect uri)))
 
-;; point queries to the in-mem test db
-(background (around :facts (with-redefs [remembrance.database/connection (fresh-conn!)] ?form)))
-
 (facts "testing fresh-conn!"
        (fact "should have no entities with a migration-created attribute"
              (d/q '[:find ?e
@@ -35,5 +32,14 @@
                    before-txes-count (count-txes (d/db our-conn))]
                (prepare-database! our-conn)
                (> (count-txes (d/db our-conn)) before-txes-count))
+             =>
+             truthy)
+       ;; we know that conformity is well-tested so we can depend on its fn here
+       (fact "conforms to all migrations we specify"
+             (let [our-conn (fresh-conn!)
+                   migration-filename "1387819157_add_articles.edn"
+                   loaded-migrations (load-all-migrations [migration-filename])]
+               (run-each-migration! our-conn loaded-migrations)
+               (io.rkn.conformity/conforms-to? (d/db our-conn) :1387819157_add_articles))
              =>
              truthy))

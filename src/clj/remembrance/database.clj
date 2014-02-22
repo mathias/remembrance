@@ -18,25 +18,36 @@
   (str (d/squuid)))
 
 ;; migrations
-(def migrations ["1387819157_add_articles.edn"
-                 "1388418412_add_notes.edn"
-                 "1388969538_add_ratings_to_articles.edn"
-                 "1392916852_add_newspaper_fields_to_articles.edn"])
+(def migration-filenames ["1387819157_add_articles.edn"
+                          "1388418412_add_notes.edn"
+                          "1388969538_add_ratings_to_articles.edn"
+                          "1392916852_add_newspaper_fields_to_articles.edn"])
 
-(defn load-migration! [filename]
-  (let [migration (read-string (slurp (str "resources/schema/" filename)))
-        migration-name (vec (keys migration))]
-    {:name migration-name
-     :txn migration}))
+(def migrations-path  "resources/schema/")
 
-(defn loaded-migrations []
-  (map load-migration! migrations))
+(def loaded-migrations (atom []))
 
-(defn migrate! [conn loaded-migrations]
-  (doseq [migration loaded-migrations]
-    (c/ensure-conforms conn (:txn migration) (:name migration))))
+(defn load-migration [filename]
+  (-> (str migrations-path filename)
+      (slurp)
+      (read-string)))
+
+(defn prepare-migration [migration]
+  {:name (-> migration keys vec)
+   :txn migration})
+
+(defn load-all-migrations [filenames]
+  (map load-migration filenames))
+
+(defn migrate! [conn migration]
+  (c/ensure-conforms conn (:txn migration) (:name migration)))
+
+(defn run-each-migration! [conn prepared-migrations]
+  (doseq [migration prepared-migrations]
+    (migrate! conn (prepare-migration migration))))
 
 (defn prepare-database!
   ([] (prepare-database! connection))
   ([conn]
-     (migrate! conn (loaded-migrations))))
+     (reset! loaded-migrations (load-all-migrations migration-filenames))
+     (run-each-migration! conn @loaded-migrations)))
