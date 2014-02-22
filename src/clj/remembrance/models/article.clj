@@ -17,6 +17,50 @@
 (defn entity [eid]
   (d/entity (db) eid))
 
+(def article-attributes-names-map
+  {:article/guid :guid
+   :article/title :title
+   :article/original_url :url
+   :article/readable_body :readable_body
+   :article/original_html :original_html
+   :article/ingest_state :ingest_state
+   :article/read :read
+   :article/date_published :date_published
+   :article/date_fetched :date_fetched
+   :article/date_ingested :date_ingested
+   :article/user_rating :user_rating})
+
+(def external-attributes-names-map (clojure.set/map-invert article-attributes-names-map))
+
+(def internal-attr-names (keys article-attributes-names-map))
+(def external-attr-names (vals article-attributes-names-map))
+
+(defn translate-internal-attr-name [internal-attr-name]
+  (get article-attributes-names-map internal-attr-name))
+
+(defn translate-external-attr-name [external-attr-name]
+  (get external-attributes-names-map external-attr-name))
+
+(defn translate-all-attrs [entity]
+  (map (fn [[k v]]
+         {(translate-internal-attr-name k) v})
+       entity))
+
+(defn attr-rule-from [[key val]]
+  ['?eid (translate-external-attr key) val])
+
+(defn article-attr-rules-from [attr-pairs]
+  (vec (map attr-rule-from attr-pairs)))
+
+(defn find-q [ext-attr-map]
+  (d/q {:find ['?eid]
+        :in ['$]
+        :where (article-attr-rules-from ext-attr-map)}
+        (db)))
+
+(defn find-one [ext-attr-map]
+  (translate-all-attrs (d/touch (entity (ffirst (find-q ext-attr-map))))))
+
 (defn article-guid [article]
   (:article/guid article))
 
@@ -72,8 +116,9 @@
                 :article/read read?}]))
 
 (defn find-all-article-ids []
-  (database/simple-q '[:find ?a
-                       :where [?a :article/guid]]))
+  (d/q '[:find ?a
+         :where [?a :article/guid]]
+       (db)))
 
 (defn all-articles []
   (map article-entity (find-all-article-ids)))
@@ -151,9 +196,9 @@
          :where (article-search-rules ?query ?e)]
        (db)
        '[[(article-search-rules ?query ?e)
-         [(fulltext $ :article/readable_body ?query) [[?e]]]]
-        [(article-search-rules ?query ?e)
-         [(fulltext $ :article/title ?query) [[?e]]]]]
+          [(fulltext $ :article/readable_body ?query) [[?e]]]]
+         [(article-search-rules ?query ?e)
+          [(fulltext $ :article/title ?query) [[?e]]]]]
        query-string))
 
 (defn search-articles [query-string]

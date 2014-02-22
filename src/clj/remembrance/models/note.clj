@@ -16,8 +16,9 @@
   (entity (first entity-vec)))
 
 (defn find-all-note-ids []
-  (database/simple-q '[:find ?n
-                       :where [?n :note/guid _]]))
+  (d/q '[:find ?n
+         :where [?n :note/guid _]]
+       (db)))
 
 (defn all-notes []
   (map note-entity (find-all-note-ids)))

@@ -15,7 +15,6 @@
   (d/db connection))
 
 (def t #(d/transact connection %))
-(def simple-q #(d/q % (db)))
 
 (defn new-guid []
   (str (d/squuid)))
