@@ -18,7 +18,7 @@
 (defn ingest-article [guid]
   (article-get-original-html guid)
   (article-extract-text guid)
-  (println "Ingested:" (:article/title (find-one-article-by-guid guid))))
+  (println "Ingested:" (:article/title (first (find-article-by-guid guid)))))
 
 (defn ingest-and-set-state [article attrs]
   ;; Always try to update the read status

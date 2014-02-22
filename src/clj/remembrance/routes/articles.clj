@@ -58,7 +58,7 @@
   :available-media-types ["application/json" "application/x-www-form-urlencoded"]
   :allowed-methods [:get :put]
   :exists? (fn [ctx]
-             (if-let [article (article/find-one-article-by-guid (get-in ctx [:request :guid]))]
+             (if-let [article (first (article/find-article-by-guid (get-in ctx [:request :guid])))]
                {::article article}))
   :handle-ok (fn [ctx]
                {:articles [(full-article-wrap-json (get ctx ::article))]})
