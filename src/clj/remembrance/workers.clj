@@ -1,10 +1,13 @@
 (ns remembrance.workers
-  (:require [remembrance.models.article :refer [article-get-original-html article-extract-text]]
+  (:require [remembrance.config :refer [production-env?]]
             [clojure.core.async :refer [chan go <! >!]]
             [taoensso.timbre :refer [info]]))
 
 (defonce article-original-html-channel (chan))
 (defonce article-extract-text-channel (chan))
+
+(defn article-get-original-html [guid])
+(defn article-extract-text [guid])
 
 (defn process-text-extraction [article-guid]
   (do
@@ -12,7 +15,8 @@
     (article-extract-text article-guid)))
 
 (defn enqueue-text-extraction [article-guid]
-  (go (>! article-extract-text-channel article-guid)))
+  (when (production-env?)
+    (go (>! article-extract-text-channel article-guid))))
 
 (defn process-original-html [article-guid]
   (do
@@ -27,6 +31,6 @@
  (while true
    (process-original-html (<! article-original-html-channel))))
 
-
 (defn enqueue-article-original-html [article-guid]
-  (go (>! article-original-html-channel article-guid)))
+  (when (production-env?)
+    (go (>! article-original-html-channel article-guid))))

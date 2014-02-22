@@ -1,15 +1,13 @@
 (ns remembrance.routes.articles
   (:require [liberator.core :refer [defresource]]
             [cemerick.url :refer [url url-encode]]
-            [remembrance.config :as config]
+            [remembrance.config :refer [env]]
             [remembrance.models.article :as article]
             [remembrance.models.note :as note]
             [remembrance.routes.core :refer :all]
             [remembrance.workers :refer [enqueue-article-original-html]]
             [ring.util.response :refer [redirect]]
             [taoensso.timbre :refer [info]]))
-
-(def env (config/load!))
 
 (defn article-index-url []
   (str (assoc (url (env :hostname)) :path "/api/articles")))

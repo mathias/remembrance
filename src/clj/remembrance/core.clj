@@ -1,5 +1,6 @@
 (ns remembrance.core
-  (:require [remembrance.database :refer [prepare-database! db shutdown-database!]]
+  (:require [remembrance.config :refer [production-env?]]
+            [remembrance.database :refer [prepare-database! db]]
             [remembrance.routes.core :refer [respond-with api-stats api-health]]
             [remembrance.routes.articles :as articles]
             [remembrance.routes.notes :as notes]
@@ -42,14 +43,13 @@
 
 (defn remembrance-init []
   ;; Turn off tests when running the server in production:
-  (if (= (System/getenv "RING_ENV") "production")
+  (when (production-env?)
     (alter-var-root #'clojure.test/*load-tests* (constantly false)))
-
 
   (info "Migrations:" (prepare-database!))
   (info "DB:" (db))
 
-  (comment
+  (when-not (production-env?)
     (info "Routes:")
     (clojure.pprint/pprint @routes)))
 
@@ -60,7 +60,3 @@
   (->
    routes-handler
    (wrap-params)))
-
-(defn remembrance-clean-shutdown []
-  (info "Shutting down the database connection.")
-  (shutdown-database!))

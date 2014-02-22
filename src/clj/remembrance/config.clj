@@ -12,3 +12,8 @@
            (fn [_ config] config)
            (edn/read-string
             (slurp config-file-path)))))
+
+(def env (load!))
+
+(defn production-env? []
+  (memoize (= (System/getenv "RING_ENV") "production")))

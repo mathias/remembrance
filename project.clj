@@ -44,7 +44,6 @@
   ;; ring tasks configuration
   :ring {:handler remembrance.core/remembrance-handler
          :init remembrance.core/remembrance-init
-         :destroy remembrance.core/remembrance-clean-shutdown
          :auto-refresh true
          :nrepl {:start? true}}
 

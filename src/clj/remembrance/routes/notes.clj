@@ -1,12 +1,10 @@
 (ns remembrance.routes.notes
   (:require [cemerick.url :refer [url]]
-            [remembrance.config :as config]
+            [remembrance.config :refer [env]]
             [remembrance.routes.core :refer :all]
             [remembrance.models.note :as note]
             [liberator.core :refer [defresource]]
             [taoensso.timbre :refer [info]]))
-
-(def env (config/load!))
 
 (defn note-show-url [guid]
   (str (assoc (url (env :hostname)) :path (str "/api/notes/" guid))))
