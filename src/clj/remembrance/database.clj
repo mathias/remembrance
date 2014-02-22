@@ -18,21 +18,26 @@
   (str (d/squuid)))
 
 ;; migrations
-(defn load-migration [filename]
-  (read-string (slurp (str "resources/schema/" filename))))
-
 (def migrations ["1387819157_add_articles.edn"
                  "1388418412_add_notes.edn"
                  "1388969538_add_ratings_to_articles.edn"
                  "1392916852_add_newspaper_fields_to_articles.edn"])
 
-(defn migrate! [conn migrations]
-  (doseq [migration-filename migrations]
-    (let [migration (load-migration migration-filename)
-          migration-name (key (first migration))]
-      (c/ensure-conforms conn migration (vec (list migration-name))))))
+(defn load-migration! [filename]
+  (let [migration (read-string (slurp (str "resources/schema/" filename)))
+        migration-name (vec (keys migration))]
+    (clojure.pprint/pprint migration-name)
+    {:name migration-name
+     :txn migration}))
+
+(defn loaded-migrations []
+  (map load-migration! migrations))
+
+(defn migrate! [conn loaded-migrations]
+  (doseq [migration loaded-migrations]
+    (c/ensure-conforms conn (:txn migration) (:name migration))))
 
 (defn prepare-database!
   ([] (prepare-database! connection))
   ([conn]
-     (migrate! conn migrations)))
+     (migrate! conn (loaded-migrations))))
