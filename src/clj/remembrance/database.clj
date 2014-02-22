@@ -26,7 +26,6 @@
 (defn load-migration! [filename]
   (let [migration (read-string (slurp (str "resources/schema/" filename)))
         migration-name (vec (keys migration))]
-    (clojure.pprint/pprint migration-name)
     {:name migration-name
      :txn migration}))
 
