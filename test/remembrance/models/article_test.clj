@@ -11,7 +11,9 @@
 (def existing-article-txn
   {:db/id (d/tempid "db.part/user")
    :article/guid existing-guid
-   :article/original_url "http://example.com"})
+   :article/original_url "http://example.com"
+   :article/title "Example"
+   :article/ingest_state :article.ingest_state/ingested})
 
 (defn prepare-fresh-conn []
   (let [our-conn (fresh-conn!)]
@@ -38,13 +40,13 @@
               =not=>
               empty?)
 
-       (fact  "found article has correct attributes"
-              (let [our-conn (prepare-fresh-conn)
-                    db (d/db our-conn)
-                    eid (first (find-article-by-guid-q db existing-guid))]
-                (:article/original_url (first-entity db eid)))
-              =>
-              "http://example.com")
+       (fact "found article has correct attributes"
+             (let [our-conn (prepare-fresh-conn)
+                   db (d/db our-conn)
+                   eid (first (find-article-by-guid-q db existing-guid))]
+               (:article/original_url (first-entity db eid)))
+             =>
+             "http://example.com")
 
        (fact "finding an entity that doesn't exist"
              (let [our-conn (prepare-fresh-conn)
@@ -52,3 +54,26 @@
                (find-article-by-guid-q db "made-up-guid"))
              =>
              empty?))
+
+(facts "search-articles-q fn"
+       (fact "finds an article which matches the search query"
+             (let [our-conn (prepare-fresh-conn)
+                   db (d/db our-conn)]
+               (search-articles-q db "Example"))
+             =not=>
+             empty?)
+
+       (fact "article that does not match query is not found"
+             (let [our-conn (prepare-fresh-conn)
+                   db (d/db our-conn)]
+               (search-articles-q db "Not matching"))
+             =>
+             empty?))
+
+(facts "search-articles fn"
+       (fact "maps returned list of entity ids into entities (can get attributes)"
+             (let [our-conn (prepare-fresh-conn)
+                   db (d/db our-conn)]
+               (:article/original_url (first (search-articles db "Example"))))
+             =>
+             "http://example.com"))

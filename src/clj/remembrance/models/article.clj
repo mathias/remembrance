@@ -24,14 +24,31 @@
        guid))
 
 (defn find-article-by-guid [guid]
-  (first-entity (db) (find-article-by-guid-q db guid)))
+  (let [db (db)]
+    (first-entity db (find-article-by-guid-q db guid))))
 
-(defn search-articles [query])
+(defn search-articles-q [db query]
+  (d/q '[:find ?e
+         :in $ % ?query
+         :where (search-rules ?query ?e)]
+       db
+       '[[(search-rules ?query ?e)
+          [(fulltext $ :article/readable_body ?query) [[?e]]]]
+         [(search-rules ?query ?e)
+          [(fulltext $ :article/title ?query) [[?e]]]]]
+       query))
+
+(defn search-articles
+  ([query]
+     (search-articles (db) query))
+  ([db query]
+     (let [results (search-articles-q db query)]
+       (map (partial first-entity db) results))))
 
 (defn articles-stats [])
 
 (defn mark-article-as-read [guid])
 
-(defn count-articles [])
+(defn count-articles [ingest-state])
 
 (defn count-read-articles [])
