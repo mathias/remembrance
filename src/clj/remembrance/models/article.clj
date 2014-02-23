@@ -19,7 +19,10 @@
          :where [?eid :article/ingest_state :article.ingest_state/ingested]]
        db))
 
-(defn find-all-ingested-articles [])
+(defn find-all-ingested-articles
+  ([] (find-all-ingested-articles (db)))
+  ([db]
+     (map (partial first-entity db) (find-all-ingested-articles-q db))))
 
 (defn find-article-by-guid-q [db guid]
   (d/q '[:find ?eid

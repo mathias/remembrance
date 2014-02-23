@@ -102,3 +102,13 @@
                 (find-all-ingested-articles-q db))
              =>
              empty?))
+
+(facts "find-all-ingested-articles"
+       (fact "returns entities for ingested articles"
+             (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)
+                   articles (find-all-ingested-articles db)
+                   first-found-article (first articles)]
+               (:article/original_url first-found-article))
+             =>
+             "http://example.com"))
