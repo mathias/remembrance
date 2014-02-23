@@ -154,3 +154,35 @@
                (count-read-articles db))
              =>
              1))
+
+(facts "count-all-articles-q fn"
+       (fact "returns an empty set when there are none"
+             (let [our-conn (fresh-conn!)
+                   _ (prepare-database! our-conn)
+                   db (d/db our-conn)]
+               (count-all-articles-q db))
+             =>
+             empty?)
+
+       (fact "returns the count when one read article exists"
+             (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)]
+               (count-all-articles-q db))
+             =>
+             1))
+
+(facts "count-all-articles fn"
+        (fact "returns 0 when there are none"
+             (let [our-conn (fresh-conn!)
+                   _ (prepare-database! our-conn)
+                   db (d/db our-conn)]
+               (count-all-articles db))
+             =>
+             0)
+
+       (fact "returns the count when one read article exists"
+             (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)]
+               (count-all-articles db))
+             =>
+             1))

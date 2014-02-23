@@ -56,6 +56,17 @@
      (let [results (search-articles-q db query)]
        (map (partial first-entity db) results))))
 
+(defn count-all-articles-q [db]
+  (ffirst (d/q '[:find (count ?e)
+                 :where [?e :article/guid _]]
+               db)))
+
+(defn count-all-articles
+  ([] (count-all-articles (db)))
+  ([db] (or
+         (count-all-articles-q db)
+         0)))
+
 (defn count-read-articles-q [db]
   (ffirst (d/q '[:find (count ?e)
                  :where [?e :article/read true]]
@@ -67,7 +78,8 @@
          (count-read-articles-q db)
          0)))
 
-(defn count-articles-of-ingest-state [ingest-state])
-
+(defn count-articles-with-ingest-state
+  ([ingest-state] count-articles-with-ingest-state (db) ingest-state)
+  ([db ingest-state] ))
 
 (defn articles-stats [])
