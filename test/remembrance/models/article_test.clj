@@ -13,6 +13,7 @@
    :article/guid existing-guid
    :article/original_url "http://example.com"
    :article/title "Example"
+   :article/read true
    :article/ingest_state :article.ingest_state/ingested})
 
 (defn prepare-conn-with-existing-article []
@@ -121,3 +122,35 @@
                (:article/original_url first-found-article))
              =>
              "http://example.com"))
+
+(facts "count-read-articles-q fn"
+       (fact "returns empty set when no read articles exist"
+             (let [our-conn (fresh-conn!)
+                   _ (prepare-database! our-conn)
+                   db (d/db our-conn)]
+                (count-read-articles-q db))
+             =>
+             empty?)
+
+       (fact "returns the correct count (1) when a single read article exists"
+             (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)]
+               (count-read-articles-q db))
+             =>
+             1))
+
+(facts "count-read-articles"
+       (fact "returns 0 when there are none"
+             (let [our-conn (fresh-conn!)
+                   _ (prepare-database! our-conn)
+                   db (d/db our-conn)]
+               (count-read-articles db))
+             =>
+             0)
+
+       (fact "returns the count when one read article exists"
+             (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)]
+               (count-read-articles db))
+             =>
+             1))
