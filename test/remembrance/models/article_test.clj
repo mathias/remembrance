@@ -30,24 +30,25 @@
       =>
       truthy)
 
-(facts "finding by guid"
-       (fact "finds an article"
+(facts "find-article-by-guid-q fn"
+       (fact "finds an existing article"
               (let [our-conn (prepare-fresh-conn)
                     db (d/db our-conn)]
                  (find-article-by-guid-q db existing-guid))
               =not=>
               empty?)
-       (fact  "has correct attributes"
+
+       (fact  "found article has correct attributes"
               (let [our-conn (prepare-fresh-conn)
                     db (d/db our-conn)
                     eid (first (find-article-by-guid-q db existing-guid))]
                 (:article/original_url (first-entity db eid)))
               =>
-              "http://example.com"))
+              "http://example.com")
 
-(fact "finding an entity that doesn't exist"
-      (let [our-conn (prepare-fresh-conn)
-            db (d/db our-conn)]
-        (find-article-by-guid-q db "made-up-guid"))
-      =>
-      empty?)
+       (fact "finding an entity that doesn't exist"
+             (let [our-conn (prepare-fresh-conn)
+                   db (d/db our-conn)]
+               (find-article-by-guid-q db "made-up-guid"))
+             =>
+             empty?))
