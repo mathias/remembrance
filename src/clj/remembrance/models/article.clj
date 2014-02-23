@@ -4,7 +4,8 @@
             [datomic.api :as d]
             ;;[org.httpkit.client :as http]
             [remembrance.config :as config]
-            [remembrance.database :as database]
+            [remembrance.database :refer [db]]
+            [remembrance.models.core :refer [first-entity]]
             ;;[taoensso.timbre :refer [info]]
             ;;[hearst.url-cleanup :refer [normalize-url]]
             ))
@@ -15,9 +16,15 @@
 
 (defn find-all-ingested-articles [])
 
-(defn find-article-by-guid-q [db guid])
+(defn find-article-by-guid-q [db guid]
+  (d/q '[:find ?eid
+         :in $ ?guid
+         :where [?eid :article/guid ?guid]]
+       db
+       guid))
 
-(defn find-article-by-guid [guid])
+(defn find-article-by-guid [guid]
+  (first-entity (db) (find-article-by-guid-q db guid)))
 
 (defn search-articles [query])
 
