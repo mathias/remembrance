@@ -31,9 +31,10 @@
        db
        guid))
 
-(defn find-article-by-guid [guid]
-  (let [db (db)]
-    (first-entity db (find-article-by-guid-q db guid))))
+(defn find-article-by-guid
+  ([guid] (find-article-by-guid (db) guid))
+  ([db guid]
+     (first-entity db (first (find-article-by-guid-q db guid)))))
 
 (defn search-articles-q [db query]
   (d/q '[:find ?e

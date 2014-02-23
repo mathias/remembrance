@@ -55,6 +55,15 @@
              =>
              empty?))
 
+(facts "find-article-by-guid fn"
+       (fact "turns the first result entity ID into an entity"
+              (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)
+                   article (find-article-by-guid db existing-guid)]
+               (:article/original_url article))
+             =>
+             "http://example.com"))
+
 (facts "search-articles-q fn"
        (fact "finds an article which matches the search query"
              (let [our-conn (prepare-conn-with-existing-article)
