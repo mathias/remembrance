@@ -1,6 +1,6 @@
 (ns remembrance.models.note
   (:require [remembrance.config :refer [env]]
-            [remembrance.models.article :refer [find-article-by-guid-q]]
+            [remembrance.models.article :refer [find-article-by-guid]]
             [datomic.api :as d]
             [remembrance.database :as database :refer [db new-guid t]]
             [taoensso.timbre :refer [info]]))
@@ -32,11 +32,8 @@
 (defn find-note-by-guid [guid]
   (find-note-by-guid-q (db) guid))
 
-(defn find-articles-for-params-q [db article-guids]
-  (map (partial find-article-by-guid-q db) article-guids))
-
 (defn find-articles-for-params [articles-param]
-  (map ffirst (find-articles-for-params-q (db) (read-string articles-param))))
+  (map ffirst (find-article-by-guid (db) (read-string articles-param))))
 
 (defn create-note [{:keys [title body articles]
                     :or {title "Untitled"
