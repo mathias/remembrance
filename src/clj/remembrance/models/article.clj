@@ -14,6 +14,11 @@
 
 (defn update-article [params])
 
+(defn find-all-ingested-articles-q [db]
+  (d/q '[:find ?eid
+         :where [?eid :article/ingest_state :article.ingest_state/ingested]]
+       db))
+
 (defn find-all-ingested-articles [])
 
 (defn find-article-by-guid-q [db guid]

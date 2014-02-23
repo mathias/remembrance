@@ -15,14 +15,14 @@
    :article/title "Example"
    :article/ingest_state :article.ingest_state/ingested})
 
-(defn prepare-fresh-conn []
+(defn prepare-conn-with-existing-article []
   (let [our-conn (fresh-conn!)]
     (prepare-database! our-conn)
     (d/transact our-conn [existing-article-txn])
     our-conn))
 
 (fact "ensure our seed transaction works"
-      (let [our-conn (prepare-fresh-conn)
+      (let [our-conn (prepare-conn-with-existing-article)
             db (d/db our-conn)
             txn-count (ffirst (d/q '[:find (count ?tx)
                                      :in $
@@ -34,14 +34,14 @@
 
 (facts "find-article-by-guid-q fn"
        (fact "finds an existing article"
-              (let [our-conn (prepare-fresh-conn)
-                    db (d/db our-conn)]
-                 (find-article-by-guid-q db existing-guid))
-              =not=>
-              empty?)
+             (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)]
+               (find-article-by-guid-q db existing-guid))
+             =not=>
+             empty?)
 
        (fact "found article has correct attributes"
-             (let [our-conn (prepare-fresh-conn)
+             (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)
                    eid (first (find-article-by-guid-q db existing-guid))]
                (:article/original_url (first-entity db eid)))
@@ -49,7 +49,7 @@
              "http://example.com")
 
        (fact "finding an entity that doesn't exist"
-             (let [our-conn (prepare-fresh-conn)
+             (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)]
                (find-article-by-guid-q db "made-up-guid"))
              =>
@@ -57,14 +57,14 @@
 
 (facts "search-articles-q fn"
        (fact "finds an article which matches the search query"
-             (let [our-conn (prepare-fresh-conn)
+             (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)]
                (search-articles-q db "Example"))
              =not=>
              empty?)
 
        (fact "article that does not match query is not found"
-             (let [our-conn (prepare-fresh-conn)
+             (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)]
                (search-articles-q db "Not matching"))
              =>
@@ -72,8 +72,33 @@
 
 (facts "search-articles fn"
        (fact "maps returned list of entity ids into entities (can get attributes)"
-             (let [our-conn (prepare-fresh-conn)
+             (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)]
                (:article/original_url (first (search-articles db "Example"))))
              =>
              "http://example.com"))
+
+(facts "find-all-ingested-articles-q fn"
+       (fact "returns a set containing our existing article"
+             (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)]
+                (find-all-ingested-articles-q db))
+             =not=>
+             empty?)
+
+       (fact "found article has correct attributes"
+             (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)
+                   found-eids (find-all-ingested-articles-q db)
+                   first-found-eid (first found-eids)]
+               (:article/original_url (first-entity db first-found-eid)))
+             =>
+             "http://example.com")
+
+       (fact "when no ingested articles exist, returns empty set"
+             (let [our-conn (fresh-conn!)
+                   _ (prepare-database! our-conn)
+                   db (d/db our-conn)]
+                (find-all-ingested-articles-q db))
+             =>
+             empty?))
