@@ -39,8 +39,8 @@
 (defn load-all-migrations [filenames]
   (map load-migration filenames))
 
-(defn migrate! [conn migration]
-  (c/ensure-conforms conn (:txn migration) (:name migration)))
+(defn migrate! [conn {:keys [txn name]}]
+  (c/ensure-conforms conn txn name))
 
 (defn run-each-migration! [conn prepared-migrations]
   (doseq [migration prepared-migrations]
