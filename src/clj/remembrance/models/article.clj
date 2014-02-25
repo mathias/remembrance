@@ -63,9 +63,10 @@
 
 (defn count-all-articles
   ([] (count-all-articles (db)))
-  ([db] (or
-         (count-all-articles-q db)
-         0)))
+  ([db]
+     (or
+      (count-all-articles-q db)
+      0)))
 
 (defn count-read-articles-q [db]
   (ffirst (d/q '[:find (count ?e)
@@ -74,9 +75,10 @@
 
 (defn count-read-articles
   ([] (count-read-articles (db)))
-  ([db] (or
-         (count-read-articles-q db)
-         0)))
+  ([db]
+     (or
+      (count-read-articles-q db)
+      0)))
 
 (defn count-articles-with-ingest-state-q [db ingest-state]
   (ffirst (d/q '[:find (count ?eid)
