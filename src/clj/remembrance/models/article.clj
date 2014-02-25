@@ -78,8 +78,19 @@
          (count-read-articles-q db)
          0)))
 
+(defn count-articles-with-ingest-state-q [db ingest-state]
+  (ffirst (d/q '[:find (count ?eid)
+                 :in $ ?state
+                 :where [?eid :article/guid _]
+                 [?eid :article/ingest_state ?state]]
+               db
+               ingest-state)))
+
 (defn count-articles-with-ingest-state
   ([ingest-state] count-articles-with-ingest-state (db) ingest-state)
-  ([db ingest-state] ))
+  ([db ingest-state]
+     (or
+      (count-articles-with-ingest-state-q db ingest-state)
+      0)))
 
 (defn articles-stats [])

@@ -186,3 +186,33 @@
                (count-all-articles db))
              =>
              1))
+
+(facts "count-articles-with-ingest-state-q fn"
+       (fact "takes an ingest state and returns the count of how many there are"
+             (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)]
+               (count-articles-with-ingest-state-q db :article.ingest_state/ingested))
+             =>
+             1)
+
+       (fact "finds empty set for an ingest state with no articles"
+             (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)]
+               (count-articles-with-ingest-state-q db :article.ingest_state/fetched))
+             =>
+             empty?))
+
+(facts "count-all-articles-with-ingest-state fn"
+       (fact "returns 0 when there are no articles of given state"
+             (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)]
+               (count-articles-with-ingest-state db :article.ingest_state/fetched))
+             =>
+             0)
+
+       (fact "returns the count when articles exist with ingest stae"
+             (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)]
+               (count-articles-with-ingest-state db :article.ingest_state/ingested))
+             =>
+             1))
