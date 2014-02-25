@@ -12,8 +12,7 @@
       (read-string)))
 
 (defn process-uptime []
-  (-> (java.lang.management.ManagementFactory/getRuntimeMXBean)
-      (.getUptime)))
+  (.getUptime (java.lang.management.ManagementFactory/getRuntimeMXBean)))
 
 (defn free-memory []
   (.freeMemory (Runtime/getRuntime)))
