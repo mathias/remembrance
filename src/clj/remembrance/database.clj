@@ -5,7 +5,10 @@
             [remembrance.config :refer [env]]
             [taoensso.timbre :refer [info]]))
 
-(def db-uri (env :db-uri))
+(def db-uri
+  (if remembrance.config/production-env?
+    (env :db-uri)
+    (env :test-db-uri)))
 
 (def connection (d/connect db-uri))
 
@@ -23,7 +26,7 @@
                           "1388969538_add_ratings_to_articles.edn"
                           "1392916852_add_newspaper_fields_to_articles.edn"])
 
-(def migrations-path  "resources/schema/")
+(def migrations-path "resources/schema/")
 
 (def loaded-migrations (atom []))
 

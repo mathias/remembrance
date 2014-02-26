@@ -12,9 +12,10 @@
 
 (facts "testing fresh-conn!"
        (fact "should have no entities with a migration-created attribute"
-             (d/q '[:find ?e
-                    :where [?e :db/ident :article/guid]]
-                  (d/db (fresh-conn!)))
+             (let [conn (fresh-conn!)]
+               (d/q '[:find ?e
+                      :where [?e :db/ident :article/guid]]
+                    (d/db conn)))
              =>
              empty?))
 
