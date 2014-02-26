@@ -46,7 +46,8 @@
   (when (production-env?)
     (alter-var-root #'clojure.test/*load-tests* (constantly false)))
 
-  (info "Migrations:" (prepare-database!))
+  (prepare-database!)
+  (info "Migrations:" remembrance.database/migration-filenames)
   (info "DB:" (db))
 
   (when-not (production-env?)
