@@ -4,7 +4,7 @@
             [remembrance.config :refer [env]]
             [remembrance.models.article :as article]
             [remembrance.models.note :as note]
-            [remembrance.routes.core :refer :all]
+            [remembrance.routes.core :refer [keywordize-form-params keywordize-query-params]]
             [remembrance.workers :refer [enqueue-article-original-html]]
             [ring.util.response :refer [redirect]]
             [taoensso.timbre :refer [info]]))
@@ -32,6 +32,14 @@
 
 (defn article-collection-json [collection]
   (map article-wrap-json collection))
+
+(defn articles-stats-json []
+  (let [db (remembrance.database/db)]
+    {:total (article/count-all-articles db)
+     :ingested (article/count-articles-with-ingest-state db :article.ingest_state/ingested)
+     :fetched (article/count-articles-with-ingest-state db :article.ingest_state/fetched)
+     :errored (article/count-articles-with-ingest-state db :article.ingest_state/errored)
+     :read (article/count-read-articles db)}))
 
 (defn create-and-enqueue-article [params]
   (let [article (article/create-article params)
@@ -80,4 +88,4 @@
 (defresource stats
   :available-media-types ["application/json"]
   :allowed-methods [:get]
-  :handle-ok (fn [_] {:stats {:articles (article/articles-stats)}}))
+  :handle-ok (fn [_] {:stats {:articles (articles-stats-json)}}))
