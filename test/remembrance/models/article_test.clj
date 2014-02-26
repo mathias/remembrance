@@ -16,9 +16,13 @@
    :article/read true
    :article/ingest_state :article.ingest_state/ingested})
 
-(defn prepare-conn-with-existing-article []
+(defn prepare-migrated-db-conn []
   (let [our-conn (fresh-conn!)]
     (prepare-database! our-conn)
+    our-conn))
+
+(defn prepare-conn-with-existing-article []
+  (let [our-conn (prepare-migrated-db-conn)]
     (d/transact our-conn [existing-article-txn])
     our-conn))
 
@@ -106,8 +110,7 @@
              "http://example.com")
 
        (fact "when no ingested articles exist, returns empty set"
-             (let [our-conn (fresh-conn!)
-                   _ (prepare-database! our-conn)
+             (let [our-conn (prepare-migrated-db-conn)
                    db (d/db our-conn)]
                 (find-all-ingested-articles-q db))
              =>
@@ -125,8 +128,7 @@
 
 (facts "count-read-articles-q fn"
        (fact "returns empty set when no read articles exist"
-             (let [our-conn (fresh-conn!)
-                   _ (prepare-database! our-conn)
+             (let [our-conn (prepare-migrated-db-conn)
                    db (d/db our-conn)]
                 (count-read-articles-q db))
              =>
@@ -141,8 +143,7 @@
 
 (facts "count-read-articles"
        (fact "returns 0 when there are none"
-             (let [our-conn (fresh-conn!)
-                   _ (prepare-database! our-conn)
+             (let [our-conn (prepare-migrated-db-conn)
                    db (d/db our-conn)]
                (count-read-articles db))
              =>
@@ -157,8 +158,7 @@
 
 (facts "count-all-articles-q fn"
        (fact "returns an empty set when there are none"
-             (let [our-conn (fresh-conn!)
-                   _ (prepare-database! our-conn)
+             (let [our-conn (prepare-migrated-db-conn)
                    db (d/db our-conn)]
                (count-all-articles-q db))
              =>
@@ -173,8 +173,7 @@
 
 (facts "count-all-articles fn"
         (fact "returns 0 when there are none"
-             (let [our-conn (fresh-conn!)
-                   _ (prepare-database! our-conn)
+             (let [our-conn (prepare-migrated-db-conn)
                    db (d/db our-conn)]
                (count-all-articles db))
              =>
