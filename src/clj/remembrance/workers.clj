@@ -23,13 +23,16 @@
     (info "Original HTML worker got:" article-guid)
     (if (= :success (article-get-original-html article-guid))
       (enqueue-text-extraction article-guid))))
-(go
- (while true
-   (process-text-extraction (<! article-extract-text-channel))))
 
-(go
- (while true
-   (process-original-html (<! article-original-html-channel))))
+(defonce extract-worker
+  (go
+    (while true
+      (process-text-extraction (<! article-extract-text-channel)))))
+
+(defonce original-html-worker
+  (go
+    (while true
+      (process-original-html (<! article-original-html-channel)))))
 
 (defn enqueue-article-original-html [article-guid]
   (when (production-env?)
