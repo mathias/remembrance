@@ -83,7 +83,7 @@ Copyright © 2013 Matt Gauger
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
 
-Pull Requests accepted, but this is a mostly-personal project for similar reasons as:
+Pull Requests Accepted, but:
 
 > "Am have been badly burned by viral end-user license agreements. Have no desire to experiment with patent shell companies held by Chechen infoterrorists. You are human, you must not worry cereal company repossess your small intestine because digest unlicensed food with it, right? Manfred, you must help me-we. Am wishing to defect."
 
