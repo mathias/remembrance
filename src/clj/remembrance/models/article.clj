@@ -113,49 +113,49 @@
                       attributes)]))
 
 (defn update-article [conn article params]
-  (when (:article/guid article)
+  (when-let [guid (:article/guid article)]
     (update-article-txn conn article (translate-update-key-names params))
-    (find-article-by-guid (d/db conn) (:article/guid article))))
+    (find-article-by-guid (d/db conn) guid)))
 
 (defn mark-article-as-read [conn guid]
   (when-let [article (find-article-by-guid (d/db conn) guid)]
     (update-article conn article {:article/read true})))
 
 (defn count-all-articles-q [db]
-  (ffirst (d/q '[:find (count ?e)
-                 :where [?e :article/guid _]]
-               db)))
+  (d/q '[:find (count ?e)
+         :where [?e :article/guid _]]
+       db))
 
 (defn count-all-articles
   ([] (count-all-articles (db)))
   ([db]
-     (or
-      (count-all-articles-q db)
-      0)))
+     (-> (count-all-articles-q db)
+         (ffirst)
+         (or 0))))
 
 (defn count-read-articles-q [db]
-  (ffirst (d/q '[:find (count ?e)
-                 :where [?e :article/read true]]
-               db)))
+  (d/q '[:find (count ?e)
+         :where [?e :article/read true]]
+       db))
 
 (defn count-read-articles
   ([] (count-read-articles (db)))
   ([db]
-     (or
-      (count-read-articles-q db)
-      0)))
+     (-> (count-read-articles-q db)
+         (ffirst)
+         (or 0))))
 
 (defn count-articles-with-ingest-state-q [db ingest-state]
-  (ffirst (d/q '[:find (count ?eid)
-                 :in $ ?state
-                 :where [?eid :article/guid _]
-                 [?eid :article/ingest_state ?state]]
-               db
-               ingest-state)))
+  (d/q '[:find (count ?eid)
+         :in $ ?state
+         :where [?eid :article/guid _]
+         [?eid :article/ingest_state ?state]]
+       db
+       ingest-state))
 
 (defn count-articles-with-ingest-state
   ([ingest-state] count-articles-with-ingest-state (db) ingest-state)
   ([db ingest-state]
-     (or
-      (count-articles-with-ingest-state-q db ingest-state)
-      0)))
+     (-> (count-articles-with-ingest-state-q db ingest-state)
+         (ffirst)
+         (or 0))))

@@ -105,3 +105,79 @@
                    (:note/title)))
              =>
              "Example title"))
+
+(facts "count-notes-q fn"
+       (fact "returns empty set when no notes exist"
+             (let [our-conn (prepare-migrated-db-conn)
+                   db (d/db our-conn)]
+               (count-notes-q db))
+             =>
+             empty?)
+
+       (fact "when note exists, returns the set with the count in it"
+             (let [our-conn (prepare-conn-with-existing-note)
+                   db (d/db our-conn)]
+               (-> (count-notes-q db)
+                   (ffirst)))
+             =>
+             1))
+
+(facts "create-note fn"
+       (fact "can successfully create a note with given attributes"
+             (let [our-conn (prepare-migrated-db-conn)
+                   db (d/db our-conn)]
+               (->> {:title "Our note title" :body "Our body"}
+                    (create-note our-conn)
+                    (:note/title)))
+             =>
+             "Our note title")
+
+       (fact "are unique so multiple can be created with some title/body"))
+
+(facts "translate-create-note-key-names fn"
+       (fact "translates a key it knows about"
+             (translate-create-note-key-names {:title "foo"})
+             =>
+             {:note/title "foo"})
+
+       (fact "it filters keys that are not in the list (sanitizes params"
+             (translate-create-note-key-names {:title "foo" :other "bar"})
+             =>
+             {:note/title "foo"}))
+
+(facts "update-note fn"
+       (facts "when note does not exist"
+              (fact "returns falsey but does not raise error"
+                    (let [our-conn (prepare-migrated-db-conn)
+                          note nil
+                          params {:body "Updated body"}]
+                      (update-note our-conn note params))
+                    =>
+                    falsey))
+       (facts "when the note exists"
+              (fact "it updates the attribute specified"
+                    (let [our-conn (prepare-conn-with-existing-note)
+                          note (find-note-by-guid (d/db our-conn) existing-note-guid)
+                          params {:body "Updated body"}]
+                      (->> params
+                           (update-note our-conn note)
+                           (:note/body)))
+                    =>
+                    "Updated body")))
+
+
+(facts "translate-update-note-key-names fn"
+       (fact "translates a key it knows about"
+             (translate-update-note-key-names {:title "foo"})
+             =>
+             {:note/title "foo"})
+
+       (fact "it filters keys that are not in the list (sanitizes params"
+             (translate-update-note-key-names {:title "foo" :other "bar"})
+             =>
+             {:note/title "foo"})
+
+       (fact "does not allow changing things like guid in update"
+             (translate-update-note-key-names {:title "foo" :guid "new-guid"})
+             =>
+             {:note/title "foo"}))

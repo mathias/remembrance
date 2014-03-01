@@ -46,14 +46,22 @@
              =>
              (schema-valid? NoteInfo))
 
+       (fact "GET /api/notes/:guid for empty note does not blow up on validation"
+             (-> (str "/api/notes/" empty-note-guid)
+                 (get-parsed-json-body)
+                 (:notes)
+                 (first))
+             =>
+             (schema-valid? NoteInfo))
+
        (fact "GET /api/notes/:guid"
              (-> existing-note-guid
                  (str "/api/notes")
                  (get-parsed-json-body)
                  (:notes)
                  (first))
-       =>
-       (schema-valid? NoteInfo))
+             =>
+             (schema-valid? NoteInfo))
 
        (fact "PUT /api/notes/:guid"
              (-> (put! (str "/api/notes/" existing-note-guid)

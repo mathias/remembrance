@@ -2,7 +2,7 @@
   (:require [liberator.core :refer [defresource]]
             [remembrance.routes.core :refer :all]
             [remembrance.routes.articles :refer [articles-stats-json]]
-            [remembrance.models.note :refer [notes-stats]]
+            [remembrance.routes.notes :refer [notes-stats-json]]
             [remembrance.utils.health :refer [health-stats]]))
 
 (defresource stats
@@ -11,7 +11,7 @@
   :allowed-methods [:get]
   :handle-ok (fn [_] {:stats
                      {:articles (articles-stats-json)
-                      :notes (notes-stats)}}))
+                      :notes (notes-stats-json)}}))
 
 (defresource health
   resource-defaults

@@ -49,6 +49,12 @@
    :note/body "Example body"
    :note/articles []})
 
+(def empty-note-guid "empty-note-guid")
+
+(def empty-note-txn
+  {:db/id (d/tempid "db.part/user")
+   :note/guid empty-note-guid})
+
 (defn prepare-conn-with-existing-note []
   (let [our-conn (prepare-migrated-db-conn)]
     (d/transact our-conn [existing-note-txn])
@@ -57,5 +63,6 @@
 (defn prepare-conn-with-seed-data []
   (let [our-conn (prepare-migrated-db-conn)]
     (d/transact our-conn [existing-article-txn
-                          existing-note-txn])
+                          existing-note-txn
+                          empty-note-txn])
     our-conn))

@@ -6,14 +6,17 @@
             [liberator.core :refer [defresource]]
             [taoensso.timbre :refer [info]]))
 
+(defn notes-stats-json []
+  {:total (note/count-notes)})
+
 (defn note-show-url [guid]
   (str (assoc (url (env :hostname)) :path (str "/api/notes/" guid))))
 
 (defn note-wrap-json [note]
   {:href (note-show-url (:note/guid note))
    :guid (:note/guid note)
-   :title (:note/title note)
-   :body (:note/body note)
+   :title (or (:note/title note) "")
+   :body (or (:note/body note) "")
    :articles (remembrance.routes.articles/article-collection-json (:note/articles note))})
 
 (defn note-collection-json [coll]
@@ -50,10 +53,11 @@
           (dosync
            (let [note (get ctx ::note)
                  attributes (keywordize-form-params ctx)]
-             (note/update-note note attributes)))))
+             (note/update-note remembrance.database/connection note attributes)))))
 
 (defresource stats
   resource-defaults
   :available-media-types ["application/json"]
   :allowed-methods [:get]
-  :handle-ok (fn [_] {:stats {:notes (note/notes-stats)}}))
+  :handle-ok (fn [_] {:stats
+                     {:notes (notes-stats-json)}}))

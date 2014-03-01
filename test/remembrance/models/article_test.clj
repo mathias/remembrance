@@ -152,7 +152,7 @@
        (fact "returns the correct count (1) when a single read article exists"
              (let [our-conn (prepare-conn-with-read-article)
                    db (d/db our-conn)]
-               (count-read-articles-q db))
+               (ffirst (count-read-articles-q db)))
              =>
              1))
 
@@ -182,7 +182,7 @@
        (fact "returns the count when one read article exists"
              (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)]
-               (count-all-articles-q db))
+               (ffirst (count-all-articles-q db)))
              =>
              1))
 
@@ -205,7 +205,9 @@
        (fact "takes an ingest state and returns the count of how many there are"
              (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)]
-               (count-articles-with-ingest-state-q db :article.ingest_state/ingested))
+               (->> :article.ingest_state/ingested
+                    (count-articles-with-ingest-state-q db)
+                    (ffirst)))
              =>
              1)
 

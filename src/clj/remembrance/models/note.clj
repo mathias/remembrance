@@ -49,6 +49,69 @@
      (let [note-entities (find-all-notes-q db)]
        (map (partial first-entity db) note-entities))))
 
+(defn count-notes-q [db]
+  (d/q '[:find (count ?e)
+         :where [?e :note/guid _]]
+       db))
+
+(defn count-notes
+  ([] (count-notes (db)))
+  ([db]
+     (-> (count-notes-q db)
+         (ffirst)
+         (or 0))))
+
+(def allowed-note-keys-for-creation
+  [:note/title
+   :note/body
+   :note/guid
+   :note/articles])
+
+(def allowed-note-keys-for-update
+  [:note/title
+   :note/body
+   :note/articles])
+
+(def note-keys-translations
+  {:title    :note/title
+   :guid     :note/guid
+   :body     :note/body
+   :articles :note/articles})
+
+(defn translate-create-note-key-names [params]
+  (-> params
+      (clojure.set/rename-keys note-keys-translations)
+      (select-keys allowed-note-keys-for-creation)))
+
+(defn translate-update-note-key-names [params]
+  (-> params
+      (clojure.set/rename-keys note-keys-translations)
+      (select-keys allowed-note-keys-for-update)))
+
+(defn create-note-txn [conn attributes]
+  (d/transact conn
+              [(merge {:db/id (d/tempid "db.part/user")}
+                      attributes)]))
+
+(defn create-note
+  ([params] (create-note remembrance.database/connection params))
+  ([conn params]
+     (let [translated-attrs (translate-create-note-key-names params)
+           guid (new-guid)
+           attrs (merge translated-attrs {:note/guid guid})]
+       (create-note-txn conn attrs)
+       (find-note-by-guid (d/db conn) guid))))
+
+(defn update-note-txn [conn note attributes]
+  (d/transact conn
+              [(merge {:db/id (:db/id note)}
+                      attributes)]))
+
+(defn update-note [conn note params]
+  (when-let [guid (:note/guid note)]
+    (update-note-txn conn note (translate-update-note-key-names params))
+    (find-note-by-guid (d/db conn) guid)))
+
 ;; (defn find-articles-for-params-q [db article-guids]
 ;;   (map (partial find-article-by-guid-q db) article-guids))
 
