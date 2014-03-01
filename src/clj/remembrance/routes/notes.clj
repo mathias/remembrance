@@ -24,7 +24,7 @@
   :available-media-types ["application/json" "application/x-www-form-urlencoded"]
   :allowed-methods [:get :post]
   :handle-ok (fn [_]
-               {:notes (note-collection-json (note/all-notes))})
+               {:notes (note-collection-json (note/find-all-notes))})
   :post! (fn [ctx]
            (dosync
             (let [params (keywordize-form-params ctx)
@@ -39,7 +39,7 @@
   :available-media-types ["application/json" "application/x-www-form-urlencoded"]
   :allowed-methods [:get :put]
   :exists? (fn [ctx]
-             (if-let [note (note/show-note (get-in ctx [:request :guid]))]
+             (if-let [note (note/find-note-by-guid (get-in ctx [:request :guid]))]
                {::note note}))
   :handle-ok (fn [ctx]
                {:notes [(note-wrap-json (get ctx ::note))]})

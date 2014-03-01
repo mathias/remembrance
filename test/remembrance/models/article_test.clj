@@ -1,7 +1,6 @@
 (ns remembrance.models.article-test
   (:require [midje.sweet :refer :all]
             [datomic.api :as d]
-            [remembrance.database :refer [prepare-database!]]
             [remembrance.test-support.database :refer :all]
             [remembrance.models.core :refer [first-entity]]
             [remembrance.models.article :refer :all]))
