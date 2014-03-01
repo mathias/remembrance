@@ -23,11 +23,18 @@
    :article/guid existing-guid
    :article/original_url original-url
    :article/title "Example"
-   :article/read true
    :article/ingest_state :article.ingest_state/ingested})
 
+(def existing-read-article-txn
+  (merge existing-article-txn
+         {:article/read true}))
 
 (defn prepare-conn-with-existing-article []
   (let [our-conn (prepare-migrated-db-conn)]
     (d/transact our-conn [existing-article-txn])
+    our-conn))
+
+(defn prepare-conn-with-read-article []
+  (let [our-conn (prepare-migrated-db-conn)]
+    (d/transact our-conn [existing-read-article-txn])
     our-conn))

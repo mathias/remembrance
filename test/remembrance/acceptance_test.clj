@@ -18,7 +18,8 @@
       (parse-redirect-location)
       (get-guid-from-uri)))
 
-(background (around :facts (with-redefs [remembrance.database/connection (prepare-conn-with-existing-article)] ?form)))
+(background
+ (around :facts (with-redefs [remembrance.database/connection (prepare-conn-with-existing-article)] ?form)))
 
 (facts "Endpoints are all accessible"
        (fact "GET / (index-page)"

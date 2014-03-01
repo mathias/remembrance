@@ -69,29 +69,36 @@
   [:article/original_url
    :article/guid])
 
+(def allowed-articles-keys-for-update
+  [:article/read])
+
 (def article-keys-translations
   {:original_url :article/original_url
    :url          :article/original_url
-   :guid         :article/guid})
+   :guid         :article/guid
+   :read         :article/read})
 
-(defn translate-query-key-names [params]
+(defn translate-create-key-names [params]
   (-> params
       (clojure.set/rename-keys article-keys-translations)
       (select-keys allowed-articles-keys-for-creation)))
 
-(defn create-article-txn
-  ([attributes] (create-article-txn remembrance.database/connection attributes))
-  ([conn attributes]
-     (d/transact conn
-                 [(merge {:db/id (d/tempid "db.part/user")
-                          :article/ingest_state :article.ingest_state/new
-                          :article/read false}
-                         attributes)])))
+(defn translate-update-key-names [params]
+  (-> params
+      (clojure.set/rename-keys article-keys-translations)
+      (select-keys allowed-articles-keys-for-update)))
+
+(defn create-article-txn [conn attributes]
+  (d/transact conn
+              [(merge {:db/id (d/tempid "db.part/user")
+                       :article/ingest_state :article.ingest_state/new
+                       :article/read false}
+                      attributes)]))
 
 (defn create-article
   ([params] (create-article remembrance.database/connection params))
   ([conn params]
-     (let [translated-attrs (translate-query-key-names params)
+     (let [translated-attrs (translate-create-key-names params)
            original-url (:article/original_url translated-attrs)]
        (when (nil? (find-article-by-original-url (d/db conn) original-url))
          ;; create and return new article
@@ -100,9 +107,19 @@
            (create-article-txn conn translated-attrs)))
        (find-article-by-original-url (d/db conn) original-url))))
 
-(defn update-article [conn params])
+(defn update-article-txn [conn article attributes]
+  (d/transact conn
+              [(merge {:db/id (:db/id article)}
+                      attributes)]))
 
-(defn mark-article-as-read [conn guid])
+(defn update-article [conn article params]
+  (when (:article/guid article)
+    (update-article-txn conn article (translate-update-key-names params))
+    (find-article-by-guid (d/db conn) (:article/guid article))))
+
+(defn mark-article-as-read [conn guid]
+  (when-let [article (find-article-by-guid (d/db conn) guid)]
+    (update-article conn article {:article/read true})))
 
 (defn count-all-articles-q [db]
   (ffirst (d/q '[:find (count ?e)

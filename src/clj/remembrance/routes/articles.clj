@@ -88,7 +88,7 @@
           (dosync
            (let [article (get ctx ::article)
                  attributes (keywordize-form-params ctx)]
-             (article/update-article article attributes)))))
+             (article/update-article remembrance.database/connection article attributes)))))
 
 (defresource search
   resource-defaults

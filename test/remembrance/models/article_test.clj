@@ -153,7 +153,7 @@
              empty?)
 
        (fact "returns the correct count (1) when a single read article exists"
-             (let [our-conn (prepare-conn-with-existing-article)
+             (let [our-conn (prepare-conn-with-read-article)
                    db (d/db our-conn)]
                (count-read-articles-q db))
              =>
@@ -168,7 +168,7 @@
              0)
 
        (fact "returns the count when one read article exists"
-             (let [our-conn (prepare-conn-with-existing-article)
+             (let [our-conn (prepare-conn-with-read-article)
                    db (d/db our-conn)]
                (count-read-articles db))
              =>
@@ -234,25 +234,23 @@
              =>
              1))
 
-
-(facts "translate-query-key-names fn"
+(facts "translate-create-key-names fn"
        (facts "it translates a key it knows about"
-              (translate-query-key-names {:original_url original-url})
+              (translate-create-key-names {:original_url original-url})
               =>
               {:article/original_url original-url})
        (facts "it handles duplicate query params for robustness"
               (let [params {:original_url "someurl.com"
                             :url original-url}]
-                (translate-query-key-names params))
+                (translate-create-key-names params))
               =>
               {:article/original_url original-url})
        (facts "it filters keys that are not in its list (sanitizes params)"
               (let [params {:something-else "foo"
                             :url original-url}]
-                (translate-query-key-names params))
+                (translate-create-key-names params))
               =>
               {:article/original_url original-url}))
-
 
 (facts "create-article fn"
        (facts "when no article exists"
@@ -273,3 +271,52 @@
                           (:article/guid)))
                     =>
                     existing-guid)))
+
+(facts "update-article fn"
+       (facts "when article does not exist"
+              (fact "it returns falsey but does not raise error"
+                    (let [our-conn (prepare-migrated-db-conn)
+                          article nil
+                          params {:read true}]
+                      (update-article our-conn article params))
+                    =>
+                    falsey))
+
+       (facts "when the article specified by guid exists"
+              (fact "updates the article's attribute"
+                    (let [our-conn (prepare-conn-with-existing-article)
+                          article (find-article-by-guid (d/db our-conn) existing-guid)
+                          params {:read true}]
+                      (->> params
+                           (update-article our-conn article)
+                           (:article/read)))
+                    =>
+                    true)))
+
+(facts "translate-update-key-names fn"
+       (facts "it translates a key it knows about"
+              (translate-update-key-names {:read true})
+              =>
+              {:article/read true})
+       (facts "it filters keys that are not in its list (sanitizes params)"
+              (let [params {:guid "asdf" :read true}]
+                (translate-update-key-names params))
+              =>
+              {:article/read true}))
+
+(facts "mark-article-as-read fn"
+       (facts "when the article specified by guid does not exist"
+              (fact "returns falsey"
+                    (let [our-conn (prepare-migrated-db-conn)]
+                      (mark-article-as-read our-conn "nonexistant"))
+                    =>
+                    falsey))
+
+       (facts "when the article specified by guid exists"
+              (fact "marks the article as read"
+                    (let [our-conn (prepare-conn-with-existing-article)]
+                      (->> existing-guid
+                           (mark-article-as-read our-conn)
+                           (:article/read)))
+                    =>
+                    true)))

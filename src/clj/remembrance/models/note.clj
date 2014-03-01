@@ -1,8 +1,9 @@
 (ns remembrance.models.note
   (:require [remembrance.config :refer [env]]
+            [remembrance.models.core :refer [first-entity]]
             [remembrance.models.article :refer [find-article-by-guid-q]]
             [datomic.api :as d]
-            [remembrance.database :as database :refer [db new-guid t]]
+            [remembrance.database :as database :refer [db new-guid]]
             [taoensso.timbre :refer [info]]))
 
 (defn entity [eid]
@@ -29,33 +30,36 @@
        db
        guid))
 
-(defn find-note-by-guid [guid]
-  (find-note-by-guid-q (db) guid))
+(defn find-note-by-guid
+  ([guid] (find-note-by-guid (db) guid))
+  ([db guid]
+     (->> guid
+          (find-note-by-guid-q db)
+          (first)
+          (first-entity db))))
 
 (defn find-articles-for-params-q [db article-guids]
   (map (partial find-article-by-guid-q db) article-guids))
 
 (defn find-articles-for-params
-  ([articles-params] (find-articles-for-params (db) articles-params))
-  ([db articles-param]
-     (find-articles-for-params-q db (read-string articles-param))
-     ;;(map ffirst )
-     ))
+  [db articles-param]
+     (find-articles-for-params-q db (read-string articles-param)))
 
 (defn create-note [{:keys [title body articles]
                     :or {title "Untitled"
                          body ""
                          articles "[]"}
                     :as all-params}]
-  (let [db (db)
+  (let [conn remembrance.database/connection
+        db (d/db conn)
         guid (new-guid)]
-    @(d/transact remembrance.database/connection
-                 [{:db/id (d/tempid "db.part/user")
-                   :note/guid guid
-                   :note/title title
-                   :note/body body
-                   :note/articles (find-articles-for-params db articles)}])
-    (find-note-by-guid-q db guid)))
+    (d/transact conn
+                [{:db/id (d/tempid "db.part/user")
+                  :note/guid guid
+                  :note/title title
+                  :note/body body
+                  :note/articles (find-articles-for-params db articles)}])
+    (find-note-by-guid db guid)))
 
 (defn count-notes []
   (or (ffirst (d/q '[:find (count ?e)
