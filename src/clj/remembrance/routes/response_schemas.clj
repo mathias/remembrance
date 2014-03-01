@@ -1,4 +1,4 @@
-(ns remembrance.test-support.schemas
+(ns remembrance.routes.response-schemas
   (:require [schema.core :as s]))
 
 (def Uri
@@ -11,13 +11,12 @@
 
 (def FullArticle
   "JSON schema for a full article's content"
-  {:articles
-   [{:href Uri
+  {:href Uri
      :guid Guid
      :title s/Str
      :original_url Uri
      :readable_body s/Str
-     :read s/Bool}]})
+     :read s/Bool})
 
 (def ArticleInfo
   "JSON schema for individual article"
@@ -26,6 +25,10 @@
    :title s/Str
    :original_url Uri
    :read s/Bool})
+
+(def FullArticleList
+  "JSON schema for individual full article, but we always put it in an articles array"
+  {:articles [FullArticle]})
 
 (def ArticleList
   "JSON schema for article list"
@@ -75,7 +78,3 @@
     :memory {:free s/Int
              :total s/Int}
     :os {:hostname s/Str}}})
-
-(defn schema-valid? [schema-type]
-        (fn [actual]
-         (s/validate schema-type actual)))

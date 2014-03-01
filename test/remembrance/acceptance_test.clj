@@ -2,7 +2,7 @@
   (:require [midje.sweet :refer :all]
             [schema.core :as s]
             [remembrance.test-support.acceptance-helpers :refer :all]
-            [remembrance.test-support.schemas :refer :all]
+            [remembrance.routes.response-schemas :refer :all]
             [remembrance.test-support.database :refer :all]))
 
 
@@ -72,8 +72,8 @@
 
        (fact "PUT /api/notes/:guid"
              (let [existing-note-guid (existing-note-guid)]
-               (-> (str "/api/notes/" existing-note-guid)
-                   (put!)
+               (-> (put! (str "/api/notes/" existing-note-guid)
+                         {:title "Foo" :body "Body"})
                    (parsed-json-body)
                    (:notes)
                    (first)))

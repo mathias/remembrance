@@ -1,7 +1,8 @@
 (ns remembrance.acceptance.articles-test
   (:require [midje.sweet :refer :all]
             [remembrance.test-support.acceptance-helpers :refer :all]
-            [remembrance.test-support.schemas :refer :all]
+            [remembrance.routes.response-schemas :refer :all]
+            [remembrance.routes.request-schemas :refer :all]
             [remembrance.test-support.database :refer :all]))
 
 (defn create-initial-article [uri]
@@ -65,7 +66,17 @@
              (let [guid (existing-article-guid)]
                (get-parsed-json-body (str "/api/articles/" guid)))
              =>
-             (schema-valid? FullArticle)
+             (schema-valid? FullArticleList)
+             (provided
+              (remembrance.workers/enqueue-article-original-html & anything) => true))
+
+       (fact "GET /api/articles/:guid gets coerced from nil values to strings"
+             (->>  (existing-article-guid)
+                   (str "api/articles/")
+                   (get-parsed-json-body)
+                   (:readable_body))
+             =not=>
+             nil?
              (provided
               (remembrance.workers/enqueue-article-original-html & anything) => true))
 
@@ -74,7 +85,7 @@
                (parsed-json-body (put! (str "/api/articles/" guid)
                                        {"read" true})))
              =>
-             (schema-valid? FullArticle)
+             (schema-valid? FullArticleList)
              (provided
                (remembrance.workers/enqueue-article-original-html & anything) => true))
 

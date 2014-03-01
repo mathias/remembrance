@@ -2,7 +2,8 @@
   (:require [midje.sweet :refer :all]
             [ring.mock.request :refer :all]
             [cheshire.core :as json]
-            [remembrance.test-support.schemas :refer :all]
+            [schema.core :as s]
+            [remembrance.routes.response-schemas :refer :all]
             [remembrance.test-support.database :refer :all]
             [remembrance.core :refer :all]))
 
@@ -60,3 +61,7 @@
 (defn get-parsed-json-body [route]
   (-> (get! route)
       (parsed-json-body)))
+
+(defn schema-valid? [schema-type]
+        (fn [actual]
+         (s/validate schema-type actual)))

@@ -1,11 +1,13 @@
 (ns remembrance.routes.articles
   (:require [liberator.core :refer [defresource]]
             [cemerick.url :refer [url url-encode]]
+            [schema.coerce :as coerce]
             [remembrance.config :refer [env]]
             [remembrance.models.article :as article]
             [remembrance.models.note :as note]
             [remembrance.routes.core :refer :all]
             [remembrance.workers :refer [enqueue-article-original-html]]
+            [remembrance.routes.response-schemas :refer :all]
             [ring.util.response :refer [redirect]]
             [taoensso.timbre :refer [info]]))
 
@@ -15,20 +17,28 @@
 (defn article-show-url [guid]
   (str (assoc (url (env :hostname)) :path (str "/api/articles/" guid))))
 
+(def coerce-article-response
+  (coerce/coercer ArticleInfo coerce/json-coercion-matcher))
+
+(def coerce-full-article-response
+  (coerce/coercer FullArticle coerce/json-coercion-matcher))
+
 (defn article-wrap-json [article]
-  {:href (article-show-url (:article/guid article))
-   :guid (:article/guid article)
-   :title (:article/title article)
-   :original_url (:article/original_url article)
-   :read (:article/read article)})
+  (coerce-article-response {:href (article-show-url (:article/guid article))
+                            :guid (:article/guid article)
+                            :title (:article/title article)
+                            :original_url (:article/original_url article)
+                            :read (:article/read article)}))
 
 (defn full-article-wrap-json [full-article]
-  {:href (article-show-url (:article/guid full-article))
-   :guid (:article/guid full-article)
-   :title (:article/title full-article)
-   :original_url (:article/original_url full-article)
-   :readable_body (:article/readable_body full-article)
-   :read (:article/read full-article)})
+  (coerce-full-article-response
+   {:href (article-show-url (:article/guid full-article))
+    :guid (:article/guid full-article)
+    :title (:article/title full-article)
+    :original_url (:article/original_url full-article)
+    :readable_body (or (:article/readable_body full-article)
+                       "")
+    :read (:article/read full-article)}))
 
 (defn article-collection-json [collection]
   (map article-wrap-json collection))
