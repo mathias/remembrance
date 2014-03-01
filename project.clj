@@ -18,7 +18,6 @@
                  [org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2080"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
-                 [org.clojure/data.json "0.2.3"]
                  [playnice "1.0.1"]
                  [prismatic/dommy "0.1.2"]
                  [prismatic/schema "0.2.1"]
