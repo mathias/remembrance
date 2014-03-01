@@ -15,12 +15,13 @@
     (prepare-database! our-conn)
     our-conn))
 
+(def original-url "http://example.com")
 (def existing-guid "existing-guid")
 
 (def existing-article-txn
   {:db/id (d/tempid "db.part/user")
    :article/guid existing-guid
-   :article/original_url "http://example.com"
+   :article/original_url original-url
    :article/title "Example"
    :article/read true
    :article/ingest_state :article.ingest_state/ingested})

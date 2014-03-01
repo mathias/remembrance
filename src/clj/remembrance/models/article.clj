@@ -1,16 +1,11 @@
 (ns remembrance.models.article
   (:require [datomic.api :as d]
             [remembrance.config :as config]
-            [remembrance.database :refer [db]]
+            [remembrance.database :refer [db new-guid]]
             [remembrance.models.core :refer [first-entity]]
             ;;[hearst.url-cleanup :refer [normalize-url]]
             ))
 
-(defn create-article [conn params])
-
-(defn update-article [conn params])
-
-(defn mark-article-as-read [conn guid])
 
 (defn find-all-ingested-articles-q [db]
   (d/q '[:find ?eid
@@ -51,6 +46,35 @@
   ([db query]
      (let [results (search-articles-q db query)]
        (map (partial first-entity db) results))))
+
+(def article-keys-translations
+  {:original_url :article/original_url
+   :url          :article/original_url
+   :guid         :article/guid})
+
+(defn translate-query-key-names [params translations]
+  (clojure.set/rename-keys params translations))
+
+(defn create-article-txn
+  ([attributes] (create-article-txn remembrance.database/connection attributes))
+  ([conn attributes]
+     (d/transact conn
+                 [(merge {:db/id (d/tempid "db.part/user")
+                          :article/ingest_state :article.ingest_state/new
+                          :article/read false}
+                         attributes)])))
+
+(defn create-article
+  ([params] (create-article remembrance.database/connection params))
+  ([conn params]
+     (let [guid (new-guid)
+           params (merge params {:article/guid guid})]
+       (create-article-txn conn (translate-query-key-names params article-keys-translations))
+       (find-article-by-guid (d/db conn) guid))))
+
+(defn update-article [conn params])
+
+(defn mark-article-as-read [conn guid])
 
 (defn count-all-articles-q [db]
   (ffirst (d/q '[:find (count ?e)

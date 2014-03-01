@@ -6,6 +6,8 @@
             [remembrance.models.core :refer [first-entity]]
             [remembrance.models.article :refer :all]))
 
+
+
 (fact "ensure our seed transaction works"
       (let [our-conn (prepare-conn-with-existing-article)
             db (d/db our-conn)
@@ -31,7 +33,7 @@
                    eid (first (find-article-by-guid-q db existing-guid))]
                (:article/original_url (first-entity db eid)))
              =>
-             "http://example.com")
+             original-url)
 
        (fact "finding an entity that doesn't exist"
              (let [our-conn (prepare-conn-with-existing-article)
@@ -47,7 +49,7 @@
                    article (find-article-by-guid db existing-guid)]
                (:article/original_url article))
              =>
-             "http://example.com"))
+             original-url))
 
 (facts "search-articles-q fn"
        (fact "finds an article which matches the search query"
@@ -70,7 +72,7 @@
                    db (d/db our-conn)]
                (:article/original_url (first (search-articles db "Example"))))
              =>
-             "http://example.com"))
+             original-url))
 
 (facts "find-all-ingested-articles-q fn"
        (fact "returns a set containing our existing article"
@@ -87,7 +89,7 @@
                    first-found-eid (first found-eids)]
                (:article/original_url (first-entity db first-found-eid)))
              =>
-             "http://example.com")
+             original-url)
 
        (fact "when no ingested articles exist, returns empty set"
              (let [our-conn (prepare-migrated-db-conn)
@@ -99,12 +101,12 @@
 (facts "find-all-ingested-articles"
        (fact "returns entities for ingested articles"
              (let [our-conn (prepare-conn-with-existing-article)
-                   db (d/db our-conn)
-                   articles (find-all-ingested-articles db)
-                   first-found-article (first articles)]
-               (:article/original_url first-found-article))
+                   db (d/db our-conn)]
+               (-> (find-all-ingested-articles db)
+                   (first)
+                   (:article/original_url)))
              =>
-             "http://example.com"))
+             original-url))
 
 (facts "count-read-articles-q fn"
        (fact "returns empty set when no read articles exist"
@@ -197,8 +199,20 @@
              1))
 
 (facts "create-article"
-       (fact "can create an article successfully with original_url"
-             (let [our-conn (prepare-migrated-db-conn)]
-               (create-article {:original_url "http://example.com"}))
-             =>
-             0))
+       (facts "when no article exists"
+              (fact "can create an article successfully with original_url"
+                    (let [our-conn (prepare-migrated-db-conn)]
+                      (-> (create-article our-conn {:original_url original-url})
+                          (:article/original_url)))
+                    =>
+                    original-url))
+       (facts "when an article already exists with the same original-url"
+              (fact "it returns the existing entity rather than creating one"
+                    (let [our-conn (prepare-conn-with-existing-article)]
+                      ;; we know that our transaction for existing article
+                      ;; gives us a guid of existing-guid
+                      ;; so we check for that here
+                      (-> (create-article our-conn {:original_url original-url})
+                          (:article/guid)))
+                    =>
+                    existing-guid)))
