@@ -6,7 +6,7 @@
 
 ## Usage
 
-You will need Datomic Pro free edition first. The recommended local storage is either the `dev` or `sql` adapter running on Postgres. How to get a Clojure webapp up and running with Datomic (and how to run Datomic) is beyond the scope of this; since I don't really intend for anyone to actually run this but me.
+You will need Datomic Pro free edition first. The recommended local storage is either the `dev` or `sql` adapter running on Postgres with `memcached`. How to get a Clojure webapp up and running with Datomic (and how to run Datomic) is beyond the scope of this; since I don't really intend for anyone to actually run this but me.
 
 Install deps:
 
@@ -19,16 +19,19 @@ Configure your storage, drop your key into the `.properties` file, etc.
 You should now be able to run the webapp with:
 
 ```bash
-lein ring server
+lein ring server-headless
 ```
 
-Migrations will run automatically on the Datomic db. (See [database.clj](https://github.com/mathias/remembrance/blob/fa798b24783688b5568b2cb78c80854e3ae8cdbf/src/clj/remembrance/database.clj) for migration system built on top of https://github.com/rkneufeld/conformity
+Migrations will run automatically on the Datomic db. (See [database.clj](https://github.com/mathias/remembrance/blob/13cb60472df2d48e3c536520c4c5573a16237849/src/clj/remembrance/database.clj) for migration system built on top of https://github.com/rkneufeld/conformity
 
-To ingest from an Instapaper CSV export:
+For now, ingesting Instapaper CSVs is broken. It will soon use the worker queue and be mostly concerned with parsing CSVs, removing the knowledge about articles and how they are created. I'd also like to support importing Google Reader JSON archives (starred, commented on, etc. will all get ingested as read articles)
+
+~~To ingest from an Instapaper CSV export:
 
 ```bash
 lein run -m remembrance.scripts.import_from_instapaper /path/to/instapaper-export.csv
 ```
+~~
 
 ### Development conventions:
 
@@ -57,6 +60,7 @@ Liberator makes our request-response cycle much more controllable and understand
 
 - [x] Need to remove the Redis-backed worker queue. Eventually, I see that work being done by https://github.com/mathias/herman and enqueued by https://github.com/mathias/renfield
 - [x] Finish rewriting to use Liberator.
+- [x] Migrations system on top of [conformity](https://github.com/rkneufeld/conformity)
 - [ ] Add https://github.com/cemerick/friend/ for auth.
 - [ ] Lots more that I'm probably not thinking of right now.
 
