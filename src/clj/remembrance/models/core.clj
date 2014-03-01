@@ -2,5 +2,5 @@
   (:require [datomic.api :as d]
             [remembrance.database :refer [db]]))
 
-(defn first-entity [db datomic-eid]
-  (d/entity db (first datomic-eid)))
+(defn first-entity [db datomic-eid-vec]
+  (d/entity db (first datomic-eid-vec)))

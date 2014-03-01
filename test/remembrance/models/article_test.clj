@@ -51,6 +51,42 @@
              =>
              original-url))
 
+(facts "find-article-by-original-url-q fn"
+       (fact "finds an existing article"
+             (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)]
+               (find-article-by-original-url-q db original-url))
+             =not=>
+             empty?)
+
+       (fact "found article has correct attributes"
+             (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)]
+               (->>
+                (find-article-by-original-url-q db original-url)
+                (first)
+                (first-entity db)
+                (:article/original_url)))
+             =>
+             original-url)
+
+       (fact "finding an entity that doesn't exist"
+             (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)]
+               (find-article-by-original-url-q db "http://nonexistent-url.com"))
+             =>
+             empty?))
+
+(facts "find-article-by-original-url fn"
+       (fact "turns the first result entity ID into an entity"
+             (let [our-conn (prepare-conn-with-existing-article)
+                   db (d/db our-conn)]
+               (->
+                (find-article-by-original-url db original-url)
+                (:article/original_url)))
+             =>
+             original-url))
+
 (facts "search-articles-q fn"
        (fact "finds an article which matches the search query"
              (let [our-conn (prepare-conn-with-existing-article)
@@ -198,7 +234,27 @@
              =>
              1))
 
-(facts "create-article"
+
+(facts "translate-query-key-names fn"
+       (facts "it translates a key it knows about"
+              (translate-query-key-names {:original_url original-url})
+              =>
+              {:article/original_url original-url})
+       (facts "it handles duplicate query params for robustness"
+              (let [params {:original_url "someurl.com"
+                            :url original-url}]
+                (translate-query-key-names params))
+              =>
+              {:article/original_url original-url})
+       (facts "it filters keys that are not in its list (sanitizes params)"
+              (let [params {:something-else "foo"
+                            :url original-url}]
+                (translate-query-key-names params))
+              =>
+              {:article/original_url original-url}))
+
+
+(facts "create-article fn"
        (facts "when no article exists"
               (fact "can create an article successfully with original_url"
                     (let [our-conn (prepare-migrated-db-conn)]
@@ -206,12 +262,13 @@
                           (:article/original_url)))
                     =>
                     original-url))
+
        (facts "when an article already exists with the same original-url"
               (fact "it returns the existing entity rather than creating one"
                     (let [our-conn (prepare-conn-with-existing-article)]
                       ;; we know that our transaction for existing article
-                      ;; gives us a guid of existing-guid
-                      ;; so we check for that here
+                      ;; gives us a guid of existing-guid,
+                      ;; so we check for that here:
                       (-> (create-article our-conn {:original_url original-url})
                           (:article/guid)))
                     =>

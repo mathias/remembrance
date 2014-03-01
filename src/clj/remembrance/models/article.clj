@@ -27,7 +27,25 @@
 (defn find-article-by-guid
   ([guid] (find-article-by-guid (db) guid))
   ([db guid]
-     (first-entity db (first (find-article-by-guid-q db guid)))))
+     (->> guid
+          (find-article-by-guid-q db)
+          (first)
+          (first-entity db))))
+
+(defn find-article-by-original-url-q [db original-url]
+  (d/q '[:find ?eid
+         :in $ ?original_url
+         :where [?eid :article/original_url ?original_url]]
+       db
+       original-url))
+
+(defn find-article-by-original-url
+  ([original-url] (find-article-by-original-url (db) original-url))
+  ([db original-url]
+     (->> original-url
+          (find-article-by-original-url-q db)
+         (first)
+         (first-entity db))))
 
 (defn search-articles-q [db query]
   (d/q '[:find ?e
@@ -47,13 +65,19 @@
      (let [results (search-articles-q db query)]
        (map (partial first-entity db) results))))
 
+(def allowed-articles-keys-for-creation
+  [:article/original_url
+   :article/guid])
+
 (def article-keys-translations
   {:original_url :article/original_url
    :url          :article/original_url
    :guid         :article/guid})
 
-(defn translate-query-key-names [params translations]
-  (clojure.set/rename-keys params translations))
+(defn translate-query-key-names [params]
+  (-> params
+      (clojure.set/rename-keys article-keys-translations)
+      (select-keys allowed-articles-keys-for-creation)))
 
 (defn create-article-txn
   ([attributes] (create-article-txn remembrance.database/connection attributes))
@@ -67,10 +91,14 @@
 (defn create-article
   ([params] (create-article remembrance.database/connection params))
   ([conn params]
-     (let [guid (new-guid)
-           params (merge params {:article/guid guid})]
-       (create-article-txn conn (translate-query-key-names params article-keys-translations))
-       (find-article-by-guid (d/db conn) guid))))
+     (let [translated-attrs (translate-query-key-names params)
+           original-url (:article/original_url translated-attrs)]
+       (when (nil? (find-article-by-original-url (d/db conn) original-url))
+         ;; create and return new article
+         (let [guid (new-guid)
+               translated-attrs (merge translated-attrs {:article/guid guid})]
+           (create-article-txn conn translated-attrs)))
+       (find-article-by-original-url (d/db conn) original-url))))
 
 (defn update-article [conn params])
 
