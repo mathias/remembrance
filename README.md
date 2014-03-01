@@ -30,6 +30,25 @@ To ingest from an Instapaper CSV export:
 lein run -m remembrance.scripts.import_from_instapaper /path/to/instapaper-export.csv
 ```
 
+### Development conventions:
+
+#### Functions that use Datomic
+
+`-q` functions contain a Datomic query (`d/q etc`) and return a set of entity IDs, as a plain `d/q` does.
+
+The corresponding function without the `-q` in the name is the "public-facing" function that consumers will call. It usually maps across the return set of entity IDs to realize entities (for queries that return more than one entity), or gets the first entity ID and realizes it as an entity (for queries that return one entity ID.)
+
+All functions that talk to Datomic must take a `db` (for queries) or `conn` (for transactions) param, both for testing and for composability. See [Datomic Antipatterns: Conn as a Value](http://www.rkn.io/2014/02/10/datomic-antipatterns-connnnn/) for more notes on "connection as value."
+
+Transactions all have a separate `-txn` function that performs the actual transaction. The main, "public-facing" function handles things like ensuring that we can create or update the thing requested, and returns the updated version of the entity that was just created or updated. (Mostly because we need the created/updated entity immediately in Liberator resources to be able to respond appropriately.)
+
+#### Model functions and Liberator resources
+
+Liberator makes our request-response cycle much more controllable and understandable. There are a few conventions in play:
+
+* The root route (`/`) serves the index (all items) and create (POST a new item) requests. The index will respond with `handle-ok` if the resource defaults and constraints are met.
+* The id route (`/:guid`) serves the show (individual item) and update (PUT to update item) requests. Both first check the `exists?` function, and `exists?` is responsible for putting the found item onto the context for the next function. If nothing is found, we send back a not-found JSON response.
+
 ### Notes:
 
 **Never** run `lein datomic initialize` -- it will destroy data, and we no longer use `lein datomic`'s concept of a schema file!
