@@ -26,12 +26,6 @@ Migrations will run automatically on the Datomic db. (See [database.clj](https:/
 
 For now, ingesting Instapaper CSVs is broken. It will soon use the worker queue and be mostly concerned with parsing CSVs, removing the knowledge about articles and how they are created. I'd also like to support importing Google Reader JSON archives (starred, commented on, etc. will all get ingested as read articles)
 
-~~To ingest from an Instapaper CSV export:
-
-```bash
-lein run -m remembrance.scripts.import_from_instapaper /path/to/instapaper-export.csv
-```
-~~
 
 ### Development conventions:
 
