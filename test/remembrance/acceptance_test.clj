@@ -151,7 +151,9 @@
              (get-parsed-json-body "/api/articles") => (schema-valid? ArticleList))
 
        (fact "Check schema of one item in /api/articles"
-             (first (:articles (get-parsed-json-body "/api/articles")))
+             (-> (get-parsed-json-body "/api/articles")
+                 (:articles)
+                 (first))
              =>
              (schema-valid? ArticleInfo))
 
@@ -180,7 +182,9 @@
              (get-parsed-json-body "/api/notes") => (schema-valid? NoteList))
 
        (fact "Check schema of one item in /api/notes"
-             (first (:notes (get-parsed-json-body "/api/notes")))
+             (-> (get-parsed-json-body "/api/notes")
+                 (:notes)
+                 (first))
              =>
              (schema-valid? NoteInfo))
 
