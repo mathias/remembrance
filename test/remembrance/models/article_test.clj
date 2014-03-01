@@ -2,29 +2,9 @@
   (:require [midje.sweet :refer :all]
             [datomic.api :as d]
             [remembrance.database :refer [prepare-database!]]
-            [remembrance.database-test :refer [fresh-conn!]]
+            [remembrance.test-support.database :refer :all]
             [remembrance.models.core :refer [first-entity]]
             [remembrance.models.article :refer :all]))
-
-(def existing-guid "existing-guid")
-
-(def existing-article-txn
-  {:db/id (d/tempid "db.part/user")
-   :article/guid existing-guid
-   :article/original_url "http://example.com"
-   :article/title "Example"
-   :article/read true
-   :article/ingest_state :article.ingest_state/ingested})
-
-(defn prepare-migrated-db-conn []
-  (let [our-conn (fresh-conn!)]
-    (prepare-database! our-conn)
-    our-conn))
-
-(defn prepare-conn-with-existing-article []
-  (let [our-conn (prepare-migrated-db-conn)]
-    (d/transact our-conn [existing-article-txn])
-    our-conn))
 
 (fact "ensure our seed transaction works"
       (let [our-conn (prepare-conn-with-existing-article)
@@ -215,3 +195,10 @@
                (count-articles-with-ingest-state db :article.ingest_state/ingested))
              =>
              1))
+
+(facts "create-article"
+       (fact "can create an article successfully with original_url"
+             (let [our-conn (prepare-migrated-db-conn)]
+               (create-article {:original_url "http://example.com"}))
+             =>
+             0))

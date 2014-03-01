@@ -11,3 +11,7 @@
 
 (defn keywordize-query-params [ctx]
   (keywordize-keys (get-in ctx [:request :query-params])))
+
+(def resource-defaults
+  {:handle-not-found (fn [_] {:errors ["Resource not found."]})
+   })

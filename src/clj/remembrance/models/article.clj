@@ -1,20 +1,16 @@
 (ns remembrance.models.article
-  (:require ;;[clojure.data.json :as json]
-            ;;[cemerick.url :refer [url url-encode]]
-            [datomic.api :as d]
-            ;;[org.httpkit.client :as http]
+  (:require [datomic.api :as d]
             [remembrance.config :as config]
             [remembrance.database :refer [db]]
             [remembrance.models.core :refer [first-entity]]
-            ;;[taoensso.timbre :refer [info]]
             ;;[hearst.url-cleanup :refer [normalize-url]]
             ))
 
-(defn create-article [params])
+(defn create-article [conn params])
 
-(defn update-article [params])
+(defn update-article [conn params])
 
-(defn mark-article-as-read [guid])
+(defn mark-article-as-read [conn guid])
 
 (defn find-all-ingested-articles-q [db]
   (d/q '[:find ?eid
@@ -94,5 +90,3 @@
      (or
       (count-articles-with-ingest-state-q db ingest-state)
       0)))
-
-(defn articles-stats [])

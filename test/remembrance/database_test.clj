@@ -2,13 +2,8 @@
   (:require [midje.sweet :refer :all]
             [remembrance.config :refer [env]]
             [datomic.api :as d]
+            [remembrance.test-support.database :refer :all]
             [remembrance.database :refer :all]))
-
-(defn fresh-conn! []
-  (let [uri (env :test-db-uri)]
-     (d/delete-database uri)
-     (d/create-database uri)
-     (d/connect uri)))
 
 (facts "testing fresh-conn!"
        (fact "should have no entities with a migration-created attribute"

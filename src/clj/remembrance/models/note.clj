@@ -1,6 +1,6 @@
 (ns remembrance.models.note
   (:require [remembrance.config :refer [env]]
-            [remembrance.models.article :refer [find-article-by-guid]]
+            [remembrance.models.article :refer [find-article-by-guid-q]]
             [datomic.api :as d]
             [remembrance.database :as database :refer [db new-guid t]]
             [taoensso.timbre :refer [info]]))
@@ -32,8 +32,15 @@
 (defn find-note-by-guid [guid]
   (find-note-by-guid-q (db) guid))
 
-(defn find-articles-for-params [articles-param]
-  (map ffirst (find-article-by-guid (db) (read-string articles-param))))
+(defn find-articles-for-params-q [db article-guids]
+  (map (partial find-article-by-guid-q db) article-guids))
+
+(defn find-articles-for-params
+  ([articles-params] (find-articles-for-params (db) articles-params))
+  ([db articles-param]
+     (find-articles-for-params-q db (read-string articles-param))
+     ;;(map ffirst )
+     ))
 
 (defn create-note [{:keys [title body articles]
                     :or {title "Untitled"
@@ -42,12 +49,12 @@
                     :as all-params}]
   (let [db (db)
         guid (new-guid)]
-    @(d/transact [{:db/id (d/tempid "db.part/user")
-          :note/guid guid
-          :note/title title
-          :note/body body
-            :note/articles (find-articles-for-params db articles)}]
-          db)
+    @(d/transact remembrance.database/connection
+                 [{:db/id (d/tempid "db.part/user")
+                   :note/guid guid
+                   :note/title title
+                   :note/body body
+                   :note/articles (find-articles-for-params db articles)}])
     (find-note-by-guid-q db guid)))
 
 (defn count-notes []
@@ -68,8 +75,9 @@
                                             :articles {:note/articles (find-articles-for-params v)}))
                                attributes)
         attributes-to-update (apply merge mapped-attributes)]
-    @(t [(merge {:db/id (:db/id note)}
-                attributes-to-update)])
+    @(d/transact remembrance.database/connection
+                 [(merge {:db/id (:db/id note)}
+                         attributes-to-update)])
     (find-note-by-guid (:note/guid note))))
 
 (defn notes-stats []

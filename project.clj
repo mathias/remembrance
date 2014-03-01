@@ -13,7 +13,7 @@
                  [hiccup "1.0.4"]
                  [http-kit "2.1.13"]
                  [io.rkn/conformity "0.2.1" :exclusions [com.datomic/datomic-free]]
-                 [liberator "0.10.0"]
+                 [liberator "0.11.0"]
                  [midje "1.6.0"]
                  [org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2080"]

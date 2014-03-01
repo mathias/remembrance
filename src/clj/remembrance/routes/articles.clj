@@ -4,7 +4,7 @@
             [remembrance.config :refer [env]]
             [remembrance.models.article :as article]
             [remembrance.models.note :as note]
-            [remembrance.routes.core :refer [keywordize-form-params keywordize-query-params]]
+            [remembrance.routes.core :refer :all]
             [remembrance.workers :refer [enqueue-article-original-html]]
             [ring.util.response :refer [redirect]]
             [taoensso.timbre :refer [info]]))
@@ -48,6 +48,7 @@
     guid))
 
 (defresource index-path
+  resource-defaults
   :available-media-types ["application/json" "application/x-www-form-urlencoded"]
   :allowed-methods [:get :post]
   :handle-ok (fn [_]
@@ -61,8 +62,10 @@
                     {:location (article-show-url (::guid ctx))}))
 
 (defresource show-article
+  resource-defaults
   :available-media-types ["application/json" "application/x-www-form-urlencoded"]
   :allowed-methods [:get :put]
+
   :exists? (fn [ctx]
              (if-let [article (article/find-article-by-guid (get-in ctx [:request :guid]))]
                {::article article}))
@@ -78,6 +81,7 @@
              (article/update-article article attributes)))))
 
 (defresource search
+  resource-defaults
   :available-media-types ["application/json"]
   :allowed-methods [:get]
   :handle-ok (fn [ctx]
@@ -86,6 +90,7 @@
                  {:articles articles})))
 
 (defresource stats
+  resource-defaults
   :available-media-types ["application/json"]
   :allowed-methods [:get]
   :handle-ok (fn [_] {:stats {:articles (articles-stats-json)}}))

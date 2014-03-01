@@ -4,6 +4,7 @@
             [clojure.data.json :as json]
             [schema.core :as s]
             [remembrance.test-support.schemas :refer :all]
+            [remembrance.test-support.database :refer :all]
             [remembrance.core :refer :all]))
 
 (defn parse-redirect-location [response]
@@ -23,9 +24,8 @@
       (remembrance-handler)))
 
 (defn set-post-content-type [request]
-  (if (= :post (:request-method request))
-    (content-type request "application/x-www-form-urlencoded")
-    request))
+  (content-type request "application/x-www-form-urlencoded")
+  request)
 
 (defn post! [route params]
   (-> (request :post route params)
@@ -64,14 +64,17 @@
 (defn get-href [json-body]
   (get json-body "href"))
 
-(defonce existing-note-guid
-  (-> (get! "/api/notes")
-      (get-body)
-      (json/read-str)
-      (get-notes-list)
-      (first)
-      (get-href)
+(defn create-initial-note []
+  (post! "/api/notes" {:title "My note"
+                       :body "Body"}))
+
+(defn existing-note-guid []
+  (-> (create-initial-note)
+      (parse-redirect-location)
       (get-guid-from-uri)))
+
+
+(background (around :facts (with-redefs [remembrance.database/connection (prepare-conn-with-existing-article)] ?form)))
 
 (facts "Endpoints are all accessible"
        (fact "GET / (index-page)"
@@ -92,7 +95,9 @@
               true))
 
        (fact "GET /api/articles/:guid"
-             (get! (str "/api/articles/" existing-article-guid)) => ok?)
+             (get! (str "/api/articles/" existing-article-guid))
+             =>
+             ok?)
 
        (fact "PUT /api/articles/:guid"
              (put! (str "/api/articles/" existing-article-guid)
@@ -113,11 +118,13 @@
              (post! "/api/notes" {:title "My note"}) => redirects?)
 
        (fact "GET /api/notes/:guid"
-             (get! (str "/api/notes/" existing-note-guid)) => ok?)
+             (let [existing-note-guid (existing-note-guid)]
+               (get! (str "/api/notes/" existing-note-guid))) => ok?)
 
        (fact "PUT /api/notes/:guid"
-             (put! (str "/api/notes/" existing-note-guid)
-                   {"body" "Body text"})
+             (let [existing-note-guid (existing-note-guid)]
+               (put! (str "/api/notes/" existing-note-guid)
+                     {"body" "Body text"}))
              => ok?)
 
        (fact "GET /api/notes/stats"
@@ -178,15 +185,22 @@
              (schema-valid? NoteInfo))
 
        (fact "GET /api/notes/:guid"
-             (first (:notes (get-parsed-json-body (str "/api/notes/" existing-note-guid))))
+             (let [existing-note-guid (existing-note-guid)]
+               (-> existing-note-guid
+                   (str "/api/notes")
+                   (get-parsed-json-body)
+                   (:notes)
+                   (first)))
              =>
              (schema-valid? NoteInfo))
 
        (fact "PUT /api/notes/:guid"
-             (first (:notes
-                     (parsed-json-body
-                      (put! (str "/api/notes/" existing-note-guid)
-                            {"body" "Body text"}))))
+             (let [existing-note-guid (existing-note-guid)]
+               (-> (str "/api/notes/" existing-note-guid)
+                   (put!)
+                   (parsed-json-body)
+                   (:notes)
+                   (first)))
              => (schema-valid? NoteInfo))
 
        (fact "GET /api/notes/stats"

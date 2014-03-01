@@ -20,6 +20,7 @@
   (map note-wrap-json coll))
 
 (defresource index-path
+  resource-defaults
   :available-media-types ["application/json" "application/x-www-form-urlencoded"]
   :allowed-methods [:get :post]
   :handle-ok (fn [_]
@@ -34,6 +35,7 @@
                     {:location (note-show-url (::guid ctx))}))
 
 (defresource show-note
+  resource-defaults
   :available-media-types ["application/json" "application/x-www-form-urlencoded"]
   :allowed-methods [:get :put]
   :exists? (fn [ctx]
@@ -51,6 +53,7 @@
              (note/update-note note attributes)))))
 
 (defresource stats
+  resource-defaults
   :available-media-types ["application/json"]
   :allowed-methods [:get]
   :handle-ok (fn [_] {:stats {:notes (note/notes-stats)}}))
