@@ -23,6 +23,7 @@
    :article/guid existing-guid
    :article/original_url original-url
    :article/title "Example"
+   :article/read false
    :article/ingest_state :article.ingest_state/ingested})
 
 (def existing-read-article-txn

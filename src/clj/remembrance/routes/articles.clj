@@ -28,7 +28,8 @@
                             :guid (:article/guid article)
                             :title (:article/title article)
                             :original_url (:article/original_url article)
-                            :read (:article/read article)}))
+                            :read (or (:article/read article)
+                                      false)}))
 
 (defn full-article-wrap-json [full-article]
   (coerce-full-article-response
@@ -38,7 +39,8 @@
     :original_url (:article/original_url full-article)
     :readable_body (or (:article/readable_body full-article)
                        "")
-    :read (:article/read full-article)}))
+    :read (or (:article/read full-article)
+              false)}))
 
 (defn article-collection-json [collection]
   (map article-wrap-json collection))

@@ -6,8 +6,6 @@
             [remembrance.models.core :refer [first-entity]]
             [remembrance.models.article :refer :all]))
 
-
-
 (fact "ensure our seed transaction works"
       (let [our-conn (prepare-conn-with-existing-article)
             db (d/db our-conn)
