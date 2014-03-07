@@ -11,9 +11,6 @@
             [ring.util.response :refer [redirect]]
             [taoensso.timbre :refer [info]]))
 
-(defn article-index-url []
-  (str (assoc (url (env :hostname)) :path "/api/articles")))
-
 (defn article-show-url [guid]
   (str (assoc (url (env :hostname)) :path (str "/api/articles/" guid))))
 
