@@ -13,12 +13,12 @@
 (defn get-body [response]
   (:body response))
 
-(defn follow-redirect [response]
-  (request :get (parse-redirect-location response)))
-
 (defn get! [route]
   (-> (request :get route)
       (remembrance-handler)))
+
+(defn follow-redirect [response]
+  (get! (parse-redirect-location response)))
 
 (defn set-post-content-type [request]
   (content-type request "application/x-www-form-urlencoded")

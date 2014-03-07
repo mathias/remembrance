@@ -51,6 +51,33 @@
        (fact "GET /api/articles/stats"
              (get! "/api/articles/stats") => ok?))
 
+(deftest article-can-be-created-and-updated-correctly
+  (fact "POST /api/articles with article URL"
+        (->  (post! "/api/articles" {"original_url" original-url})
+             (follow-redirect)
+             (parsed-json-body)
+             (:articles)
+             (first)
+             (:original_url))
+        =>
+        original-url
+        (provided
+         (remembrance.workers/enqueue-article-original-html & anything) => true))
+
+  (fact "PUT /api/articles/:guid"
+        (let [guid (existing-article-guid)
+              parsed-response (parsed-json-body (put! (str "/api/articles/" guid)
+                                                      {"read" true}))]
+          (-> (get! (str "/api/articles/" guid))
+              (parsed-json-body)
+              (:articles)
+              (first)
+              (:read)))
+        =>
+        truthy
+        (provided
+         (remembrance.workers/enqueue-article-original-html & anything) => true)))
+
 (deftest article-endpoint-json-schema-structure
        (fact "GET /api/articles"
              (get-parsed-json-body "/api/articles") => (schema-valid? ArticleList))

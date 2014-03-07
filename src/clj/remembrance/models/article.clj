@@ -88,6 +88,16 @@
       (clojure.set/rename-keys article-keys-translations)
       (select-keys allowed-articles-keys-for-update)))
 
+(defn translate-update-values [params]
+  (if (= (type (:article/read params)) java.lang.String)
+    (update-in params [:article/read] read-string)
+    params))
+
+(defn translate-update-keys-and-values [params]
+  (-> params
+      (translate-update-key-names)
+      (translate-update-values)))
+
 (defn create-article-txn [conn attributes]
   (d/transact conn
               [(merge {:db/id (d/tempid "db.part/user")
@@ -114,7 +124,7 @@
 
 (defn update-article [conn article params]
   (when-let [guid (:article/guid article)]
-    (update-article-txn conn article (translate-update-key-names params))
+    (update-article-txn conn article (translate-update-keys-and-values params))
     (find-article-by-guid (d/db conn) guid)))
 
 (defn mark-article-as-read [conn guid]

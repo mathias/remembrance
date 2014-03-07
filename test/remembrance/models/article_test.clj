@@ -299,6 +299,7 @@
               (translate-update-key-names {:read true})
               =>
               {:article/read true})
+
        (facts "it filters keys that are not in its list (sanitizes params)"
               (let [params {:guid "asdf" :read true}]
                 (translate-update-key-names params))
@@ -321,3 +322,20 @@
                            (:article/read)))
                     =>
                     true)))
+
+(deftest translate-update-keys-and-values-fn-test
+  (fact "it tries to resolve the keys first"
+        (translate-update-keys-and-values {:read "true"})
+        =>
+        {:article/read true})
+
+  (facts "it turns a read parameter into a Clojure boolean"
+         (fact "when it is a string"
+               (translate-update-keys-and-values {:read "true"})
+               =>
+               {:article/read true})
+
+         (fact "when it is already a boolean"
+               (translate-update-keys-and-values {:read true})
+               =>
+               {:article/read true})))
