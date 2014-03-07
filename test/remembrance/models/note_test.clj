@@ -1,22 +1,24 @@
 (ns remembrance.models.note-test
   (:require [midje.sweet :refer :all]
+            [clojure.test :refer :all]
             [datomic.api :as d]
             [remembrance.test-support.database :refer :all]
             [remembrance.models.core :refer [first-entity]]
             [remembrance.models.note :refer :all]))
 
-(fact "ensure our seed transaction works"
-      (let [our-conn (prepare-conn-with-existing-note)
-            db (d/db our-conn)
-            txn-count (ffirst (d/q '[:find (count ?tx)
-                                     :in $
-                                     :where [?tx :db/txInstant _]]
-                                   db))]
-        (> txn-count 3))
-      =>
-      truthy)
+(deftest ensure-seed-transaction-works
+  (fact "ensure our seed transaction works"
+        (let [our-conn (prepare-conn-with-existing-note)
+              db (d/db our-conn)
+              txn-count (ffirst (d/q '[:find (count ?tx)
+                                       :in $
+                                       :where [?tx :db/txInstant _]]
+                                     db))]
+          (> txn-count 3))
+        =>
+        truthy))
 
-(facts "find-note-by-guid-q"
+(deftest find-note-by-guid-q-fn-test
        (facts "when note doesn't exist"
               (let [our-conn (prepare-conn-with-existing-note)
                     db (d/db our-conn)]
@@ -43,7 +45,7 @@
                     =>
                     "Example title")))
 
-(facts "find-note-by-guid fn"
+(deftest find-note-by-guid-fn-test
        (fact "turns the first result entity ID into an entity"
               (let [our-conn (prepare-conn-with-existing-note)
                    db (d/db our-conn)
@@ -52,7 +54,7 @@
              =>
              "Example title"))
 
-(facts "search-notes-q fn"
+(deftest search-notes-q-fn-test
        (fact "finds a note which matches the search query"
              (let [our-conn (prepare-conn-with-existing-note)
                    db (d/db our-conn)]
@@ -67,7 +69,7 @@
              =>
              empty?))
 
-(facts "search-notes fn"
+(deftest search-notes-fn-test
        (fact "turns returned list of entity IDs into entities (can get attributes)"
              (let [our-conn (prepare-conn-with-existing-note)
                    db (d/db our-conn)
@@ -79,7 +81,7 @@
              =>
              "Example title"))
 
-(facts "find-all-notes-q fn"
+(deftest find-all-notes-q-fn-test
        (facts "when no notes exist"
               (facts "returns empty set"
                      (let [our-conn (prepare-migrated-db-conn)
@@ -96,7 +98,7 @@
                      =not=>
                      empty?)))
 
-(facts "find-all-notes fn"
+(deftest find-all-notes-fn-test
        (fact "maps entity IDs to entities (can get attributes)"
              (let [our-conn (prepare-conn-with-existing-note)
                    db (d/db our-conn)]
@@ -106,7 +108,7 @@
              =>
              "Example title"))
 
-(facts "count-notes-q fn"
+(deftest count-notes-q-fn-test
        (fact "returns empty set when no notes exist"
              (let [our-conn (prepare-migrated-db-conn)
                    db (d/db our-conn)]
@@ -122,7 +124,7 @@
              =>
              1))
 
-(facts "create-note fn"
+(deftest create-note-fn-test
        (fact "can successfully create a note with given attributes"
              (let [our-conn (prepare-migrated-db-conn)
                    db (d/db our-conn)]
@@ -134,7 +136,7 @@
 
        (fact "are unique so multiple can be created with some title/body"))
 
-(facts "translate-create-note-key-names fn"
+(deftest translate-create-note-keyn-names-fn-test
        (fact "translates a key it knows about"
              (translate-create-note-key-names {:title "foo"})
              =>
@@ -145,7 +147,7 @@
              =>
              {:note/title "foo"}))
 
-(facts "update-note fn"
+(deftest update-note-fn-test
        (facts "when note does not exist"
               (fact "returns falsey but does not raise error"
                     (let [our-conn (prepare-migrated-db-conn)
@@ -166,7 +168,7 @@
                     "Updated body")))
 
 
-(facts "translate-update-note-key-names fn"
+(deftest translate-update-note-key-names-fn-test
        (fact "translates a key it knows about"
              (translate-update-note-key-names {:title "foo"})
              =>

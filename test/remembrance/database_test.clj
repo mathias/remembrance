@@ -1,25 +1,26 @@
 (ns remembrance.database-test
   (:require [midje.sweet :refer :all]
+            [clojure.test :refer :all]
             [remembrance.config :refer [env]]
             [datomic.api :as d]
             [remembrance.test-support.database :refer :all]
             [remembrance.database :refer :all]))
 
-(facts "testing fresh-conn!"
-       (fact "should have no entities with a migration-created attribute"
-             (let [conn (fresh-conn!)]
-               (d/q '[:find ?e
-                      :where [?e :db/ident :article/guid]]
-                    (d/db conn)))
-             =>
-             empty?))
+(deftest test-fresh-conn!
+  (fact "should have no entities with a migration-created attribute"
+        (let [conn (fresh-conn!)]
+          (d/q '[:find ?e
+                 :where [?e :db/ident :article/guid]]
+               (d/db conn)))
+        =>
+        empty?))
 
 (defn count-txes [db]
   (ffirst (d/q '[:find (count ?tx)
                  :where [?tx :db/txInstant _]]
                db)))
 
-(facts "prepare-database!"
+(deftest test-prepare-database!-fn
        ;; we don't need to inspect the migrations themselves since we assume
        ;; conformity is doing its job, so instead just check that some
        ;; transactions have happened since before the test

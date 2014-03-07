@@ -1,8 +1,8 @@
 (ns remembrance.acceptance.articles-test
   (:require [midje.sweet :refer :all]
+            [clojure.test :refer :all]
             [remembrance.test-support.acceptance-helpers :refer :all]
             [remembrance.routes.response-schemas :refer :all]
-            [remembrance.routes.request-schemas :refer :all]
             [remembrance.test-support.database :refer :all]))
 
 (defn create-initial-article [uri]
@@ -16,7 +16,7 @@
 (background
  (around :facts (with-redefs [remembrance.database/connection (prepare-conn-with-existing-article)] ?form)))
 
-(facts "Articles endpoints are all accessible"
+(deftest articles-endpoints-are-all-accessible
        (fact "GET /api/articles"
              (get! "/api/articles") => ok?)
 
@@ -51,7 +51,7 @@
        (fact "GET /api/articles/stats"
              (get! "/api/articles/stats") => ok?))
 
-(facts "Article endpoints JSON schema structure"
+(deftest article-endpoint-json-schema-structure
        (fact "GET /api/articles"
              (get-parsed-json-body "/api/articles") => (schema-valid? ArticleList))
 

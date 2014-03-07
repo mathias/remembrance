@@ -30,6 +30,7 @@
 
   :plugins [;; cljsbuild plugin
             [lein-cljsbuild "0.3.3"]
+            [lein-cloverage "1.0.2"]
 
             ;; ring plugin
             [lein-ring "0.8.8"]]

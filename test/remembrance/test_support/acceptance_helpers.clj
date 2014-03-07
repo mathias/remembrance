@@ -1,10 +1,7 @@
 (ns remembrance.test-support.acceptance-helpers
-  (:require [midje.sweet :refer :all]
-            [ring.mock.request :refer :all]
+  (:require [ring.mock.request :refer :all]
             [cheshire.core :as json]
             [schema.core :as s]
-            [remembrance.routes.response-schemas :refer :all]
-            [remembrance.test-support.database :refer :all]
             [remembrance.core :refer :all]))
 
 (defn parse-redirect-location [response]

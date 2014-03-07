@@ -1,22 +1,24 @@
 (ns remembrance.models.article-test
   (:require [midje.sweet :refer :all]
+            [clojure.test :refer :all]
             [datomic.api :as d]
             [remembrance.test-support.database :refer :all]
             [remembrance.models.core :refer [first-entity]]
             [remembrance.models.article :refer :all]))
 
-(fact "ensure our seed transaction works"
-      (let [our-conn (prepare-conn-with-existing-article)
-            db (d/db our-conn)
-            txn-count (ffirst (d/q '[:find (count ?tx)
-                                     :in $
-                                     :where [?tx :db/txInstant _]]
-                                   db))]
-        (> txn-count 3))
-      =>
-      truthy)
+(deftest ensure-seed-transaction-works
+  (fact "ensure our seed transaction works"
+        (let [our-conn (prepare-conn-with-existing-article)
+              db (d/db our-conn)
+              txn-count (ffirst (d/q '[:find (count ?tx)
+                                       :in $
+                                       :where [?tx :db/txInstant _]]
+                                     db))]
+          (> txn-count 3))
+        =>
+        truthy))
 
-(facts "find-article-by-guid-q fn"
+(deftest find-article-by-guid-q-fn-test
        (fact "finds an existing article"
              (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)]
@@ -39,7 +41,7 @@
              =>
              empty?))
 
-(facts "find-article-by-guid fn"
+(deftest find-article-by-guid-fn-test
        (fact "turns the first result entity ID into an entity"
               (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)
@@ -48,7 +50,7 @@
              =>
              original-url))
 
-(facts "find-article-by-original-url-q fn"
+(deftest find-article-by-original-url-q-fn-test
        (fact "finds an existing article"
              (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)]
@@ -74,7 +76,7 @@
              =>
              empty?))
 
-(facts "find-article-by-original-url fn"
+(deftest find-article-by-original-url-fn-test
        (fact "turns the first result entity ID into an entity"
              (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)]
@@ -84,7 +86,7 @@
              =>
              original-url))
 
-(facts "search-articles-q fn"
+(deftest search-articles-q-fn-test
        (fact "finds an article which matches the search query"
              (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)]
@@ -99,7 +101,7 @@
              =>
              empty?))
 
-(facts "search-articles fn"
+(deftest search-articles-fn-test
        (fact "maps returned list of entity ids into entities (can get attributes)"
              (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)]
@@ -107,7 +109,7 @@
              =>
              original-url))
 
-(facts "find-all-ingested-articles-q fn"
+(deftest find-all-ingested-articles-q-fn-test
        (fact "returns a set containing our existing article"
              (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)]
@@ -131,7 +133,7 @@
              =>
              empty?))
 
-(facts "find-all-ingested-articles"
+(deftest find-all-ingested-articles-fn-test
        (fact "returns entities for ingested articles"
              (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)]
@@ -141,7 +143,7 @@
              =>
              original-url))
 
-(facts "count-read-articles-q fn"
+(deftest count-read-articles-q-fn-test
        (fact "returns empty set when no read articles exist"
              (let [our-conn (prepare-migrated-db-conn)
                    db (d/db our-conn)]
@@ -156,7 +158,7 @@
              =>
              1))
 
-(facts "count-read-articles"
+(deftest count-read-articles-fn-test
        (fact "returns 0 when there are none"
              (let [our-conn (prepare-migrated-db-conn)
                    db (d/db our-conn)]
@@ -171,7 +173,7 @@
              =>
              1))
 
-(facts "count-all-articles-q fn"
+(deftest count-all-articles-q-fn-test
        (fact "returns an empty set when there are none"
              (let [our-conn (prepare-migrated-db-conn)
                    db (d/db our-conn)]
@@ -186,7 +188,7 @@
              =>
              1))
 
-(facts "count-all-articles fn"
+(deftest count-all-articles-fn-test
         (fact "returns 0 when there are none"
              (let [our-conn (prepare-migrated-db-conn)
                    db (d/db our-conn)]
@@ -201,7 +203,7 @@
              =>
              1))
 
-(facts "count-articles-with-ingest-state-q fn"
+(deftest count-articles-with-ingest-state-q-fn-test
        (fact "takes an ingest state and returns the count of how many there are"
              (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)]
@@ -218,7 +220,7 @@
              =>
              empty?))
 
-(facts "count-all-articles-with-ingest-state fn"
+(deftest count-all-articles-with-ingest-state-fn-test
        (fact "returns 0 when there are no articles of given state"
              (let [our-conn (prepare-conn-with-existing-article)
                    db (d/db our-conn)]
@@ -233,7 +235,7 @@
              =>
              1))
 
-(facts "translate-create-key-names fn"
+(deftest translate-create-key-names-fn-test
        (facts "it translates a key it knows about"
               (translate-create-key-names {:original_url original-url})
               =>
@@ -251,7 +253,7 @@
               =>
               {:article/original_url original-url}))
 
-(facts "create-article fn"
+(deftest create-article-fn-test
        (facts "when no article exists"
               (fact "can create an article successfully with original_url"
                     (let [our-conn (prepare-migrated-db-conn)]
@@ -271,7 +273,7 @@
                     =>
                     existing-guid)))
 
-(facts "update-article fn"
+(deftest update-article-fn-test
        (facts "when article does not exist"
               (fact "it returns falsey but does not raise error"
                     (let [our-conn (prepare-migrated-db-conn)
@@ -292,7 +294,7 @@
                     =>
                     true)))
 
-(facts "translate-update-key-names fn"
+(deftest translate-update-key-names-fn-test
        (facts "it translates a key it knows about"
               (translate-update-key-names {:read true})
               =>
@@ -303,7 +305,7 @@
               =>
               {:article/read true}))
 
-(facts "mark-article-as-read fn"
+(deftest mark-article-as-read-fn-test
        (facts "when the article specified by guid does not exist"
               (fact "returns falsey"
                     (let [our-conn (prepare-migrated-db-conn)]
