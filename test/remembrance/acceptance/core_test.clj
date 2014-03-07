@@ -1,4 +1,4 @@
-(ns remembrance.acceptance-test
+(ns remembrance.acceptance.core-test
   (:require [midje.sweet :refer :all]
             [clojure.test :refer :all]
             [schema.core :as s]
