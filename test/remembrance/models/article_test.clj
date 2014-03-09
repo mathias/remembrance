@@ -339,3 +339,16 @@
                (translate-update-keys-and-values {:read true})
                =>
                {:article/read true})))
+
+(deftest translate-create-keys-and-values-fn-test
+  (fact "it tries to resolve the keys first"
+        (translate-create-keys-and-values {:url "http://example.com"})
+        =>
+        {:article/original_url "http://example.com"}))
+
+(deftest translate-create-values-fn-test
+  (facts "original_url param"
+         (fact "gets normalized"
+               (translate-create-keys-and-values {:url "http://:@example.com/"})
+               =>
+               {:article/original_url "http://example.com/"})))

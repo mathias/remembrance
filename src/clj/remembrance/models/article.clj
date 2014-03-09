@@ -3,8 +3,7 @@
             [remembrance.config :as config]
             [remembrance.database :refer [db new-guid]]
             [remembrance.models.core :refer [first-entity]]
-            ;;[hearst.url-cleanup :refer [normalize-url]]
-            ))
+            [hearst.url-cleanup :refer [normalize-url]]))
 
 
 (defn find-all-ingested-articles-q [db]
@@ -98,6 +97,16 @@
       (translate-update-key-names)
       (translate-update-values)))
 
+(defn translate-create-values [params]
+  (if (contains? params :article/original_url)
+    (update-in params [:article/original_url] normalize-url)
+    params))
+
+(defn translate-create-keys-and-values [params]
+  (-> params
+      (translate-create-key-names)
+      (translate-create-values)))
+
 (defn create-article-txn [conn attributes]
   (d/transact conn
               [(merge {:db/id (d/tempid "db.part/user")
@@ -108,7 +117,7 @@
 (defn create-article
   ([params] (create-article remembrance.database/connection params))
   ([conn params]
-     (let [translated-attrs (translate-create-key-names params)
+     (let [translated-attrs (translate-create-keys-and-values params)
            original-url (:article/original_url translated-attrs)]
        (when (nil? (find-article-by-original-url (d/db conn) original-url))
          ;; create and return new article
