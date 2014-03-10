@@ -122,8 +122,8 @@
        (when (nil? (find-article-by-original-url (d/db conn) original-url))
          ;; create and return new article
          (let [guid (new-guid)
-               translated-attrs (merge translated-attrs {:article/guid guid})]
-           (create-article-txn conn translated-attrs)))
+               article-attrs (merge translated-attrs {:article/guid guid})]
+           (create-article-txn conn article-attrs)))
        (find-article-by-original-url (d/db conn) original-url))))
 
 (defn update-article-txn [conn article attributes]
