@@ -3,8 +3,7 @@
             [remembrance.config :refer [env]]
             [remembrance.routes.core :refer :all]
             [remembrance.models.note :as note]
-            [liberator.core :refer [defresource]]
-            [taoensso.timbre :refer [info]]))
+            [liberator.core :refer [defresource]]))
 
 (defn notes-stats-json []
   {:total (note/count-notes)})

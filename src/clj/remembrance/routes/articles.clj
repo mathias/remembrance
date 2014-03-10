@@ -7,8 +7,7 @@
             [remembrance.models.note :as note]
             [remembrance.routes.core :refer :all]
             [remembrance.routes.response-schemas :refer :all]
-            [ring.util.response :refer [redirect]]
-            [taoensso.timbre :refer [info]]))
+            [ring.util.response :refer [redirect]]))
 
 (defn article-show-url [guid]
   (str (assoc (url (env :hostname)) :path (str "/api/articles/" guid))))
