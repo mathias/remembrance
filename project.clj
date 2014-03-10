@@ -19,11 +19,10 @@
                  [org.clojure/clojurescript "0.0-2080"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
                  [playnice "1.0.1"]
-                 [prismatic/dommy "0.1.2"]
                  [prismatic/schema "0.2.1"]
+                 [ring-mock "0.1.5"]
                  [ring/ring-jetty-adapter "1.2.1"]
-                 [ring/ring-json "0.2.0"]
-                 [ring-mock "0.1.5"]]
+                 [ring/ring-json "0.2.0"]]
 
   ;; clojure source code pathname
   :source-paths ["src/clj"]
