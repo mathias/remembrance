@@ -1,9 +1,7 @@
 (ns remembrance.database
-  (:require [clojure.edn :as edn]
+  (:require [datomic.api :as d]
             [io.rkn.conformity :as c]
-            [datomic.api :as d]
-            [remembrance.config :refer [env]]
-            [taoensso.timbre :refer [info]]))
+            [remembrance.config :refer [env]]))
 
 (def db-uri
   (if remembrance.config/production-env?

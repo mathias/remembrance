@@ -1,10 +1,7 @@
 (ns remembrance.models.note
-  (:require [remembrance.config :refer [env]]
-            [remembrance.models.core :refer [first-entity]]
-            [remembrance.models.article :refer [find-article-by-guid-q]]
-            [datomic.api :as d]
-            [remembrance.database :as database :refer [db new-guid]]
-            [taoensso.timbre :refer [info]]))
+  (:require [datomic.api :as d]
+            [remembrance.database :refer [db new-guid]]
+            [remembrance.models.core :refer [first-entity]]))
 
 (defn find-note-by-guid-q [db guid]
   (d/q '[:find ?eid

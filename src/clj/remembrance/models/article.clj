@@ -1,9 +1,8 @@
 (ns remembrance.models.article
   (:require [datomic.api :as d]
-            [remembrance.config :as config]
+            [hearst.url-cleanup :refer [normalize-url]]
             [remembrance.database :refer [db new-guid]]
-            [remembrance.models.core :refer [first-entity]]
-            [hearst.url-cleanup :refer [normalize-url]]))
+            [remembrance.models.core :refer [first-entity]]))
 
 
 (defn find-all-ingested-articles-q [db]

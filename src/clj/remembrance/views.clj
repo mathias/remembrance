@@ -1,6 +1,8 @@
 (ns remembrance.views
   (:require [hiccup.page :refer :all]
-            [remembrance.models.article :refer [count-all-articles count-read-articles count-articles-with-ingest-state]]
+            [remembrance.models.article :refer [count-all-articles
+                                                count-articles-with-ingest-state
+                                                count-read-articles]]
             [remembrance.models.note :refer [count-notes]]))
 
 (defn index-page []
