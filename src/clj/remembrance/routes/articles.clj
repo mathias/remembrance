@@ -6,7 +6,6 @@
             [remembrance.models.article :as article]
             [remembrance.models.note :as note]
             [remembrance.routes.core :refer :all]
-            [remembrance.workers :refer [enqueue-article-original-html]]
             [remembrance.routes.response-schemas :refer :all]
             [ring.util.response :refer [redirect]]
             [taoensso.timbre :refer [info]]))
@@ -53,7 +52,8 @@
 (defn create-and-enqueue-article [params]
   (let [article (article/create-article params)
         guid (:article/guid article)]
-    (enqueue-article-original-html guid)
+    ;; TODO: enqueue article ingestion here
+    ;; (enqueue-article-original-html guid)
     guid))
 
 (defresource index-path

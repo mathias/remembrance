@@ -24,26 +24,20 @@
              (post! "/api/articles"
                     {"original_url" original-url})
              =>
-             redirects?
-             (provided
-              (remembrance.workers/enqueue-article-original-html & anything) => true))
+             redirects?)
 
        (fact "GET /api/articles/:guid"
              (let [guid (existing-article-guid)]
                (get! (str "/api/articles/" guid)))
              =>
-             ok?
-             (provided
-              (remembrance.workers/enqueue-article-original-html & anything) => true))
+             ok?)
 
        (fact "PUT /api/articles/:guid"
              (let [guid (existing-article-guid)]
                (put! (str "/api/articles/" guid)
                      {"read" true}))
              =>
-             ok?
-             (provided
-              (remembrance.workers/enqueue-article-original-html & anything) => true))
+             ok?)
 
        (fact "GET /api/articles/search"
              (get! "/api/articles/search?q=Example") => ok?)
@@ -60,9 +54,7 @@
              (first)
              (:original_url))
         =>
-        original-url
-        (provided
-         (remembrance.workers/enqueue-article-original-html & anything) => true))
+        original-url)
 
   (fact "PUT /api/articles/:guid"
         (let [guid (existing-article-guid)
@@ -74,9 +66,7 @@
               (first)
               (:read)))
         =>
-        truthy
-        (provided
-         (remembrance.workers/enqueue-article-original-html & anything) => true)))
+        truthy))
 
 (deftest article-endpoint-json-schema-structure
        (fact "GET /api/articles"
@@ -93,9 +83,7 @@
              (let [guid (existing-article-guid)]
                (get-parsed-json-body (str "/api/articles/" guid)))
              =>
-             (schema-valid? FullArticleList)
-             (provided
-              (remembrance.workers/enqueue-article-original-html & anything) => true))
+             (schema-valid? FullArticleList))
 
        (fact "GET /api/articles/:guid gets coerced from nil values to strings"
              (->>  (existing-article-guid)
@@ -103,18 +91,14 @@
                    (get-parsed-json-body)
                    (:readable_body))
              =not=>
-             nil?
-             (provided
-              (remembrance.workers/enqueue-article-original-html & anything) => true))
+             nil?)
 
        (fact "PUT /api/articles/:guid"
              (let [guid (existing-article-guid)]
                (parsed-json-body (put! (str "/api/articles/" guid)
                                        {"read" true})))
              =>
-             (schema-valid? FullArticleList)
-             (provided
-               (remembrance.workers/enqueue-article-original-html & anything) => true))
+             (schema-valid? FullArticleList))
 
        (fact "GET /api/articles/search"
              (get-parsed-json-body "/api/articles/search?q=Example")
