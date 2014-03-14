@@ -24,6 +24,9 @@
               {"body" "Body text"})
         => ok?)
 
+  (fact "GET /api/notes/search"
+        (get! "/api/notes/search?q=Example") => ok?)
+
   (fact "GET /api/notes/stats"
         (get! "/api/notes/stats") => ok?)
 
@@ -68,6 +71,11 @@
             (:notes)
             (first))
         => (schema-valid? NoteInfo))
+
+  (fact "GET /api/notes/search"
+        (get-parsed-json-body "/api/notes/search?q=Example")
+        =>
+        (schema-valid? NoteList))
 
   (fact "GET /api/notes/stats"
         (get-in (get-parsed-json-body "/api/notes/stats") [:stats :notes])

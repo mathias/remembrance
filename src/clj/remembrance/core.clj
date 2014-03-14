@@ -29,6 +29,7 @@
   (route "/api/articles/stats" articles/stats)
   (route "/api/notes" notes/index-path)
   (route "/api/notes/:guid" notes/show-note)
+  (route "/api/notes/search" notes/search)
   (route "/api/notes/stats" notes/stats)
   (route "/api/stats" api/stats)
 

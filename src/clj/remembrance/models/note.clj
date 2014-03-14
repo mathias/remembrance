@@ -108,3 +108,21 @@
   (when-let [guid (:note/guid note)]
     (update-note-txn conn note (translate-update-note-key-names params))
     (find-note-by-guid (d/db conn) guid)))
+
+(defn search-notes-q [db query]
+  (d/q '[:find ?e
+         :in $ % ?query
+         :where (search-rules ?query ?e)]
+       db
+       '[[(search-rules ?query ?e)
+          [(fulltext $ :note/body ?query) [[?e]]]]
+         [(search-rules ?query ?e)
+          [(fulltext $ :note/title ?query) [[?e]]]]]
+       query))
+
+(defn search-notes
+  ([query]
+     (search-notes (db) query))
+  ([db query]
+     (let [results (search-notes-q db query)]
+       (map (partial first-entity db) results))))

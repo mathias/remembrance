@@ -54,6 +54,15 @@
                  attributes (keywordize-form-params ctx)]
              (note/update-note remembrance.database/connection note attributes)))))
 
+(defresource search
+  resource-defaults
+  :available-media-types ["application/json"]
+  :allowed-methods [:get]
+  :handle-ok (fn [ctx]
+               (let [query (:q (keywordize-query-params ctx))
+                     notes (note-collection-json (note/search-notes query))]
+                 {:notes notes})))
+
 (defresource stats
   resource-defaults
   :available-media-types ["application/json"]
