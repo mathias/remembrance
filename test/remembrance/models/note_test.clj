@@ -183,3 +183,26 @@
              (translate-update-note-key-names {:title "foo" :guid "new-guid"})
              =>
              {:note/title "foo"}))
+
+(deftest search-notes-q-fn-test
+       (fact "finds a note which matches the search query"
+             (let [our-conn (prepare-conn-with-existing-note)
+                   db (d/db our-conn)]
+               (search-notes-q db "Example"))
+             =not=>
+             empty?)
+
+       (fact "note that does not match query is not found"
+             (let [our-conn (prepare-conn-with-existing-note)
+                   db (d/db our-conn)]
+               (search-notes-q db "Not matching"))
+             =>
+             empty?))
+
+(deftest search-notes-fn-test
+       (fact "maps returned list of entity ids into entities (can get attributes)"
+             (let [our-conn (prepare-conn-with-existing-note)
+                   db (d/db our-conn)]
+               (:note/title (first (search-notes db "Example"))))
+             =>
+             "Example title"))
