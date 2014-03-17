@@ -60,8 +60,8 @@
   :available-media-types ["application/json" "application/x-www-form-urlencoded"]
   :allowed-methods [:get :post]
   :handle-ok (fn [_]
-               {:articles (article-collection-json
-                           (article/find-all-ingested-articles))})
+               (jsonify {:articles (article-collection-json
+                                    (article/find-all-ingested-articles))}))
   :post! (fn [ctx]
            (dosync
             (let [guid (create-and-enqueue-article (keywordize-form-params ctx))]
@@ -78,7 +78,7 @@
              (if-let [article (article/find-article-by-guid (get-in ctx [:request :guid]))]
                {::article article}))
   :handle-ok (fn [ctx]
-               {:articles [(full-article-wrap-json (get ctx ::article))]})
+               (jsonify {:articles [(full-article-wrap-json (get ctx ::article))]}))
   :can-put-to-missing? false
   :new? false
   :respond-with-entity? true
@@ -95,10 +95,10 @@
   :handle-ok (fn [ctx]
                (let [query (:q (keywordize-query-params ctx))
                      articles (article-collection-json (article/search-articles query))]
-                 {:articles articles})))
+                 (jsonify {:articles articles}))))
 
 (defresource stats
   resource-defaults
   :available-media-types ["application/json"]
   :allowed-methods [:get]
-  :handle-ok (fn [_] {:stats {:articles (articles-stats-json)}}))
+  :handle-ok (fn [_] (jsonify {:stats {:articles (articles-stats-json)}})))

@@ -4,7 +4,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :dependencies [[cheshire "5.2.0"]
+  :dependencies [[cheshire "5.3.1"]
                  [clojure-csv "2.0.1"]
                  [com.cemerick/url "0.1.0"]
                  [com.datomic/datomic-pro "0.9.4384"]

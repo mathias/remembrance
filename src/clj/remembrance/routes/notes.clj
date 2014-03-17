@@ -26,7 +26,7 @@
   :available-media-types ["application/json" "application/x-www-form-urlencoded"]
   :allowed-methods [:get :post]
   :handle-ok (fn [_]
-               {:notes (note-collection-json (note/find-all-notes))})
+               (jsonify {:notes (note-collection-json (note/find-all-notes))}))
   :post! (fn [ctx]
            (dosync
             (let [params (keywordize-form-params ctx)
@@ -44,7 +44,7 @@
              (if-let [note (note/find-note-by-guid (get-in ctx [:request :guid]))]
                {::note note}))
   :handle-ok (fn [ctx]
-               {:notes [(note-wrap-json (get ctx ::note))]})
+               (jsonify {:notes [(note-wrap-json (get ctx ::note))]}))
   :can-put-to-missing? false
   :new? false
   :respond-with-entity? true
@@ -61,11 +61,11 @@
   :handle-ok (fn [ctx]
                (let [query (:q (keywordize-query-params ctx))
                      notes (note-collection-json (note/search-notes query))]
-                 {:notes notes})))
+                 (jsonify {:notes notes}))))
 
 (defresource stats
   resource-defaults
   :available-media-types ["application/json"]
   :allowed-methods [:get]
-  :handle-ok (fn [_] {:stats
-                     {:notes (notes-stats-json)}}))
+  :handle-ok (fn [_] (jsonify {:stats
+                              {:notes (notes-stats-json)}})))

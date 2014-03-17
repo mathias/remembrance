@@ -1,5 +1,6 @@
 (ns remembrance.routes.core
-  (:require [clojure.walk :refer [keywordize-keys]]))
+  (:require [cheshire.core :refer [generate-string]]
+            [clojure.walk :refer [keywordize-keys]]))
 
 (defn respond-with
   ([body] {:body body})
@@ -15,3 +16,6 @@
 (def resource-defaults
   {:handle-not-found (fn [_] {:errors ["Resource not found."]})
    :handle-not-implemented (fn [_] {:errors ["Not implemented."]})})
+
+(defn jsonify [response]
+  (generate-string response {:pretty true}))

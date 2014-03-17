@@ -9,12 +9,12 @@
   resource-defaults
   :available-media-types ["application/json"]
   :allowed-methods [:get]
-  :handle-ok (fn [_] {:stats
-                     {:articles (articles-stats-json)
-                      :notes (notes-stats-json)}}))
+  :handle-ok (fn [_] (jsonify {:stats
+                              {:articles (articles-stats-json)
+                               :notes (notes-stats-json)}})))
 
 (defresource health
   resource-defaults
   :available-media-types ["application/json"]
   :allowed-methods [:get]
-  :handle-ok (fn [_] {:health (health-stats)}))
+  :handle-ok (fn [_] (jsonify {:health (health-stats)})))
