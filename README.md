@@ -4,9 +4,11 @@
 
 &mdash; Marcel Proust
 
+An experiment in building a system of augmented memory, targeting the cloud and (evenutually) wearable computing. Lots of papers and scifi novels inspired this project.
+
 ## Usage
 
-You will need Datomic Pro free edition first. The recommended local storage is either the `dev` or `sql` adapter running on Postgres with `memcached`. How to get a Clojure webapp up and running with Datomic (and how to run Datomic) is beyond the scope of this; since I don't really intend for anyone to actually run this but me.
+You will need the free Datomic Pro Starter Edition first. The recommended local storage is either the `dev` or `sql` adapter running on Postgres with `memcached`. How to get a Clojure webapp up and running with Datomic (and how to run Datomic) is beyond the scope of this; since I don't really intend for anyone to actually run this but me.
 
 Install deps:
 
