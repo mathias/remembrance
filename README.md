@@ -4,7 +4,7 @@
 
 &mdash; Marcel Proust
 
-An experiment in building a system of augmented memory, targeting the cloud and (evenutually) wearable computing. Lots of papers and scifi novels inspired this project.
+An experiment in building a system of augmented memory, targeting the cloud and (evenutually) wearable computing. Lots of academic papers and scifi novels inspired this project.
 
 ## Usage
 
