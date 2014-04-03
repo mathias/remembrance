@@ -76,5 +76,6 @@
     :pid s/Int
     :process-uptime s/Int
     :memory {:free s/Int
-             :total s/Int}
+             :stack-total s/Int
+             :os-total s/Int}
     :os {:hostname s/Str}}})
