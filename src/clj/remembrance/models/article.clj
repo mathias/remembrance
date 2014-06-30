@@ -42,8 +42,8 @@
   ([db original-url]
      (->> original-url
           (find-article-by-original-url-q db)
-         (first)
-         (first-entity db))))
+          (first)
+          (first-entity db))))
 
 (defn search-articles-q [db query]
   (d/q '[:find ?e
