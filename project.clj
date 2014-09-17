@@ -6,39 +6,39 @@
 
   :dependencies [[cheshire "5.3.1"]
                  [clojure-csv "2.0.1"]
-                 [com.cemerick/url "0.1.0"]
+                 [com.cemerick/url "0.1.1"]
                  [com.datomic/datomic-pro "0.9.4384"]
-                 [com.taoensso/timbre "2.7.1"]
-                 [hearst "0.1.1-SNAPSHOT"]
-                 [hiccup "1.0.4"]
-                 [http-kit "2.1.13"]
-                 [io.rkn/conformity "0.2.1" :exclusions [com.datomic/datomic-free]]
-                 [liberator "0.11.0"]
-                 [midje "1.6.0"]
-                 [org.clojure/clojure "1.5.1"]
-                 [org.clojure/clojurescript "0.0-2080"]
+                 [com.taoensso/timbre "3.3.1"]
+                 [hearst "0.1.2"]
+                 [hiccup "1.0.5"]
+                 [http-kit "2.1.19"]
+                 [io.rkn/conformity "0.3.2" :exclusions [com.datomic/datomic-free]]
+                 [liberator "0.12.1"]
+                 [org.clojure/clojure "1.6.0"]
+                 [org.clojure/clojurescript "0.0-2322"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
                  [playnice "1.0.1"]
-                 [prismatic/schema "0.2.1"]
+                 [prismatic/schema "0.2.6"]
                  [ring-mock "0.1.5"]
-                 [ring/ring-jetty-adapter "1.2.1"]
-                 [ring/ring-json "0.2.0"]]
+                 [ring/ring-jetty-adapter "1.3.1"]
+                 [ring/ring-json "0.3.1"]]
 
   ;; clojure source code pathname
   :source-paths ["src/clj"]
 
   :plugins [;; cljsbuild plugin
-            [lein-cljsbuild "0.3.3"]
+            [lein-cljsbuild "1.0.3"]
             [lein-cloverage "1.0.2"]
 
             ;; ring plugin
-            [lein-ring "0.8.8"]]
+            [lein-ring "0.8.11"]]
 
   ;; datomic configuration
   :profiles {:dev
              {:datomic {:config "resources/sql-transactor-template.properties"
                         :db-uri "datomic:sql://remembrance?jdbc:postgresql://localhost:5432/datomic?user=datomic&password=datomic"}
-              :plugins [[lein-midje "3.1.1"]]}}
+              :dependencies [[midje "1.6.3"]]
+              :plugins [[lein-midje "3.1.3"]]}}
 
   ;; ring tasks configuration
   :ring {:handler remembrance.core/remembrance-handler
