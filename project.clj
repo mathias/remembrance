@@ -13,7 +13,6 @@
                  [ring/ring-jetty-adapter "1.3.1"]
                  [ring/ring-json "0.3.1"]]
 
-  ;; clojure source code pathname
   :source-paths ["src/clj"]
 
   :plugins [;; cljsbuild plugin
@@ -22,13 +21,11 @@
             ;; ring plugin
             [lein-ring "0.8.11"]]
 
-  ;; datomic configuration
   :profiles {:dev
              {:dependencies [[midje "1.6.3"]
                              [ring-mock "0.1.5"]]
               :plugins [[lein-midje "3.1.3"]]}}
 
-  ;; ring tasks configuration
   :ring {:handler remembrance.core/remembrance-handler
          :init remembrance.core/remembrance-init
          :auto-refresh true
