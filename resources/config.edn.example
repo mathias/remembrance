@@ -1,6 +1,0 @@
-{
-  :api-version "1.1.0"
-  :hostname "http://localhost:3000"
-  :db-uri "datomic:pro://localhost:4334/remembrance"
-  :test-db-uri "datomic:mem://test"
-}
