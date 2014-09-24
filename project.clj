@@ -1,4 +1,4 @@
-(defproject remembrance "0.1.1"
+(defproject remembrance "0.2.0-SNAPSHOT"
   :description "Note taking"
   :url "https://github.com/mathias/remembrance"
   :license {:name "Eclipse Public License"
