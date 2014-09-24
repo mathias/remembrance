@@ -7,9 +7,8 @@
   :dependencies [[cheshire "5.3.1"]
                  [clojure-csv "2.0.1"]
                  [hiccup "1.0.5"]
-                 [liberator "0.12.1"]
+                 [liberator "0.12.2"]
                  [org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2322"]
                  [playnice "1.0.1"]
                  [ring/ring-jetty-adapter "1.3.1"]
                  [ring/ring-json "0.3.1"]]
@@ -18,7 +17,6 @@
   :source-paths ["src/clj"]
 
   :plugins [;; cljsbuild plugin
-            [lein-cljsbuild "1.0.3"]
             [lein-cloverage "1.0.2"]
 
             ;; ring plugin
