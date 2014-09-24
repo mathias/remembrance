@@ -1,0 +1,4 @@
+{:dev {:env {:database-url "jdbc:postgres://localhost/dev"
+             :hostname "api.remembrance.local:3000"}}
+ :test {:env {:database-url "jdbc:postgres://localhost/test"
+              :hostname "api.remembrance.local:3000"}}}

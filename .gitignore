@@ -12,13 +12,10 @@ config.edn
 .lein-repl-history
 .lein-plugins/
 
-# datomic
-resources/*-transactor-template.properties
-
 # emacs
 *~
 \#*\#
 .#*
 
-# redis dumps
-dump.rdb
+# environ env file
+profiles.clj

@@ -15,12 +15,8 @@
                  [ring/ring-jetty-adapter "1.3.1"]
                  [ring/ring-json "0.3.1"]]
 
-  :source-paths ["src/clj"]
-
-  :plugins [;; cljsbuild plugin
-            [lein-cloverage "1.0.2"]
-
-            ;; ring plugin
+  :plugins [[lein-cloverage "1.0.2"]
+            [lein-environ "1.0.0"]
             [lein-ring "0.8.11"]]
 
   :profiles {:dev
