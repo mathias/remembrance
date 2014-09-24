@@ -7,6 +7,7 @@
   :dependencies [[cheshire "5.3.1"]
                  [clojure-csv "2.0.1"]
                  [com.cemerick/friend "0.2.1"]
+                 [environ "1.0.0"]
                  [hiccup "1.0.5"]
                  [liberator "0.12.2"]
                  [org.clojure/clojure "1.6.0"]
