@@ -54,7 +54,7 @@ Liberator makes our request-response cycle much more controllable and understand
 
 ## Features, TODOs, wishful thinking.
 
-- [x] Need to remove the Redis-backed worker queue. Eventually, I see that work being done by https://github.com/mathias/herman and enqueued by https://github.com/mathias/renfield
+- [x] Need to remove the Redis-backed worker queue. Eventually, I see that work being done by https://github.com/mathias/herman
 - [x] Finish rewriting to use Liberator.
 - [x] Migrations system on top of [conformity](https://github.com/rkneufeld/conformity)
 - [ ] Add https://github.com/cemerick/friend/ for auth.
