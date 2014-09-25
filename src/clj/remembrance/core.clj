@@ -16,27 +16,35 @@
 (def resource-defaults
   {:available-media-types ["application/vnd.remembrance+json"]
    :handle-not-found (fn [_] {:errors ["Resource not found."]})
+   :handle-not-acceptable (fn [_] {:errors ["Request type not acceptable."]})
    :handle-not-implemented (fn [_] {:errors ["Not implemented."]})})
 
 (defn jsonify [response]
   (generate-string response {:pretty true}))
 
 (defn url-to [path]
-  (str (env :hostname) path))
+  (str (env :hostname) ":" (env :port) path))
+
+(defn api-url-to [path]
+  (url-to (str "/api" path)))
 
 (def api-index-response
-  {:current_user_url (url-to "/user")
-   :authorizations_url (url-to "/authorizations")
-   :articles_url (url-to "/articles")
-   :articles_import_url (url-to "/articles/import")
-   :articles_search_url (url-to "/articles/search")
-   :notes_url (url-to "/notes")
-   :stats_url (url-to "/stats")})
+  {:current_user_url (api-url-to "/user")
+   :articles_url (api-url-to "/articles")
+   :articles_import_url (api-url-to "/articles/import")
+   :articles_search_url (api-url-to "/articles/search")
+   :notes_url (api-url-to "/notes")
+   :stats_url (api-url-to "/stats")})
 
 (defresource api-index
   resource-defaults
   :allowed-methods [:get]
   :handle-ok (fn [_] (jsonify api-index-response)))
+
+(defresource articles-route
+  resource-defaults
+  :allowed-methods [:get]
+  :handle-ok (fn [_] (jsonify {:articles []})))
 
 (def routes (atom {}))
 
@@ -49,21 +57,16 @@
 (defn define-routes!
   []
   ;; API discovery endpoint
-  (route "/" api-index)
+  (route "/api/" api-index)
 
   ;; Articles
-  )
+  (route "/api/articles" articles-route))
 
 ;; we must do this in the namespace and not init fn below,
 ;; because ring in dev will reload this file but not re-run init,
 ;; losing all route definitions.
-(define-routes!)
 
-(defn remembrance-init
-  []
-  ;; Turn off tests in production:
-  (when false ;; TODO: FIXME
-     (alter-var-root #'clojure.test/*load-tests* (constantly false))))
+(define-routes!)
 
 (defn routes-handler [req]
   (playnice/dispatch @routes req))

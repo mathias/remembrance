@@ -19,3 +19,7 @@ config.edn
 
 # environ env file
 profiles.clj
+
+.boot
+project.clj
+resources/

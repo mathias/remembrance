@@ -1,0 +1,56 @@
+(page "index.html"
+  (:require [tailrecursion.hoplon.reload :refer [reload-all]]
+            [tailrecursion.javelin :refer [cell]]))
+
+;; page meta
+(defc page-title       "Remembrance")
+(defc meta-description "notes")
+(defc favicon-path     "/favicon.ico")
+
+;; blog settings
+
+;; content settings
+
+;; Blog content
+
+;; routing
+(defc current-route (.. js/window -location -hash))
+
+(defn router
+  [requested-route]
+  (do
+    (.log js/console
+          (clojure.string/split requested-route "/"))
+    ;; logic for determining which route matches
+    ;; set any input cells to reflect current page
+    (reset! current-route requested-route)))
+
+(def route (route-cell current-route router))
+
+;; content elems
+
+;; Live reload functionality:
+;;(reload-all 500)
+
+(html
+  (head
+    ;; document settings
+    (meta :charset "utf-8")
+    (meta :http-equiv "X-UA-Compatible" :content "IE=edge")
+
+    ;; page meta
+    (title page-title)
+    (meta :name "description" :content meta-description)
+
+    (meta :name "HandheldFriendly" :content "True")
+    (meta :name "viewport" :content "width=device-width, initial-scale=1.0")
+
+    (link :rel "shortcut icon" :href favicon-path)
+
+    ;; stylesheets
+    (link :rel "stylesheet" :type "text/css" :href "css/main.css"))
+
+  (body
+    (header)
+    (h1 (text "Remem"))
+    (footer)))
