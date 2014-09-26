@@ -27,6 +27,9 @@
 
 (def route (route-cell current-route router))
 
+(defc articles [])
+
+(defn fetch-articles! [])
 ;; content elems
 
 ;; Live reload functionality:
