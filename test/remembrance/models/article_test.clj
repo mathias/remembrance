@@ -240,12 +240,7 @@
               (translate-create-key-names {:original_url original-url})
               =>
               {:article/original_url original-url})
-       (facts "it handles duplicate query params for robustness"
-              (let [params {:original_url "someurl.com"
-                            :url original-url}]
-                (translate-create-key-names params))
-              =>
-              {:article/original_url original-url})
+
        (facts "it filters keys that are not in its list (sanitizes params)"
               (let [params {:something-else "foo"
                             :url original-url}]
