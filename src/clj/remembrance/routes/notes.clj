@@ -3,6 +3,7 @@
             [remembrance.config :refer [env]]
             [remembrance.routes.core :refer :all]
             [remembrance.models.note :as note]
+            [remembrance.routes.articles :refer [article-collection-json]]
             [liberator.core :refer [defresource]]))
 
 (defn notes-stats-json []
@@ -16,7 +17,7 @@
    :guid (:note/guid note)
    :title (or (:note/title note) "")
    :body (or (:note/body note) "")
-   :articles (remembrance.routes.articles/article-collection-json (:note/articles note))})
+   :articles (article-collection-json (:note/articles note))})
 
 (defn note-collection-json [coll]
   (map note-wrap-json coll))
