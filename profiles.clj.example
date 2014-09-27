@@ -1,9 +1,0 @@
-{:dev  {:env {:api-version "1.1.0"
-              :hostname "http://remembrance.local:3000"
-              :database-uri "datomic:pro//localhost:4334/remembrance"
-              :newspaper-delivery-uri "http://localhost:5000"}}
-
- :test {:env {:api-version "1.1.0"
-              :hostname "http://remembrance.local:3000"
-              :database-uri "datomic:mem://test"
-              :newspaper-delivery-uri "http://newspaper.local"}}}

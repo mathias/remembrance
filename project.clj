@@ -37,11 +37,12 @@
   :profiles {:dev
              {:datomic {:config "resources/sql-transactor-template.properties"
                         :db-uri "datomic:sql://remembrance?jdbc:postgresql://localhost:5432/datomic?user=datomic&password=datomic"}
-              :env {:api-version "1.1.0"
+              :env {:database-uri "datomic:sql://remembrance?jdbc:postgresql://localhost:5432/datomic?user=datomic&password=datomic"
                     :hostname "http://remembrance.local:3000"
-                    :database-uri "datomic:sql://remembrance?jdbc:postgresql://localhost:5432/datomic?user=datomic&password=datomic"
                     :newspaper-delivery-uri "http://localhost:5000"}}
-             :test {:env {:database-uri "datomic:mem://test"}}}
+             :test {:env {:database-uri "datomic:mem://test"
+                          :hostname "http://remembrance.local:3000"
+                          :newspaper-delivery-uri "http://localhost:5000"}}}
 
   :ring {:handler remembrance.core/remembrance-handler
          :init remembrance.core/remembrance-init

@@ -3,10 +3,12 @@
             [io.rkn.conformity :as c]
             [environ.core :refer [env]]))
 
-(def connection (d/connect (env :database-uri)))
+(def connection
+  (let [db-uri (env :database-uri)]
+    (d/create-database db-uri)
+    (d/connect db-uri)))
 
-(defn db []
-  (d/db connection))
+(def db #(d/db connection))
 
 (def t #(d/transact connection %))
 

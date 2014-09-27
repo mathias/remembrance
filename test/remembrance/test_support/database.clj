@@ -5,7 +5,7 @@
             [environ.core :refer [env]]))
 
 (defn fresh-conn! []
-  (let [uri (env :test-db-uri)]
+  (let [uri (env :database-uri)]
      (d/delete-database uri)
      (d/create-database uri)
      (d/connect uri)))
