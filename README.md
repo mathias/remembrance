@@ -1,8 +1,11 @@
 # remembrance
 
-> “Remembrance of things past is not necessarily the remembrance of things as they were.”
+>"A moment." Manfred tries to remember what address to ping. It's useless, and painfully frustrating. "It would help if I could remember where I keep the rest of my mind," he complains. "It used to be at – oh, there."
 
-&mdash; Marcel Proust
+>An elephantine semantic network sits down on his spectacles as soon as he asks for the site, crushing his surroundings into blocky pixilated monochrome that jerks as he looks around. "This is going to take some time," he warns his hosts as a goodly chunk of his metacortex tries to handshake with his brain over a wireless network connection that was really only designed for web browsing. The download consists of the part of his consciousness that isn't security-critical – public access actors and vague opinionated rants – but it clears down a huge memory castle, sketching in the outline of a map of miracles and wonders onto the whitewashed walls of the room.
+
+-- Accelerando by Charlie Stross <http://www.antipope.org/charlie/blog-static/fiction/accelerando/accelerando-intro.html>
+
 
 An experiment in building a system of augmented memory, targeting the cloud and (evenutually) wearable computing. Lots of academic papers and scifi novels inspired this project.
 
@@ -10,13 +13,9 @@ An experiment in building a system of augmented memory, targeting the cloud and 
 
 You will need the free Datomic Pro Starter Edition first. The recommended local storage is either the `dev` or `sql` adapter running on Postgres with `memcached`. How to get a Clojure webapp up and running with Datomic (and how to run Datomic) is beyond the scope of this; since I don't really intend for anyone to actually run this but me.
 
-Install deps:
-
-```bash
-lein deps
-```
-
 Configure your storage, drop your key into the `.properties` file, etc.
+
+Copy `resources/config.edn.example` to `resources/config.edn` and edit as appropriate with your values.
 
 You should now be able to run the webapp with:
 
@@ -24,10 +23,7 @@ You should now be able to run the webapp with:
 lein ring server-headless
 ```
 
-Migrations will run automatically on the Datomic db. (See [database.clj](https://github.com/mathias/remembrance/blob/13cb60472df2d48e3c536520c4c5573a16237849/src/clj/remembrance/database.clj) for migration system built on top of https://github.com/rkneufeld/conformity
-
-For now, ingesting Instapaper CSVs is broken. It will soon use the worker queue and be mostly concerned with parsing CSVs, removing the knowledge about articles and how they are created. I'd also like to support importing Google Reader JSON archives (starred, commented on, etc. will all get ingested as read articles)
-
+Migrations will run automatically on the Datomic data store. (See [database.clj](https://github.com/mathias/remembrance/blob/13cb60472df2d48e3c536520c4c5573a16237849/src/clj/remembrance/database.clj) for migration system built on top of https://github.com/rkneufeld/conformity
 
 ### Development conventions:
 
@@ -52,7 +48,7 @@ Liberator makes our request-response cycle much more controllable and understand
 
 **Never** run `lein datomic initialize` -- it will destroy data, and we no longer use `lein datomic`'s concept of a schema file!
 
-## Features, TODOs, wishful thinking.
+## Features, TODOs, wishful thinking, etc.
 
 - [x] Need to remove the Redis-backed worker queue. Eventually, I see that work being done by https://github.com/mathias/herman
 - [x] Finish rewriting to use Liberator.
@@ -61,22 +57,6 @@ Liberator makes our request-response cycle much more controllable and understand
 - [ ] Lots more that I'm probably not thinking of right now.
 
 Future features:
-
-* Automatically pull in each webpage read with a Chrome extension, to be indexed and searchable (with a lower "importance" score than manually added articles.)
-* Move all of my RSS feed reading activities to this app, using a cron-like feed updater.
-* Index emails sent/received for later searching and cross-referencing, with lower "importance"
-* Features utilizing topic modeling + TDF/IF scores to find related content and suggest related content. (See: http://infolab.stanford.edu/~ullman/mmds.html )
-
-Someday:
-
-* A ClojureScript-based mobile-first UI that provides as good or better experience as reading content in Instapaper native iOS app. One can dream.
-* Full instrumentation about time taken to read, etc.
-* Suggest related content, possibly web search / web crawling built in to crawl for other related content not yet in the data store.
-* Features that otherwise help this app be a research assistant.
-
-Related but maybe not living in this app:
-
-* Quantified self style datastore for personal analytics: Fitbit steps, Strava bike rides, Lift habit goals, RescueTime-like application usage tracking, and any other data I generate day-to-day. Since this won't be lots of text to be indexed/search, it probably doesn't make sense to store it in this app.
 
 ## License
 
