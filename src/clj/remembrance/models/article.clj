@@ -67,7 +67,7 @@
   [:article/original_url
    :article/guid])
 
-(def allowed-articles-keys-for-update
+(def allowed-articles-keys-for-user-update
   [:article/read])
 
 (def article-keys-translations
@@ -84,7 +84,7 @@
 (defn translate-update-key-names [params]
   (-> params
       (clojure.set/rename-keys article-keys-translations)
-      (select-keys allowed-articles-keys-for-update)))
+      (select-keys allowed-articles-keys-for-user-update)))
 
 (defn translate-update-values [params]
   (if (= (type (:article/read params)) java.lang.String)
