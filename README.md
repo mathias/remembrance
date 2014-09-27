@@ -4,7 +4,7 @@
 
 >An elephantine semantic network sits down on his spectacles as soon as he asks for the site, crushing his surroundings into blocky pixilated monochrome that jerks as he looks around. "This is going to take some time," he warns his hosts as a goodly chunk of his metacortex tries to handshake with his brain over a wireless network connection that was really only designed for web browsing. The download consists of the part of his consciousness that isn't security-critical – public access actors and vague opinionated rants – but it clears down a huge memory castle, sketching in the outline of a map of miracles and wonders onto the whitewashed walls of the room.
 
--- Accelerando by Charlie Stross <http://www.antipope.org/charlie/blog-static/fiction/accelerando/accelerando-intro.html>
+&mdash; Accelerando by Charlie Stross <http://www.antipope.org/charlie/blog-static/fiction/accelerando/accelerando-intro.html>
 
 
 An experiment in building a system of augmented memory, targeting the cloud and (evenutually) wearable computing. Lots of academic papers and scifi novels inspired this project.
@@ -69,4 +69,4 @@ Pull Requests Accepted, but:
 
 > "Am have been badly burned by viral end-user license agreements. Have no desire to experiment with patent shell companies held by Chechen infoterrorists. You are human, you must not worry cereal company repossess your small intestine because digest unlicensed food with it, right? Manfred, you must help me-we. Am wishing to defect."
 
--- Accelerando by Charlie Stross <http://www.antipope.org/charlie/blog-static/fiction/accelerando/accelerando-intro.html>
+&mdash; Accelerando by Charlie Stross <http://www.antipope.org/charlie/blog-static/fiction/accelerando/accelerando-intro.html>
