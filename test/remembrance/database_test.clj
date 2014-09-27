@@ -1,7 +1,7 @@
 (ns remembrance.database-test
   (:require [midje.sweet :refer :all]
             [clojure.test :refer :all]
-            [remembrance.config :refer [env]]
+            [environ.core :refer [env]]
             [datomic.api :as d]
             [remembrance.test-support.database :refer :all]
             [remembrance.database :refer :all]))

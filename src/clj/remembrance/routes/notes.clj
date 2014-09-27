@@ -1,6 +1,6 @@
 (ns remembrance.routes.notes
   (:require [cemerick.url :refer [url]]
-            [remembrance.config :refer [env]]
+            [environ.core :refer [env]]
             [remembrance.routes.core :refer :all]
             [remembrance.models.note :as note]
             [remembrance.routes.articles :refer [article-collection-json]]

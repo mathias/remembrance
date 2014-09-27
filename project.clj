@@ -9,6 +9,7 @@
                  [com.cemerick/url "0.1.1"]
                  [com.datomic/datomic-pro "0.9.4384"]
                  [com.taoensso/timbre "3.3.1"]
+                 [environ "1.0.0"]
                  [hearst "0.1.2"]
                  [hiccup "1.0.5"]
                  [http-kit "2.1.19"]
@@ -20,43 +21,36 @@
                  [playnice "1.0.1"]
                  [prismatic/schema "0.3.0"]
                  [ring/ring-jetty-adapter "1.3.1"]
-                 [ring/ring-json "0.3.1"]]
+                 [ring/ring-json "0.3.1"]
+                 [midje "1.6.3"]
+                 [ring-mock "0.1.5"]]
 
   ;; clojure source code pathname
   :source-paths ["src/clj"]
 
-  :plugins [;; cljsbuild plugin
-            [lein-cljsbuild "1.0.3"]
+  :plugins [[lein-cljsbuild "1.0.3"]
             [lein-cloverage "1.0.2"]
-
-            ;; ring plugin
+            [lein-environ "1.0.0"]
+            [lein-midje "3.1.3"]
             [lein-ring "0.8.11"]]
 
-  ;; datomic configuration
   :profiles {:dev
              {:datomic {:config "resources/sql-transactor-template.properties"
                         :db-uri "datomic:sql://remembrance?jdbc:postgresql://localhost:5432/datomic?user=datomic&password=datomic"}
-              :dependencies [[midje "1.6.3"]
-                             [ring-mock "0.1.5"]]
-              :plugins [[lein-midje "3.1.3"]]}}
+              :env {:api-version "1.1.0"
+                    :hostname "http://remembrance.local:3000"
+                    :database-uri "datomic:sql://remembrance?jdbc:postgresql://localhost:5432/datomic?user=datomic&password=datomic"
+                    :newspaper-delivery-uri "http://localhost:5000"}}
+             :test {:env {:database-uri "datomic:mem://test"}}}
 
-  ;; ring tasks configuration
   :ring {:handler remembrance.core/remembrance-handler
          :init remembrance.core/remembrance-init
          :auto-refresh true
          :nrepl {:start? true}}
 
-  ;; cljsbuild tasks configuration
+
   :cljsbuild {:builds
-              [{;; clojurescript source code path
-                :source-paths ["src/cljs"]
-
-                ;; Google Closure Compiler options
-                :compiler {;; the name of the emitted JS file
-                           :output-to "resources/public/js/application.js"
-
-                           ;; use minimal optimization CLS directive
+              [{:source-paths ["src/cljs"]
+                :compiler {:output-to "resources/public/js/application.js"
                            :optimizations :whitespace
-
-                           ;; prettyfying emitted JS
                            :pretty-print true}}]})

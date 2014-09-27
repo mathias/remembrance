@@ -2,7 +2,7 @@
   (:require [midje.sweet :refer :all]
             [datomic.api :as d]
             [remembrance.database :refer [prepare-database!]]
-            [remembrance.config :refer [env]]))
+            [environ.core :refer [env]]))
 
 (defn fresh-conn! []
   (let [uri (env :test-db-uri)]

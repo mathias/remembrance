@@ -2,7 +2,7 @@
   (:require [liberator.core :refer [defresource]]
             [cemerick.url :refer [url url-encode]]
             [schema.coerce :as coerce]
-            [remembrance.config :refer [env]]
+            [environ.core :refer [env]]
             [remembrance.models.article :as article]
             [remembrance.models.note :as note]
             [remembrance.routes.core :refer :all]

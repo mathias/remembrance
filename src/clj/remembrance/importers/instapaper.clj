@@ -13,4 +13,10 @@
         lowercased-headers (map string/lower-case headers)]
     (map #(->> % (zipmap lowercased-headers) keywordize-keys) rows)))
 
+(defn create-and-import-article [article-data]
+  (let [new-article (create-article article-data)]
+    ))
 
+(defn import-from-post [csv-data]
+  (let [articles-to-import (parse-csv csv-data)]
+    (map create-and-import-article articles-to-import)))

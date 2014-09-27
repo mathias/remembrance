@@ -1,6 +1,5 @@
 (ns remembrance.core
-  (:require [remembrance.config :refer [production-env?]]
-            [remembrance.database :refer [prepare-database! db]]
+  (:require [remembrance.database :refer [prepare-database! db]]
             [remembrance.routes.core :refer [respond-with]]
             [remembrance.routes.api :as api]
             [remembrance.routes.articles :as articles]
@@ -9,6 +8,9 @@
             [playnice.core :refer [dassoc] :as playnice]
             [ring.middleware.params :refer [wrap-params]]
             [taoensso.timbre :refer [info]]))
+
+(defn production-env? []
+  (memoize (= (env :ring-env) "production")))
 
 (def routes (atom {}))
 

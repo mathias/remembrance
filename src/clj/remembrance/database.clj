@@ -1,14 +1,9 @@
 (ns remembrance.database
   (:require [datomic.api :as d]
             [io.rkn.conformity :as c]
-            [remembrance.config :refer [env]]))
+            [environ.core :refer [env]]))
 
-(def db-uri
-  (if remembrance.config/production-env?
-    (env :db-uri)
-    (env :test-db-uri)))
-
-(def connection (d/connect db-uri))
+(def connection (d/connect (env :database-uri)))
 
 (defn db []
   (d/db connection))
