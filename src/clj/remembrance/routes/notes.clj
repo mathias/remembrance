@@ -24,7 +24,8 @@
 
 (defresource index-path
   resource-defaults
-  :available-media-types ["application/json" "application/x-www-form-urlencoded"]
+  :available-media-types ["application/json"
+                          "application/x-www-form-urlencoded"]
   :allowed-methods [:get :post]
   :handle-ok (fn [_]
                (jsonify {:notes (note-collection-json (note/find-all-notes))}))
@@ -39,10 +40,12 @@
 
 (defresource show-note
   resource-defaults
-  :available-media-types ["application/json" "application/x-www-form-urlencoded"]
+  :available-media-types ["application/json"
+                          "application/x-www-form-urlencoded"]
   :allowed-methods [:get :put]
   :exists? (fn [ctx]
-             (if-let [note (note/find-note-by-guid (get-in ctx [:request :guid]))]
+             (if-let [note (note/find-note-by-guid
+                            (get-in ctx [:request :guid]))]
                {::note note}))
   :handle-ok (fn [ctx]
                (jsonify {:notes [(note-wrap-json (get ctx ::note))]}))
@@ -53,7 +56,9 @@
           (dosync
            (let [note (get ctx ::note)
                  attributes (keywordize-form-params ctx)]
-             (note/update-note remembrance.database/connection note attributes)))))
+             (note/update-note remembrance.database/connection
+                               note
+                               attributes)))))
 
 (defresource search
   resource-defaults

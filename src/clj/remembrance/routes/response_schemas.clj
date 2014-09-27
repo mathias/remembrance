@@ -27,7 +27,8 @@
    :read s/Bool})
 
 (def FullArticleList
-  "JSON schema for individual full article, but we always put it in an articles array"
+  "JSON schema for individual full article, but we always put it in an articles
+  array"
   {:articles [FullArticle]})
 
 (def ArticleList

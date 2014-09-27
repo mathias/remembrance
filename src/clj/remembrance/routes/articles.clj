@@ -43,9 +43,15 @@
 (defn articles-stats-json []
   (let [db (remembrance.database/db)]
     {:total (article/count-all-articles db)
-     :ingested (article/count-articles-with-ingest-state db :article.ingest_state/ingested)
-     :fetched (article/count-articles-with-ingest-state db :article.ingest_state/fetched)
-     :errored (article/count-articles-with-ingest-state db :article.ingest_state/errored)
+     :ingested
+     (article/count-articles-with-ingest-state db
+                                               :article.ingest_state/ingested)
+     :fetched
+     (article/count-articles-with-ingest-state db
+                                               :article.ingest_state/fetched)
+     :errored
+     (article/count-articles-with-ingest-state db
+                                               :article.ingest_state/errored)
      :read (article/count-read-articles db)}))
 
 (defn create-and-enqueue-article [params]
@@ -57,28 +63,33 @@
 
 (defresource index-path
   resource-defaults
-  :available-media-types ["application/json" "application/x-www-form-urlencoded"]
+  :available-media-types ["application/json"
+                          "application/x-www-form-urlencoded"]
   :allowed-methods [:get :post]
   :handle-ok (fn [_]
                (jsonify {:articles (article-collection-json
                                     (article/find-all-ingested-articles))}))
   :post! (fn [ctx]
            (dosync
-            (let [guid (create-and-enqueue-article (keywordize-form-params ctx))]
+            (let [guid (create-and-enqueue-article
+                        (keywordize-form-params ctx))]
               {::guid guid})))
   :post-redirect? (fn [ctx]
                     {:location (article-show-url (::guid ctx))}))
 
 (defresource show-article
   resource-defaults
-  :available-media-types ["application/json" "application/x-www-form-urlencoded"]
+  :available-media-types ["application/json"
+                          "application/x-www-form-urlencoded"]
   :allowed-methods [:get :put]
 
   :exists? (fn [ctx]
-             (if-let [article (article/find-article-by-guid (get-in ctx [:request :guid]))]
+             (if-let [article (article/find-article-by-guid
+                               (get-in ctx [:request :guid]))]
                {::article article}))
   :handle-ok (fn [ctx]
-               (jsonify {:articles [(full-article-wrap-json (get ctx ::article))]}))
+               (jsonify {:articles [(full-article-wrap-json
+                                     (get ctx ::article))]}))
   :can-put-to-missing? false
   :new? false
   :respond-with-entity? true
@@ -86,7 +97,9 @@
           (dosync
            (let [article (get ctx ::article)
                  attributes (keywordize-form-params ctx)]
-             (article/update-article remembrance.database/connection article attributes)))))
+             (article/update-article remembrance.database/connection
+                                     article
+                                     attributes)))))
 
 (defresource search
   resource-defaults
@@ -94,7 +107,8 @@
   :allowed-methods [:get]
   :handle-ok (fn [ctx]
                (let [query (:q (keywordize-query-params ctx))
-                     articles (article-collection-json (article/search-articles query))]
+                     articles (article-collection-json
+                               (article/search-articles query))]
                  (jsonify {:articles articles}))))
 
 (defresource stats

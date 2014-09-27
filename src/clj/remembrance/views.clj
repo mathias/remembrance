@@ -19,13 +19,19 @@
       [:h3 "Articles"]
       [:ul
        [:li (str "There are " total-articles-count " articles in the system.")]
-       [:li (str (count-articles-with-ingest-state :article.ingest_state/ingested)
-                " ingested, "
-                (count-articles-with-ingest-state :article.ingest_state/fetched)
-                " waiting to be ingested, and "
-                (count-articles-with-ingest-state :article.ingest_state/errored)
-                " errored.")]
-       [:li (str "You have read " (count-read-articles) " out of " total-articles-count ".")]]
+       [:li (str
+             (count-articles-with-ingest-state :article.ingest_state/ingested)
+             " ingested, "
+             (count-articles-with-ingest-state :article.ingest_state/fetched)
+             " waiting to be ingested, and "
+             (count-articles-with-ingest-state :article.ingest_state/errored)
+             " errored.")]
+       [:li (str
+             "You have read "
+             (count-read-articles)
+             " out of "
+             total-articles-count
+             ".")]]
       [:h3 "Notes"]
       [:ul
        [:li (str "There are " total-notes-count " notes in the system.")]]])))
