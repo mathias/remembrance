@@ -5,10 +5,15 @@
 
 (def example-instapaper-csv (slurp "test/remembrance/test_support/example-instapaper.csv"))
 
-(deftest parse-file-fn-tests
+(deftest parse-csv-fn-tests
   (fact "Parses a simple Instapaper CSV into seq of expected maps"
-    (parse-file example-instapaper-csv) => (just [{:folder "Unread"
+    (parse-csv example-instapaper-csv) => (just [{:folder "Unread"
                                                    :selection ""
                                                    :title "Knapsack problem - Wikipedia, the free encyclopedia"
                                                    :url "http://en.wikipedia.org/wiki/Knapsack_problem"}])))
 
+(deftest newspaper-url-fn-tests
+  (fact "Appends the URL-encoded URL to newspaper-delivery URL"
+    ;; note that test-env has newspaper-deliver-url set to"http://localhost:5000"
+    (let [original-url "http://example.com"]
+      (newspaper-url original-url) => "http://localhost:5000/article?url=http%253A%252F%252Fexample.com")))
