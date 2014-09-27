@@ -1,5 +1,5 @@
 (defproject remembrance "0.1.1"
-  :description "Note taking"
+  :description "Where is my mind?"
   :url "https://github.com/mathias/remembrance"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
@@ -19,7 +19,6 @@
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
                  [playnice "1.0.1"]
                  [prismatic/schema "0.3.0"]
-                 [ring-mock "0.1.5"]
                  [ring/ring-jetty-adapter "1.3.1"]
                  [ring/ring-json "0.3.1"]]
 
@@ -37,7 +36,8 @@
   :profiles {:dev
              {:datomic {:config "resources/sql-transactor-template.properties"
                         :db-uri "datomic:sql://remembrance?jdbc:postgresql://localhost:5432/datomic?user=datomic&password=datomic"}
-              :dependencies [[midje "1.6.3"]]
+              :dependencies [[midje "1.6.3"]
+                             [ring-mock "0.1.5"]]
               :plugins [[lein-midje "3.1.3"]]}}
 
   ;; ring tasks configuration
