@@ -6,6 +6,7 @@
             [clojure.string :as string]
             [clojure.core.async :refer [chan go <! >!]]
             [environ.core :refer [env]]
+            [org.httpkit.client :as http]
             [taoensso.timbre :refer [info]]))
 
 (def create-and-ingest-article-chan (chan))
@@ -21,7 +22,8 @@
         lowercased-headers (map string/lower-case headers)]
     (map #(->> % (zipmap lowercased-headers) keywordize-keys) rows)))
 
-(defn import-article [article])
+(defn import-article [article]
+  (:body @(http/get (newspaper-url (:original_url article)))))
 
 (defn create-and-import-article [article-data]
   (let [new-article (create-article article-data)]

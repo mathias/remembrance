@@ -1,6 +1,7 @@
 (ns remembrance.importers.instapaper-test
   (:require [midje.sweet :refer :all]
             [clojure.test :refer :all]
+            [org.httpkit.fake :refer :all]
             [remembrance.importers.instapaper :refer :all]))
 
 (def example-instapaper-csv (slurp "test/remembrance/test_support/example-instapaper.csv"))
@@ -17,3 +18,8 @@
     ;; note that test-env has newspaper-deliver-url set to"http://localhost:5000"
     (let [original-url "http://example.com"]
       (newspaper-url original-url) => "http://localhost:5000/article?url=http%253A%252F%252Fexample.com")))
+
+(deftest http-kit-testing
+  (let [response "{\"text\": \"a fake response\"}"]
+    (with-fake-http [#"^http://localhost:5000/article" response]
+      (fact (import-article {:original_url "http://example.com"}) => response))))

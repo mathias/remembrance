@@ -40,7 +40,8 @@
               :env {:database-uri "datomic:sql://remembrance?jdbc:postgresql://localhost:5432/datomic?user=datomic&password=datomic"
                     :hostname "http://remembrance.local:3000"
                     :newspaper-delivery-uri "http://localhost:5000"}}
-             :test {:env {:database-uri "datomic:mem://test"
+             :test {:dependencies [[http-kit.fake "0.2.1"]]
+                    :env {:database-uri "datomic:mem://test"
                           :hostname "http://remembrance.local:3000"
                           :newspaper-delivery-uri "http://localhost:5000"}}}
 
