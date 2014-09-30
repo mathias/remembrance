@@ -19,7 +19,7 @@
     (let [original-url "http://example.com"]
       (newspaper-url original-url) => "http://localhost:5000/article?url=http%253A%252F%252Fexample.com")))
 
-(deftest http-kit-testing
-  (let [response "{\"text\": \"a fake response\"}"]
+(deftest import-article-fn-tests
+  (let [response (slurp "test/remembrance/test_support/example-article.json")]
     (with-fake-http [#"^http://localhost:5000/article" response]
       (fact (import-article {:original_url "http://example.com"}) => response))))
