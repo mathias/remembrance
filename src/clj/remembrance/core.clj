@@ -26,6 +26,7 @@
   (route "/" (fn [req] (respond-with (index-page))))
 
   ;; API
+  (route "/api/" api/api-map)
   (route "/api/articles" articles/index-path)
   (route "/api/articles/:guid" articles/show-article)
   (route "/api/articles/search" articles/search)

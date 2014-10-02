@@ -1,6 +1,5 @@
 (ns remembrance.routes.notes
-  (:require [cemerick.url :refer [url]]
-            [environ.core :refer [env]]
+  (:require [remembrance.routes.route-helpers :refer :all]
             [remembrance.routes.core :refer :all]
             [remembrance.models.note :as note]
             [remembrance.routes.articles :refer [article-collection-json]]
@@ -8,9 +7,6 @@
 
 (defn notes-stats-json []
   {:total (note/count-notes)})
-
-(defn note-show-url [guid]
-  (str (assoc (url (env :hostname)) :path (str "/api/notes/" guid))))
 
 (defn note-wrap-json [note]
   {:href (note-show-url (:note/guid note))

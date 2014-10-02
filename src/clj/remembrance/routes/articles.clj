@@ -1,16 +1,13 @@
 (ns remembrance.routes.articles
   (:require [liberator.core :refer [defresource]]
-            [cemerick.url :refer [url url-encode]]
             [schema.coerce :as coerce]
             [environ.core :refer [env]]
             [remembrance.models.article :as article]
             [remembrance.models.note :as note]
             [remembrance.routes.core :refer :all]
+            [remembrance.routes.route-helpers :refer :all]
             [remembrance.routes.response-schemas :refer :all]
             [ring.util.response :refer [redirect]]))
-
-(defn article-show-url [guid]
-  (str (assoc (url (env :hostname)) :path (str "/api/articles/" guid))))
 
 (def coerce-article-response
   (coerce/coercer ArticleInfo coerce/json-coercion-matcher))
