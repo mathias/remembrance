@@ -105,11 +105,13 @@
   resource-defaults
   :available-media-types ["application/json"]
   :allowed-methods [:get]
+  :exists? (fn [ctx]
+               (if-let [query (:q (keywordize-query-params ctx))]
+                 (let [articles (article-collection-json
+                                 (article/search-articles query))]
+                   {::articles articles})))
   :handle-ok (fn [ctx]
-               (let [query (:q (keywordize-query-params ctx))
-                     articles (article-collection-json
-                               (article/search-articles query))]
-                 (jsonify {:articles articles}))))
+               (jsonify {:articles (get ctx ::articles)})))
 
 (defresource stats
   resource-defaults
