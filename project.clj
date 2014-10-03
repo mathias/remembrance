@@ -23,7 +23,8 @@
                  [ring/ring-jetty-adapter "1.3.1"]
                  [ring/ring-json "0.3.1"]
                  [midje "1.6.3"]
-                 [ring-mock "0.1.5"]]
+                 [ring-mock "0.1.5"]
+                 [http-kit.fake "0.2.1"]]
 
   :source-paths ["src/clj"]
 
@@ -39,8 +40,7 @@
               :env {:database-uri "datomic:sql://remembrance?jdbc:postgresql://localhost:5432/datomic?user=datomic&password=datomic"
                     :hostname "http://remembrance.local:3000"
                     :newspaper-delivery-uri "http://localhost:5000"}}
-             :test {:dependencies [[http-kit.fake "0.2.1"]]
-                    :env {:database-uri "datomic:mem://test"
+             :test {:env {:database-uri "datomic:mem://test"
                           :hostname "http://remembrance.local:3000"
                           :newspaper-delivery-uri "http://testing:5000"}}}
 
