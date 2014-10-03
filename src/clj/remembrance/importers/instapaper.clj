@@ -2,13 +2,13 @@
   (:require [remembrance.models.article :refer :all]
             [cemerick.url :refer [url url-encode]]
             [cheshire.core :refer [parse-string]]
+            [clojure.core.async :refer [chan go <! >! close!]]
             [clojure-csv.core :as csv]
             [clojure.walk :refer [keywordize-keys]]
             [clojure.string :refer [lower-case]]
             [environ.core :refer [env]]
             [org.httpkit.client :as http]
-            [taoensso.timbre :refer [info]]))
-
+            [taoensso.timbre :refer [info error]]))
 
 (defn parse-csv [csv-data]
   (let [[headers & rows] (csv/parse-csv csv-data)
@@ -28,6 +28,9 @@
         ingest-time (:ingest-time opts)
         response-data (parse-string response-body)]
     ;; TODO: create authors, if any
+
+    (info "Fetched article:" (:article/original_url article))
+
     (data-import-article db-conn
                          article
                          {:title (get response-data "title" "")
@@ -43,18 +46,18 @@
                           :summary (get response-data "summary" "")
                           :tags (get response-data "tags" [])})))
 
-(defn import-article-callback
+(defn handle-newspaper-response
   [{:keys [status headers body error opts]}]
-  (if error
-    (info "Article request failed:" (get-in opts [:article :article/original_url]))
-    (update-article-with body opts)))
+  (if (and (= status 200) (not error))
+    (update-article-with body opts)
+    (info "Article request failed:" (get-in opts [:article :article/original_url]))))
 
 (defn fetch-from-newspaper-delivery [db-conn article]
   (let [opts {:article article
               :db-conn db-conn
               :ingest-time (java.util.Date.)}
         original-url (:article/original_url article)]
-    (http/get (newspaper-url original-url) opts import-article-callback)))
+    (handle-newspaper-response @(http/get (newspaper-url original-url) opts))))
 
 (defn valid-row? [article-data]
   (not (nil? (get article-data :url))))
@@ -63,15 +66,29 @@
   (when (= "Archive" (:folder row))
      (mark-article-as-read db-conn article)))
 
-(defn create-and-import-article
-  ([article-data] (create-and-import-article remembrance.database/connection article-data))
+(defn create-and-setup-article
+  ([article-data] (create-and-setup-article remembrance.database/connection article-data))
   ([db-conn article-data]
-     (when (valid-row? article-data)
-       (let [new-article (create-article db-conn article-data)]
-         (set-read-status db-conn new-article article-data)
-         (fetch-from-newspaper-delivery db-conn new-article)
-         (:article/guid new-article)))))
+     (let [new-article (create-article db-conn article-data)]
+       (set-read-status db-conn new-article article-data)
+       new-article)))
 
-(defn import-articles [csv-data]
-  (let [articles-to-import (parse-csv csv-data)]
-    (map create-and-import-article articles-to-import)))
+(defn import-articles
+  ([csv-data] (import-articles remembrance.database/connection csv-data))
+  ([db-conn csv-data]
+     (let [import-chan (chan 4)]
+       (go
+         (doseq [row (parse-csv csv-data)]
+           (when (valid-row? row)
+             (let [article (create-and-setup-article db-conn row)]
+               (when (not= (:article/ingest_state article) :article.ingest_state/ingested)
+                 (>! import-chan [db-conn article]))))))
+
+       (go
+         (while true
+           (let [[db-conn article] (<! import-chan)]
+             (fetch-from-newspaper-delivery db-conn article)))))))
+
+(comment
+  (def article-csv (slurp "instapaper-export.csv"))
+  (import-articles article-csv))

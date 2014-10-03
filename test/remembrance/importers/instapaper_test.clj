@@ -37,17 +37,14 @@
       =>
       response)
 
-    (facts "when no URL is provided"
-      (let [our-conn (prepare-migrated-db-conn)
-            article-data {:url nil :title "Broken"}]
-        (fact "Does nothing"
-          (create-and-import-article our-conn article-data) => nil)))
-
     (facts "when new articles are created"
       (let [our-conn (prepare-migrated-db-conn)
             article-data {:url "http://example.com" :title "Example"}]
-        (fact "returns the guid of the newly-created article"
-          (create-and-import-article our-conn article-data) => string?))))
+        (fact "returns the newly-created article"
+          (-> (create-and-setup-article our-conn article-data)
+              (:article/original_url))
+          =>
+          "http://example.com"))))
 
   (deftest update-article-with-fn-tests
     (let [our-conn (prepare-conn-with-seed-data)
