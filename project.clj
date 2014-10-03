@@ -25,7 +25,6 @@
                  [midje "1.6.3"]
                  [ring-mock "0.1.5"]]
 
-  ;; clojure source code pathname
   :source-paths ["src/clj"]
 
   :plugins [[lein-cljsbuild "1.0.3"]
@@ -43,7 +42,7 @@
              :test {:dependencies [[http-kit.fake "0.2.1"]]
                     :env {:database-uri "datomic:mem://test"
                           :hostname "http://remembrance.local:3000"
-                          :newspaper-delivery-uri "http://localhost:5000"}}}
+                          :newspaper-delivery-uri "http://testing:5000"}}}
 
   :ring {:handler remembrance.core/remembrance-handler
          :init remembrance.core/remembrance-init
