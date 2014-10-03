@@ -26,7 +26,7 @@
     ;; note that test-env has newspaper-deliver-url set to"http://localhost:5000"
     (let [original-url "http://example.com"
           newspaper-delivery-url (env :newspaper-delivery-uri)]
-      (newspaper-url original-url) => (str newspaper-delivery-url "/article?url=http%253A%252F%252Fexample.com"))))
+      (newspaper-url original-url) => (str newspaper-delivery-url "/article?url=http%3A%2F%2Fexample.com"))))
 
 ;; All tests that might try to call out through http-kit need to be inside this
 (let [response (slurp "test/remembrance/test_support/example-article.json")

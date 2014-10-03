@@ -19,7 +19,7 @@
   (-> (env :newspaper-delivery-uri)
       url
       (assoc :path "/article")
-      (assoc :query {:url (url-encode article-original-url)})
+      (assoc :query {:url article-original-url})
       str))
 
 (defn update-article-with [response-body opts]
