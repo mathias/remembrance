@@ -70,16 +70,50 @@
 (def allowed-articles-keys-for-user-update
   [:article/read])
 
+(def allowed-articles-keys-for-data-import
+  [:article/read
+   :article/title
+   :article/readable_body
+   :article/plain_text_body
+   :article/original_html
+   :article/ingest_state
+   :article/date_published
+   :article/date_fetched
+   :article/date_ingested
+   :article/authors
+   :article/keywords
+   :article/meta_language
+   :article/summary
+   :article/tags])
+
 (def article-keys-translations
-  {:original_url :article/original_url
-   :url          :article/original_url
-   :guid         :article/guid
-   :read         :article/read})
+  {:original_url    :article/original_url
+   :url             :article/original_url
+   :guid            :article/guid
+   :read            :article/read
+   :title           :article/title
+   :readable_body   :article/readable_body
+   :plain_text_body :article/plain_text_body
+   :original_html   :article/original_html
+   :ingest_state    :article/ingest_state
+   :date_published  :article/date_published
+   :date_fetched    :article/date_fetched
+   :date_ingested   :article/date_ingested
+   :authors         :article/authors
+   :keywords        :article/keywords
+   :meta_language   :article/meta_language
+   :summary         :article/summary
+   :tags            :article/tags})
 
 (defn translate-create-key-names [params]
   (-> params
       (clojure.set/rename-keys article-keys-translations)
       (select-keys allowed-articles-keys-for-creation)))
+
+(defn translate-data-import-key-names [params]
+  (-> params
+      (clojure.set/rename-keys article-keys-translations)
+      (select-keys allowed-articles-keys-for-data-import)))
 
 (defn translate-update-key-names [params]
   (-> params
@@ -90,6 +124,11 @@
   (if (= (type (:article/read params)) java.lang.String)
     (update-in params [:article/read] read-string)
     params))
+
+(defn translate-data-import-keys-and-values [params]
+  (-> params
+      (translate-data-import-key-names)
+      (translate-update-values)))
 
 (defn translate-update-keys-and-values [params]
   (-> params
@@ -118,12 +157,15 @@
   ([conn params]
      (let [translated-attrs (translate-create-keys-and-values params)
            original-url (:article/original_url translated-attrs)]
-       (when (nil? (find-article-by-original-url (d/db conn) original-url))
+       (if-let [article (find-article-by-original-url (d/db conn) original-url)]
+         article
          ;; create and return new article
          (let [guid (new-guid)
-               article-attrs (merge translated-attrs {:article/guid guid})]
-           (create-article-txn conn article-attrs)))
-       (find-article-by-original-url (d/db conn) original-url))))
+               article-attrs (assoc translated-attrs :article/guid guid)]
+           (create-article-txn conn article-attrs)
+           (find-article-by-original-url (d/db conn) original-url))))))
+
+
 
 (defn update-article-txn [conn article attributes]
   (d/transact conn
@@ -133,6 +175,11 @@
 (defn update-article [conn article params]
   (when-let [guid (:article/guid article)]
     (update-article-txn conn article (translate-update-keys-and-values params))
+    (find-article-by-guid (d/db conn) guid)))
+
+(defn data-import-article [conn article params]
+  (when-let [guid (:article/guid article)]
+    (println (update-article-txn conn article (translate-data-import-keys-and-values params)))
     (find-article-by-guid (d/db conn) guid)))
 
 (defn mark-article-as-read [conn guid]
