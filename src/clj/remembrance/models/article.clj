@@ -4,7 +4,6 @@
             [remembrance.database :refer [db new-guid]]
             [remembrance.models.core :refer [first-entity]]))
 
-
 (defn find-all-ingested-articles-q [db]
   (d/q '[:find ?eid
          :where [?eid :article/ingest_state :article.ingest_state/ingested]]
@@ -165,8 +164,6 @@
            (create-article-txn conn article-attrs)
            (find-article-by-original-url (d/db conn) original-url))))))
 
-
-
 (defn update-article-txn [conn article attributes]
   (d/transact conn
               [(merge {:db/id (:db/id article)}
@@ -179,7 +176,7 @@
 
 (defn data-import-article [conn article params]
   (when-let [guid (:article/guid article)]
-    (println (update-article-txn conn article (translate-data-import-keys-and-values params)))
+    (update-article-txn conn article (translate-data-import-keys-and-values params))
     (find-article-by-guid (d/db conn) guid)))
 
 (defn mark-article-as-read [conn guid]
