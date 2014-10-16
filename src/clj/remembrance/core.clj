@@ -29,6 +29,7 @@
   (route "/api/" api/api-map)
   (route "/api/articles" articles/index-path)
   (route "/api/articles/:guid" articles/show-article)
+  (route "/api/articles/import" articles/import-articles)
   (route "/api/articles/search" articles/search)
   (route "/api/articles/stats" articles/stats)
   (route "/api/notes" notes/index-path)

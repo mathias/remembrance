@@ -5,9 +5,11 @@
             [remembrance.models.article :as article]
             [remembrance.models.note :as note]
             [remembrance.routes.core :refer :all]
+            [remembrance.importers.instapaper :as instapaper]
             [remembrance.routes.route-helpers :refer :all]
             [remembrance.routes.response-schemas :refer :all]
-            [ring.util.response :refer [redirect]]))
+            [ring.util.response :refer [redirect]]
+            [taoensso.timbre :refer [info error]]))
 
 (def coerce-article-response
   (coerce/coercer ArticleInfo coerce/json-coercion-matcher))
@@ -20,8 +22,7 @@
                             :guid (:article/guid article)
                             :title (:article/title article)
                             :original_url (:article/original_url article)
-                            :read (or (:article/read article)
-                                      false)}))
+                            :read (:article/read article)}))
 
 (defn full-article-wrap-json [full-article]
   (coerce-full-article-response
@@ -115,3 +116,12 @@
   :available-media-types ["application/json"]
   :allowed-methods [:get]
   :handle-ok (fn [_] (jsonify {:stats {:articles (articles-stats-json)}})))
+
+(defresource import-articles
+  resource-defaults
+  :available-media-types ["multipart/form-data"]
+  :allowed-methods [:post]
+  :post! (fn [ctx]
+           (with-open [rdr (clojure.java.io/reader (get-in ctx [:request :body]))]
+             (instapaper/import-articles (line-seq rdr))))
+  :post-redirect (fn [ctx] {:location (articles-index-url)}))
