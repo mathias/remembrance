@@ -314,7 +314,7 @@
       (let [our-conn (prepare-conn-with-existing-article)]
         (->> existing-guid
              (mark-article-as-read our-conn)
-             (:article/read)))
+             :article/read))
       =>
       true)))
 
