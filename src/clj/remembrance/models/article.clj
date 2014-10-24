@@ -251,8 +251,9 @@
        ingest-state))
 
 (defn count-articles-with-ingest-state
-  ([ingest-state] count-articles-with-ingest-state (db) ingest-state)
+  ([ingest-state] (count-articles-with-ingest-state (db) ingest-state))
   ([db ingest-state]
-     (-> (count-articles-with-ingest-state-q db ingest-state)
-         (ffirst)
-         (or 0))))
+     (or (->> ingest-state
+              (count-articles-with-ingest-state-q db)
+              ffirst)
+         0)))

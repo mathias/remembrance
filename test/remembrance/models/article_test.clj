@@ -209,7 +209,7 @@
           db (d/db our-conn)]
       (->> :article.ingest_state/ingested
            (count-articles-with-ingest-state-q db)
-           (ffirst)))
+           ffirst))
     =>
     1)
 
@@ -224,11 +224,11 @@
   (fact "returns 0 when there are no articles of given state"
     (let [our-conn (prepare-conn-with-existing-article)
           db (d/db our-conn)]
-      (count-articles-with-ingest-state db :article.ingest_state/fetched))
+      (count-articles-with-ingest-state db :article.ingest_state/errored))
     =>
     0)
 
-  (fact "returns the count when articles exist with ingest stae"
+  (fact "returns the count when articles exist with ingest state"
     (let [our-conn (prepare-conn-with-existing-article)
           db (d/db our-conn)]
       (count-articles-with-ingest-state db :article.ingest_state/ingested))
