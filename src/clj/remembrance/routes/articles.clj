@@ -44,7 +44,7 @@
         fetched-state :article.ingest_state/fetched
         errored-state :article.ingest_state/errored]
     {:total (article/count-all-articles db)
-     :ingested (article/count-articles-with-ingest-state db ingest-state)
+     :ingested (article/count-articles-with-ingest-state db ingested-state)
      :fetched (article/count-articles-with-ingest-state db fetched-state)
      :errored (article/count-articles-with-ingest-state db errored-state)
      :read (article/count-read-articles db)}))
