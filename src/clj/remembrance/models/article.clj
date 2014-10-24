@@ -181,7 +181,11 @@
 
 (defn mark-article-as-read [conn guid]
   (when-let [article (find-article-by-guid (d/db conn) guid)]
-    (update-article conn article {:article/read true})))
+    (update-article-txn conn article {:article/read true})))
+
+(defn mark-article-as-unread [conn guid]
+  (when-let [article (find-article-by-guid (d/db conn) guid)]
+    (update-article-txn conn article {:article/read false})))
 
 (defn count-all-articles-q [db]
   (d/q '[:find (count ?e)

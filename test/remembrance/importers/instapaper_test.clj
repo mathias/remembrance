@@ -1,7 +1,6 @@
 (ns remembrance.importers.instapaper-test
   (:require [midje.sweet :refer :all]
             [clojure.test :refer :all]
-            [datomic.api :as d]
             [org.httpkit.client :as http]
             [org.httpkit.fake :refer :all]
             [environ.core :refer [env]]

@@ -4,7 +4,8 @@
             [clojure.core.async :refer [chan go <! >! close!]]
             [clojure-csv.core :as csv]
             [clojure.walk :refer [keywordize-keys]]
-            [clojure.string :refer [lower-case]]))
+            [clojure.string :refer [lower-case]]
+            [taoensso.timbre :refer [info error]]))
 
 (defn parse-csv [csv-data]
   (let [[headers & rows] (csv/parse-csv csv-data)
@@ -16,7 +17,8 @@
 
 (defn set-read-status [db-conn article row]
   (when (= "Archive" (:folder row))
-     (mark-article-as-read db-conn article)))
+    (info "Setting article as read:" (get article :article/original_url))
+    (mark-article-as-read db-conn (:article/guid article))))
 
 (defn create-and-setup-article
   ([article-data] (create-and-setup-article remembrance.database/connection article-data))
