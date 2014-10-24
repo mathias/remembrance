@@ -41,8 +41,37 @@
   ([db original-url]
      (->> original-url
           (find-article-by-original-url-q db)
-          (first)
+          first
           (first-entity db))))
+
+(defn find-articles-by-tag-q [db tag]
+  (d/q '[:find ?eid
+         :in $ ?tag
+         :where [?eid :article/tags ?tag]]
+       db
+       tag))
+
+(defn find-articles-by-tag
+  ([tag] (find-articles-by-tag (db) tag))
+  ([db tag]
+     (->> tag
+          (find-articles-by-tag-q db)
+          (map #(first-entity db %)))))
+
+(defn find-articles-by-keyword-q [db keyword]
+  (d/q '[:find ?eid
+         :in $ ?keyword
+         :where [?eid :article/keywords ?keyword]]
+       db
+       (clojure.string/lower-case keyword)))
+
+(defn find-articles-by-keyword
+  ([keyword] (find-articles-by-keyword (db) keyword))
+  ([db keyword]
+     (->> keyword
+          (find-articles-by-keyword-q db)
+          (map #(first-entity db %)))))
+
 
 (defn search-articles-q [db query]
   (d/q '[:find ?e
