@@ -122,4 +122,5 @@
            (dosync
             (let [file (slurp (get-in ctx [:request :body]))]
               (instapaper/import-articles file))))
-  :post-redirect? (fn [ctx] {:location (articles-index-url)}))
+  :post-redirect? (fn [ctx]
+                    {:location articles-index-url}))
