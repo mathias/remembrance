@@ -119,6 +119,7 @@
   :available-media-types ["multipart/form-data"]
   :allowed-methods [:post]
   :post! (fn [ctx]
-           (with-open [rdr (clojure.java.io/reader (get-in ctx [:request :body]))]
-             (instapaper/import-articles (line-seq rdr))))
-  :post-redirect (fn [ctx] {:location (articles-index-url)}))
+           (dosync
+            (let [file (slurp (get-in ctx [:request :body]))]
+              (instapaper/import-articles file))))
+  :post-redirect? (fn [ctx] {:location (articles-index-url)}))
