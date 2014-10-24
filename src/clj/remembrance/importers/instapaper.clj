@@ -17,7 +17,6 @@
 
 (defn set-read-status [db-conn article row]
   (when (= "Archive" (:folder row))
-    (info "Setting article as read:" (get article :article/original_url))
     (mark-article-as-read db-conn (:article/guid article))))
 
 (defn create-and-setup-article
