@@ -39,17 +39,14 @@
   (map article-wrap-json collection))
 
 (defn articles-stats-json []
-  (let [db (remembrance.database/db)]
+  (let [db (remembrance.database/db)
+        ingested-state :article.ingest_state/ingested
+        fetched-state :article.ingest_state/fetched
+        errored-state :article.ingest_state/errored]
     {:total (article/count-all-articles db)
-     :ingested
-     (article/count-articles-with-ingest-state db
-                                               :article.ingest_state/ingested)
-     :fetched
-     (article/count-articles-with-ingest-state db
-                                               :article.ingest_state/fetched)
-     :errored
-     (article/count-articles-with-ingest-state db
-                                               :article.ingest_state/errored)
+     :ingested (article/count-articles-with-ingest-state db ingest-state)
+     :fetched (article/count-articles-with-ingest-state db fetched-state)
+     :errored (article/count-articles-with-ingest-state db errored-state)
      :read (article/count-read-articles db)}))
 
 (defn create-and-enqueue-article [params]

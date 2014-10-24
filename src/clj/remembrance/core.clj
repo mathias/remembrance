@@ -65,4 +65,4 @@
 (def remembrance-handler
   (->
    routes-handler
-   (wrap-params)))
+   wrap-params))
