@@ -4,7 +4,6 @@
             [remembrance.routes.api :as api]
             [remembrance.routes.articles :as articles]
             [remembrance.routes.notes :as notes]
-            [remembrance.views :refer [index-page]]
             [playnice.core :refer [dassoc] :as playnice]
             [ring.middleware.params :refer [wrap-params]]
             [environ.core :refer [env]]
@@ -23,7 +22,7 @@
 
 (defn define-routes! []
   ;; Pages
-  (route "/" (fn [req] (respond-with (index-page))))
+  (route "/" (fn [req] (respond-with "Hello world")))
 
   ;; API
   (route "/api/" api/api-map)

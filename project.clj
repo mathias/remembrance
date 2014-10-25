@@ -11,7 +11,6 @@
                  [com.taoensso/timbre "3.3.1"]
                  [environ "1.0.0"]
                  [hearst "0.1.2"]
-                 [hiccup "1.0.5"]
                  [http-kit "2.1.19"]
                  [io.rkn/conformity "0.3.2" :exclusions [com.datomic/datomic-free]]
                  [liberator "0.12.2"]
