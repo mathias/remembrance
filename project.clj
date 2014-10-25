@@ -24,8 +24,6 @@
                  [ring-mock "0.1.5"]
                  [http-kit.fake "0.2.1"]]
 
-  :source-paths ["src/clj"]
-
   :plugins [[lein-cloverage "1.0.2"]
             [lein-environ "1.0.0"]
             [lein-midje "3.1.3"]
