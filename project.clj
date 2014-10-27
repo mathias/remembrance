@@ -29,6 +29,8 @@
             [lein-midje "3.1.3"]
             [lein-ring "0.8.11"]]
 
+  :aliases {"db" ["datomic" "start"]}
+
   :profiles {:dev
              {:datomic {:config "resources/sql-transactor-template.properties"
                         :db-uri "datomic:sql://remembrance?jdbc:postgresql://localhost:5432/datomic?user=datomic&password=datomic"}
